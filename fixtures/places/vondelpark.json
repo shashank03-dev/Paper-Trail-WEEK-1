@@ -1,0 +1,667 @@
+{
+ "meta": {
+  "preset": "vondelpark",
+  "center": {
+   "lat": 52.3584,
+   "lon": 4.8712
+  },
+  "radiusM": 900,
+  "source": "hand-traced",
+  "note": "Hand-traced approximation of OpenStreetMap data for offline demos. Run `pnpm fixtures:fetch` to replace with live OSM. © OpenStreetMap contributors (ODbL)."
+ },
+ "features": [
+  {
+   "id": "n9000053",
+   "kind": "cafe",
+   "name": "'t Blauwe Theehuis",
+   "tags": {
+    "name": "'t Blauwe Theehuis"
+   },
+   "lat": 52.3583,
+   "lon": 4.8716,
+   "distanceM": 29,
+   "bearingDeg": 112
+  },
+  {
+   "id": "n9000069",
+   "kind": "bench",
+   "tags": {
+    "inscription": "yes"
+   },
+   "lat": 52.3581,
+   "lon": 4.8705,
+   "distanceM": 58,
+   "bearingDeg": 235
+  },
+  {
+   "id": "w9000038",
+   "kind": "park",
+   "name": "Vondelpark",
+   "tags": {
+    "name": "Vondelpark"
+   },
+   "lat": 52.358691,
+   "lon": 4.870409,
+   "distanceM": 63,
+   "bearingDeg": 301
+  },
+  {
+   "id": "n9000068",
+   "kind": "bench",
+   "tags": {},
+   "lat": 52.359,
+   "lon": 4.8725,
+   "distanceM": 111,
+   "bearingDeg": 53
+  },
+  {
+   "id": "n9000065",
+   "kind": "drinking_water",
+   "tags": {},
+   "lat": 52.3577,
+   "lon": 4.87,
+   "distanceM": 113,
+   "bearingDeg": 226
+  },
+  {
+   "id": "n9000072",
+   "kind": "tree",
+   "tags": {
+    "species": "Taxodium distichum",
+    "genus": "Taxodium"
+   },
+   "lat": 52.3585,
+   "lon": 4.873,
+   "distanceM": 123,
+   "bearingDeg": 85
+  },
+  {
+   "id": "n9000073",
+   "kind": "tree",
+   "tags": {
+    "genus": "Salix"
+   },
+   "lat": 52.3578,
+   "lon": 4.869,
+   "distanceM": 164,
+   "bearingDeg": 246
+  },
+  {
+   "id": "n9000063",
+   "kind": "fountain",
+   "tags": {},
+   "lat": 52.3589,
+   "lon": 4.874,
+   "distanceM": 198,
+   "bearingDeg": 74
+  },
+  {
+   "id": "n9000075",
+   "kind": "tree",
+   "tags": {},
+   "lat": 52.3596,
+   "lon": 4.8735,
+   "distanceM": 205,
+   "bearingDeg": 49
+  },
+  {
+   "id": "w9000039",
+   "kind": "water",
+   "tags": {},
+   "lat": 52.359057,
+   "lon": 4.874471,
+   "distanceM": 234,
+   "bearingDeg": 72
+  },
+  {
+   "id": "n9000070",
+   "kind": "bench",
+   "tags": {},
+   "lat": 52.3575,
+   "lon": 4.868,
+   "distanceM": 239,
+   "bearingDeg": 245
+  },
+  {
+   "id": "n9000056",
+   "kind": "garden",
+   "name": "Rosarium",
+   "tags": {
+    "name": "Rosarium"
+   },
+   "lat": 52.3566,
+   "lon": 4.8692,
+   "distanceM": 242,
+   "bearingDeg": 214
+  },
+  {
+   "id": "n9000071",
+   "kind": "tree",
+   "tags": {
+    "species": "Platanus x hispanica",
+    "genus": "Platanus"
+   },
+   "lat": 52.3592,
+   "lon": 4.8748,
+   "distanceM": 260,
+   "bearingDeg": 70
+  },
+  {
+   "id": "n9000058",
+   "kind": "playground",
+   "name": "Speeltuin Groot Melkhuis",
+   "tags": {
+    "name": "Speeltuin Groot Melkhuis"
+   },
+   "lat": 52.357,
+   "lon": 4.8673,
+   "distanceM": 307,
+   "bearingDeg": 240
+  },
+  {
+   "id": "n9000057",
+   "kind": "cafe",
+   "name": "Het Groot Melkhuis",
+   "tags": {
+    "name": "Het Groot Melkhuis"
+   },
+   "lat": 52.3572,
+   "lon": 4.8667,
+   "distanceM": 333,
+   "bearingDeg": 246
+  },
+  {
+   "id": "n9000064",
+   "kind": "drinking_water",
+   "tags": {},
+   "lat": 52.3595,
+   "lon": 4.8762,
+   "distanceM": 361,
+   "bearingDeg": 70
+  },
+  {
+   "id": "n9000059",
+   "kind": "historic",
+   "name": "Vondelkerk",
+   "tags": {
+    "name": "Vondelkerk",
+    "historic": "building",
+    "start_date": "1880"
+   },
+   "lat": 52.3614,
+   "lon": 4.874,
+   "distanceM": 384,
+   "bearingDeg": 30
+  },
+  {
+   "id": "n9000062",
+   "kind": "man_made",
+   "name": "Vondeltunnel",
+   "tags": {
+    "name": "Vondeltunnel",
+    "man_made": "bridge"
+   },
+   "lat": 52.3603,
+   "lon": 4.876,
+   "distanceM": 388,
+   "bearingDeg": 57
+  },
+  {
+   "id": "n9000055",
+   "kind": "artwork",
+   "name": "Figure découpée l'Oiseau",
+   "tags": {
+    "name": "Figure découpée l'Oiseau",
+    "artwork_type": "sculpture",
+    "artist_name": "Pablo Picasso"
+   },
+   "lat": 52.3567,
+   "lon": 4.8656,
+   "distanceM": 425,
+   "bearingDeg": 244
+  },
+  {
+   "id": "w9000040",
+   "kind": "water",
+   "tags": {},
+   "lat": 52.356883,
+   "lon": 4.865,
+   "distanceM": 454,
+   "bearingDeg": 248
+  },
+  {
+   "id": "n9000054",
+   "kind": "memorial",
+   "name": "Joost van den Vondel statue",
+   "tags": {
+    "name": "Joost van den Vondel statue",
+    "historic": "memorial",
+    "memorial": "statue"
+   },
+   "lat": 52.36,
+   "lon": 4.8774,
+   "distanceM": 457,
+   "bearingDeg": 67
+  },
+  {
+   "id": "n9000077",
+   "kind": "bus_stop",
+   "name": "Van Baerlestraat",
+   "tags": {
+    "name": "Van Baerlestraat"
+   },
+   "lat": 52.3622,
+   "lon": 4.8742,
+   "distanceM": 469,
+   "bearingDeg": 26
+  },
+  {
+   "id": "n9000067",
+   "kind": "post_box",
+   "tags": {},
+   "lat": 52.362,
+   "lon": 4.8752,
+   "distanceM": 484,
+   "bearingDeg": 34
+  },
+  {
+   "id": "n9000074",
+   "kind": "tree",
+   "tags": {
+    "leaf_type": "broadleaved"
+   },
+   "lat": 52.3569,
+   "lon": 4.8645,
+   "distanceM": 485,
+   "bearingDeg": 250
+  },
+  {
+   "id": "n9000061",
+   "kind": "historic",
+   "name": "Vondelpark Paviljoen",
+   "tags": {
+    "name": "Vondelpark Paviljoen",
+    "historic": "building"
+   },
+   "lat": 52.3601,
+   "lon": 4.8779,
+   "distanceM": 493,
+   "bearingDeg": 67
+  },
+  {
+   "id": "n9000060",
+   "kind": "historic",
+   "name": "Hollandsche Manege",
+   "tags": {
+    "name": "Hollandsche Manege",
+    "historic": "building"
+   },
+   "lat": 52.3614,
+   "lon": 4.8773,
+   "distanceM": 532,
+   "bearingDeg": 51
+  },
+  {
+   "id": "n9000076",
+   "kind": "street_lamp",
+   "tags": {},
+   "lat": 52.3606,
+   "lon": 4.8786,
+   "distanceM": 559,
+   "bearingDeg": 64
+  },
+  {
+   "id": "n9000066",
+   "kind": "bicycle_parking",
+   "tags": {},
+   "lat": 52.3612,
+   "lon": 4.879,
+   "distanceM": 614,
+   "bearingDeg": 60
+  }
+ ],
+ "ways": [
+  {
+   "id": "w9000038",
+   "kind": "park",
+   "name": "Vondelpark",
+   "closed": true,
+   "coords": [
+    [
+     52.3618,
+     4.8795
+    ],
+    [
+     52.3608,
+     4.8745
+    ],
+    [
+     52.3566,
+     4.8578
+    ],
+    [
+     52.3549,
+     4.859
+    ],
+    [
+     52.3561,
+     4.8645
+    ],
+    [
+     52.36,
+     4.8812
+    ],
+    [
+     52.3618,
+     4.8795
+    ]
+   ]
+  },
+  {
+   "id": "w9000039",
+   "kind": "water",
+   "closed": true,
+   "coords": [
+    [
+     52.3597,
+     4.8758
+    ],
+    [
+     52.3594,
+     4.8772
+    ],
+    [
+     52.3586,
+     4.8748
+    ],
+    [
+     52.3582,
+     4.8722
+    ],
+    [
+     52.3587,
+     4.8717
+    ],
+    [
+     52.3591,
+     4.8738
+    ],
+    [
+     52.3597,
+     4.8758
+    ]
+   ]
+  },
+  {
+   "id": "w9000040",
+   "kind": "water",
+   "closed": true,
+   "coords": [
+    [
+     52.3574,
+     4.866
+    ],
+    [
+     52.3571,
+     4.8672
+    ],
+    [
+     52.3565,
+     4.865
+    ],
+    [
+     52.3562,
+     4.863
+    ],
+    [
+     52.3567,
+     4.8628
+    ],
+    [
+     52.3574,
+     4.866
+    ]
+   ]
+  },
+  {
+   "id": "w9000041",
+   "kind": "minor",
+   "name": "Vondelstraat",
+   "closed": false,
+   "coords": [
+    [
+     52.3628,
+     4.8793
+    ],
+    [
+     52.3619,
+     4.8745
+    ],
+    [
+     52.361,
+     4.87
+    ]
+   ]
+  },
+  {
+   "id": "w9000042",
+   "kind": "major",
+   "name": "Overtoom",
+   "closed": false,
+   "coords": [
+    [
+     52.364,
+     4.879
+    ],
+    [
+     52.3625,
+     4.871
+    ],
+    [
+     52.3607,
+     4.862
+    ],
+    [
+     52.359,
+     4.856
+    ]
+   ]
+  },
+  {
+   "id": "w9000043",
+   "kind": "major",
+   "name": "Van Baerlestraat",
+   "closed": false,
+   "coords": [
+    [
+     52.363,
+     4.8738
+    ],
+    [
+     52.3604,
+     4.8757
+    ],
+    [
+     52.3578,
+     4.8778
+    ],
+    [
+     52.356,
+     4.879
+    ]
+   ]
+  },
+  {
+   "id": "w9000044",
+   "kind": "major",
+   "name": "Koninginneweg",
+   "closed": false,
+   "coords": [
+    [
+     52.3552,
+     4.8712
+    ],
+    [
+     52.3547,
+     4.865
+    ],
+    [
+     52.3541,
+     4.859
+    ]
+   ]
+  },
+  {
+   "id": "w9000045",
+   "kind": "minor",
+   "name": "Emmalaan",
+   "closed": false,
+   "coords": [
+    [
+     52.3566,
+     4.869
+    ],
+    [
+     52.3545,
+     4.87
+    ]
+   ]
+  },
+  {
+   "id": "w9000046",
+   "kind": "minor",
+   "name": "Van Eeghenstraat",
+   "closed": false,
+   "coords": [
+    [
+     52.3586,
+     4.88
+    ],
+    [
+     52.3577,
+     4.8745
+    ],
+    [
+     52.3566,
+     4.8695
+    ]
+   ]
+  },
+  {
+   "id": "w9000047",
+   "kind": "major",
+   "name": "Amstelveenseweg",
+   "closed": false,
+   "coords": [
+    [
+     52.359,
+     4.8565
+    ],
+    [
+     52.3555,
+     4.8582
+    ],
+    [
+     52.3525,
+     4.8595
+    ]
+   ]
+  },
+  {
+   "id": "w9000048",
+   "kind": "major",
+   "name": "Stadhouderskade",
+   "closed": false,
+   "coords": [
+    [
+     52.363,
+     4.8805
+    ],
+    [
+     52.3612,
+     4.883
+    ]
+   ]
+  },
+  {
+   "id": "w9000049",
+   "kind": "path",
+   "closed": false,
+   "coords": [
+    [
+     52.361,
+     4.88
+    ],
+    [
+     52.3571,
+     4.8635
+    ],
+    [
+     52.3559,
+     4.859
+    ]
+   ]
+  },
+  {
+   "id": "w9000050",
+   "kind": "path",
+   "closed": false,
+   "coords": [
+    [
+     52.3605,
+     4.879
+    ],
+    [
+     52.359,
+     4.8752
+    ],
+    [
+     52.3579,
+     4.8712
+    ],
+    [
+     52.3567,
+     4.8665
+    ]
+   ]
+  },
+  {
+   "id": "w9000051",
+   "kind": "path",
+   "closed": false,
+   "coords": [
+    [
+     52.3599,
+     4.8705
+    ],
+    [
+     52.3583,
+     4.8716
+    ],
+    [
+     52.3576,
+     4.8728
+    ]
+   ]
+  },
+  {
+   "id": "w9000052",
+   "kind": "path",
+   "closed": false,
+   "coords": [
+    [
+     52.3586,
+     4.8665
+    ],
+    [
+     52.357,
+     4.867
+    ],
+    [
+     52.3561,
+     4.8676
+    ]
+   ]
+  }
+ ]
+}

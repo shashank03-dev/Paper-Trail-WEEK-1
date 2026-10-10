@@ -1,0 +1,647 @@
+{
+ "elements": [
+  {
+   "type": "way",
+   "id": 9000038,
+   "tags": {
+    "leisure": "park",
+    "name": "Vondelpark"
+   },
+   "geometry": [
+    {
+     "lat": 52.3618,
+     "lon": 4.8795
+    },
+    {
+     "lat": 52.3608,
+     "lon": 4.8745
+    },
+    {
+     "lat": 52.3594,
+     "lon": 4.869
+    },
+    {
+     "lat": 52.358,
+     "lon": 4.8635
+    },
+    {
+     "lat": 52.3566,
+     "lon": 4.8578
+    },
+    {
+     "lat": 52.3549,
+     "lon": 4.859
+    },
+    {
+     "lat": 52.3561,
+     "lon": 4.8645
+    },
+    {
+     "lat": 52.3574,
+     "lon": 4.87
+    },
+    {
+     "lat": 52.3588,
+     "lon": 4.876
+    },
+    {
+     "lat": 52.36,
+     "lon": 4.8812
+    },
+    {
+     "lat": 52.3618,
+     "lon": 4.8795
+    }
+   ]
+  },
+  {
+   "type": "way",
+   "id": 9000039,
+   "tags": {
+    "natural": "water"
+   },
+   "geometry": [
+    {
+     "lat": 52.3597,
+     "lon": 4.8758
+    },
+    {
+     "lat": 52.3594,
+     "lon": 4.8772
+    },
+    {
+     "lat": 52.3586,
+     "lon": 4.8748
+    },
+    {
+     "lat": 52.3582,
+     "lon": 4.8722
+    },
+    {
+     "lat": 52.3587,
+     "lon": 4.8717
+    },
+    {
+     "lat": 52.3591,
+     "lon": 4.8738
+    },
+    {
+     "lat": 52.3597,
+     "lon": 4.8758
+    }
+   ]
+  },
+  {
+   "type": "way",
+   "id": 9000040,
+   "tags": {
+    "natural": "water"
+   },
+   "geometry": [
+    {
+     "lat": 52.3574,
+     "lon": 4.866
+    },
+    {
+     "lat": 52.3571,
+     "lon": 4.8672
+    },
+    {
+     "lat": 52.3565,
+     "lon": 4.865
+    },
+    {
+     "lat": 52.3562,
+     "lon": 4.863
+    },
+    {
+     "lat": 52.3567,
+     "lon": 4.8628
+    },
+    {
+     "lat": 52.3574,
+     "lon": 4.866
+    }
+   ]
+  },
+  {
+   "type": "way",
+   "id": 9000041,
+   "tags": {
+    "highway": "residential",
+    "name": "Vondelstraat"
+   },
+   "geometry": [
+    {
+     "lat": 52.3628,
+     "lon": 4.8793
+    },
+    {
+     "lat": 52.3619,
+     "lon": 4.8745
+    },
+    {
+     "lat": 52.361,
+     "lon": 4.87
+    }
+   ]
+  },
+  {
+   "type": "way",
+   "id": 9000042,
+   "tags": {
+    "highway": "secondary",
+    "name": "Overtoom"
+   },
+   "geometry": [
+    {
+     "lat": 52.364,
+     "lon": 4.879
+    },
+    {
+     "lat": 52.3625,
+     "lon": 4.871
+    },
+    {
+     "lat": 52.3607,
+     "lon": 4.862
+    },
+    {
+     "lat": 52.359,
+     "lon": 4.856
+    }
+   ]
+  },
+  {
+   "type": "way",
+   "id": 9000043,
+   "tags": {
+    "highway": "secondary",
+    "name": "Van Baerlestraat"
+   },
+   "geometry": [
+    {
+     "lat": 52.363,
+     "lon": 4.8738
+    },
+    {
+     "lat": 52.3604,
+     "lon": 4.8757
+    },
+    {
+     "lat": 52.3578,
+     "lon": 4.8778
+    },
+    {
+     "lat": 52.356,
+     "lon": 4.879
+    }
+   ]
+  },
+  {
+   "type": "way",
+   "id": 9000044,
+   "tags": {
+    "highway": "tertiary",
+    "name": "Koninginneweg"
+   },
+   "geometry": [
+    {
+     "lat": 52.3552,
+     "lon": 4.8712
+    },
+    {
+     "lat": 52.3547,
+     "lon": 4.865
+    },
+    {
+     "lat": 52.3541,
+     "lon": 4.859
+    }
+   ]
+  },
+  {
+   "type": "way",
+   "id": 9000045,
+   "tags": {
+    "highway": "residential",
+    "name": "Emmalaan"
+   },
+   "geometry": [
+    {
+     "lat": 52.3566,
+     "lon": 4.869
+    },
+    {
+     "lat": 52.3545,
+     "lon": 4.87
+    }
+   ]
+  },
+  {
+   "type": "way",
+   "id": 9000046,
+   "tags": {
+    "highway": "residential",
+    "name": "Van Eeghenstraat"
+   },
+   "geometry": [
+    {
+     "lat": 52.3586,
+     "lon": 4.88
+    },
+    {
+     "lat": 52.3577,
+     "lon": 4.8745
+    },
+    {
+     "lat": 52.3566,
+     "lon": 4.8695
+    }
+   ]
+  },
+  {
+   "type": "way",
+   "id": 9000047,
+   "tags": {
+    "highway": "secondary",
+    "name": "Amstelveenseweg"
+   },
+   "geometry": [
+    {
+     "lat": 52.359,
+     "lon": 4.8565
+    },
+    {
+     "lat": 52.3555,
+     "lon": 4.8582
+    },
+    {
+     "lat": 52.3525,
+     "lon": 4.8595
+    }
+   ]
+  },
+  {
+   "type": "way",
+   "id": 9000048,
+   "tags": {
+    "highway": "tertiary",
+    "name": "Stadhouderskade"
+   },
+   "geometry": [
+    {
+     "lat": 52.363,
+     "lon": 4.8805
+    },
+    {
+     "lat": 52.3612,
+     "lon": 4.883
+    }
+   ]
+  },
+  {
+   "type": "way",
+   "id": 9000049,
+   "tags": {
+    "highway": "cycleway"
+   },
+   "geometry": [
+    {
+     "lat": 52.361,
+     "lon": 4.88
+    },
+    {
+     "lat": 52.3596,
+     "lon": 4.874
+    },
+    {
+     "lat": 52.3584,
+     "lon": 4.869
+    },
+    {
+     "lat": 52.3571,
+     "lon": 4.8635
+    },
+    {
+     "lat": 52.3559,
+     "lon": 4.859
+    }
+   ]
+  },
+  {
+   "type": "way",
+   "id": 9000050,
+   "tags": {
+    "highway": "footway"
+   },
+   "geometry": [
+    {
+     "lat": 52.3605,
+     "lon": 4.879
+    },
+    {
+     "lat": 52.359,
+     "lon": 4.8752
+    },
+    {
+     "lat": 52.3579,
+     "lon": 4.8712
+    },
+    {
+     "lat": 52.3567,
+     "lon": 4.8665
+    }
+   ]
+  },
+  {
+   "type": "way",
+   "id": 9000051,
+   "tags": {
+    "highway": "footway"
+   },
+   "geometry": [
+    {
+     "lat": 52.3599,
+     "lon": 4.8705
+    },
+    {
+     "lat": 52.3583,
+     "lon": 4.8716
+    },
+    {
+     "lat": 52.3576,
+     "lon": 4.8728
+    }
+   ]
+  },
+  {
+   "type": "way",
+   "id": 9000052,
+   "tags": {
+    "highway": "footway"
+   },
+   "geometry": [
+    {
+     "lat": 52.3586,
+     "lon": 4.8665
+    },
+    {
+     "lat": 52.357,
+     "lon": 4.867
+    },
+    {
+     "lat": 52.3561,
+     "lon": 4.8676
+    }
+   ]
+  },
+  {
+   "type": "node",
+   "id": 9000053,
+   "lat": 52.3583,
+   "lon": 4.8716,
+   "tags": {
+    "amenity": "cafe",
+    "name": "'t Blauwe Theehuis"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9000054,
+   "lat": 52.36,
+   "lon": 4.8774,
+   "tags": {
+    "historic": "memorial",
+    "memorial": "statue",
+    "name": "Joost van den Vondel statue"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9000055,
+   "lat": 52.3567,
+   "lon": 4.8656,
+   "tags": {
+    "tourism": "artwork",
+    "artwork_type": "sculpture",
+    "artist_name": "Pablo Picasso",
+    "name": "Figure découpée l'Oiseau"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9000056,
+   "lat": 52.3566,
+   "lon": 4.8692,
+   "tags": {
+    "leisure": "garden",
+    "name": "Rosarium"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9000057,
+   "lat": 52.3572,
+   "lon": 4.8667,
+   "tags": {
+    "amenity": "cafe",
+    "name": "Het Groot Melkhuis"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9000058,
+   "lat": 52.357,
+   "lon": 4.8673,
+   "tags": {
+    "leisure": "playground",
+    "name": "Speeltuin Groot Melkhuis"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9000059,
+   "lat": 52.3614,
+   "lon": 4.874,
+   "tags": {
+    "historic": "building",
+    "name": "Vondelkerk",
+    "start_date": "1880"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9000060,
+   "lat": 52.3614,
+   "lon": 4.8773,
+   "tags": {
+    "historic": "building",
+    "name": "Hollandsche Manege"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9000061,
+   "lat": 52.3601,
+   "lon": 4.8779,
+   "tags": {
+    "historic": "building",
+    "name": "Vondelpark Paviljoen"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9000062,
+   "lat": 52.3603,
+   "lon": 4.876,
+   "tags": {
+    "man_made": "bridge",
+    "name": "Vondeltunnel"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9000063,
+   "lat": 52.3589,
+   "lon": 4.874,
+   "tags": {
+    "amenity": "fountain"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9000064,
+   "lat": 52.3595,
+   "lon": 4.8762,
+   "tags": {
+    "amenity": "drinking_water"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9000065,
+   "lat": 52.3577,
+   "lon": 4.87,
+   "tags": {
+    "amenity": "drinking_water"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9000066,
+   "lat": 52.3612,
+   "lon": 4.879,
+   "tags": {
+    "amenity": "bicycle_parking"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9000067,
+   "lat": 52.362,
+   "lon": 4.8752,
+   "tags": {
+    "amenity": "post_box"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9000068,
+   "lat": 52.359,
+   "lon": 4.8725,
+   "tags": {
+    "amenity": "bench"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9000069,
+   "lat": 52.3581,
+   "lon": 4.8705,
+   "tags": {
+    "amenity": "bench",
+    "inscription": "yes"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9000070,
+   "lat": 52.3575,
+   "lon": 4.868,
+   "tags": {
+    "amenity": "bench"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9000071,
+   "lat": 52.3592,
+   "lon": 4.8748,
+   "tags": {
+    "natural": "tree",
+    "genus": "Platanus",
+    "species": "Platanus x hispanica"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9000072,
+   "lat": 52.3585,
+   "lon": 4.873,
+   "tags": {
+    "natural": "tree",
+    "genus": "Taxodium",
+    "species": "Taxodium distichum"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9000073,
+   "lat": 52.3578,
+   "lon": 4.869,
+   "tags": {
+    "natural": "tree",
+    "genus": "Salix"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9000074,
+   "lat": 52.3569,
+   "lon": 4.8645,
+   "tags": {
+    "natural": "tree",
+    "leaf_type": "broadleaved"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9000075,
+   "lat": 52.3596,
+   "lon": 4.8735,
+   "tags": {
+    "natural": "tree"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9000076,
+   "lat": 52.3606,
+   "lon": 4.8786,
+   "tags": {
+    "highway": "street_lamp"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9000077,
+   "lat": 52.3622,
+   "lon": 4.8742,
+   "tags": {
+    "highway": "bus_stop",
+    "name": "Van Baerlestraat"
+   }
+  }
+ ]
+}

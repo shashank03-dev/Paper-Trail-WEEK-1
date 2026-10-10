@@ -1,0 +1,576 @@
+{
+ "meta": {
+  "preset": "cubbon-park",
+  "center": {
+   "lat": 12.9763,
+   "lon": 77.5929
+  },
+  "radiusM": 900,
+  "source": "hand-traced",
+  "note": "Hand-traced approximation of OpenStreetMap data for offline demos. Run `pnpm fixtures:fetch` to replace with live OSM. © OpenStreetMap contributors (ODbL)."
+ },
+ "features": [
+  {
+   "id": "w9000000",
+   "kind": "park",
+   "name": "Cubbon Park",
+   "tags": {
+    "name": "Cubbon Park"
+   },
+   "lat": 12.9762,
+   "lon": 77.59295,
+   "distanceM": 12,
+   "bearingDeg": 154
+  },
+  {
+   "id": "n9000026",
+   "kind": "bench",
+   "tags": {},
+   "lat": 12.976,
+   "lon": 77.5925,
+   "distanceM": 55,
+   "bearingDeg": 232
+  },
+  {
+   "id": "n9000024",
+   "kind": "drinking_water",
+   "tags": {},
+   "lat": 12.9758,
+   "lon": 77.5934,
+   "distanceM": 78,
+   "bearingDeg": 136
+  },
+  {
+   "id": "n9000028",
+   "kind": "bench",
+   "tags": {
+    "inscription": "yes"
+   },
+   "lat": 12.977,
+   "lon": 77.5935,
+   "distanceM": 101,
+   "bearingDeg": 40
+  },
+  {
+   "id": "n9000035",
+   "kind": "street_lamp",
+   "tags": {},
+   "lat": 12.9772,
+   "lon": 77.5925,
+   "distanceM": 109,
+   "bearingDeg": 337
+  },
+  {
+   "id": "n9000030",
+   "kind": "tree",
+   "tags": {
+    "genus": "Ficus"
+   },
+   "lat": 12.9754,
+   "lon": 77.5935,
+   "distanceM": 119,
+   "bearingDeg": 147
+  },
+  {
+   "id": "n9000029",
+   "kind": "tree",
+   "tags": {
+    "species": "Samanea saman"
+   },
+   "lat": 12.9765,
+   "lon": 77.5918,
+   "distanceM": 121,
+   "bearingDeg": 281
+  },
+  {
+   "id": "n9000021",
+   "kind": "fountain",
+   "tags": {},
+   "lat": 12.9766,
+   "lon": 77.594,
+   "distanceM": 124,
+   "bearingDeg": 74
+  },
+  {
+   "id": "n9000016",
+   "kind": "historic",
+   "name": "Cubbon Park Bandstand",
+   "tags": {
+    "name": "Cubbon Park Bandstand",
+    "historic": "building"
+   },
+   "lat": 12.9762,
+   "lon": 77.5944,
+   "distanceM": 163,
+   "bearingDeg": 94
+  },
+  {
+   "id": "n9000034",
+   "kind": "street_lamp",
+   "tags": {},
+   "lat": 12.9749,
+   "lon": 77.5943,
+   "distanceM": 217,
+   "bearingDeg": 136
+  },
+  {
+   "id": "n9000013",
+   "kind": "library",
+   "name": "State Central Library",
+   "tags": {
+    "name": "State Central Library",
+    "colour": "red",
+    "start_date": "1915"
+   },
+   "lat": 12.9746,
+   "lon": 77.5939,
+   "distanceM": 218,
+   "bearingDeg": 150
+  },
+  {
+   "id": "w9000001",
+   "kind": "wood",
+   "name": "Bamboo grove",
+   "tags": {
+    "name": "Bamboo grove"
+   },
+   "lat": 12.97504,
+   "lon": 77.59118,
+   "distanceM": 233,
+   "bearingDeg": 233
+  },
+  {
+   "id": "n9000019",
+   "kind": "memorial",
+   "name": "Sir Mark Cubbon statue",
+   "tags": {
+    "name": "Sir Mark Cubbon statue",
+    "historic": "memorial",
+    "memorial": "statue"
+   },
+   "lat": 12.9786,
+   "lon": 77.5926,
+   "distanceM": 258,
+   "bearingDeg": 353
+  },
+  {
+   "id": "n9000027",
+   "kind": "bench",
+   "tags": {},
+   "lat": 12.9751,
+   "lon": 77.595,
+   "distanceM": 264,
+   "bearingDeg": 120
+  },
+  {
+   "id": "n9000032",
+   "kind": "tree",
+   "tags": {
+    "species": "Peltophorum pterocarpum"
+   },
+   "lat": 12.9739,
+   "lon": 77.5925,
+   "distanceM": 270,
+   "bearingDeg": 189
+  },
+  {
+   "id": "n9000031",
+   "kind": "tree",
+   "tags": {
+    "species": "Spathodea campanulata"
+   },
+   "lat": 12.9779,
+   "lon": 77.5948,
+   "distanceM": 272,
+   "bearingDeg": 49
+  },
+  {
+   "id": "n9000033",
+   "kind": "tree",
+   "tags": {},
+   "lat": 12.9768,
+   "lon": 77.5957,
+   "distanceM": 308,
+   "bearingDeg": 80
+  },
+  {
+   "id": "n9000014",
+   "kind": "historic",
+   "name": "Attara Kacheri",
+   "tags": {
+    "name": "Attara Kacheri",
+    "historic": "building",
+    "colour": "red",
+    "start_date": "1868"
+   },
+   "lat": 12.979,
+   "lon": 77.5917,
+   "distanceM": 327,
+   "bearingDeg": 337
+  },
+  {
+   "id": "n9000023",
+   "kind": "post_box",
+   "tags": {},
+   "lat": 12.9788,
+   "lon": 77.5912,
+   "distanceM": 333,
+   "bearingDeg": 326
+  },
+  {
+   "id": "n9000025",
+   "kind": "drinking_water",
+   "tags": {},
+   "lat": 12.9735,
+   "lon": 77.5944,
+   "distanceM": 351,
+   "bearingDeg": 152
+  },
+  {
+   "id": "n9000036",
+   "kind": "cafe",
+   "tags": {},
+   "lat": 12.9737,
+   "lon": 77.5952,
+   "distanceM": 382,
+   "bearingDeg": 139
+  },
+  {
+   "id": "n9000020",
+   "kind": "playground",
+   "name": "Jawahar Bal Bhavan",
+   "tags": {
+    "name": "Jawahar Bal Bhavan"
+   },
+   "lat": 12.9728,
+   "lon": 77.5928,
+   "distanceM": 389,
+   "bearingDeg": 182
+  },
+  {
+   "id": "n9000015",
+   "kind": "historic",
+   "name": "Government Museum",
+   "tags": {
+    "name": "Government Museum",
+    "historic": "building"
+   },
+   "lat": 12.9741,
+   "lon": 77.5959,
+   "distanceM": 407,
+   "bearingDeg": 127
+  },
+  {
+   "id": "n9000018",
+   "kind": "memorial",
+   "name": "King Edward VII statue",
+   "tags": {
+    "name": "King Edward VII statue",
+    "historic": "memorial",
+    "memorial": "statue"
+   },
+   "lat": 12.9771,
+   "lon": 77.5966,
+   "distanceM": 411,
+   "bearingDeg": 77
+  },
+  {
+   "id": "n9000022",
+   "kind": "bus_stop",
+   "name": "Cubbon Park",
+   "tags": {
+    "name": "Cubbon Park"
+   },
+   "lat": 12.9744,
+   "lon": 77.5966,
+   "distanceM": 453,
+   "bearingDeg": 118
+  },
+  {
+   "id": "n9000037",
+   "kind": "waste_basket",
+   "tags": {},
+   "lat": 12.9719,
+   "lon": 77.5939,
+   "distanceM": 501,
+   "bearingDeg": 168
+  },
+  {
+   "id": "n9000017",
+   "kind": "memorial",
+   "name": "Queen Victoria statue",
+   "tags": {
+    "name": "Queen Victoria statue",
+    "historic": "memorial",
+    "memorial": "statue",
+    "material": "marble"
+   },
+   "lat": 12.9757,
+   "lon": 77.5986,
+   "distanceM": 621,
+   "bearingDeg": 96
+  }
+ ],
+ "ways": [
+  {
+   "id": "w9000000",
+   "kind": "park",
+   "name": "Cubbon Park",
+   "closed": true,
+   "coords": [
+    [
+     12.9808,
+     77.5898
+    ],
+    [
+     12.98,
+     77.5958
+    ],
+    [
+     12.9772,
+     77.599
+    ],
+    [
+     12.9732,
+     77.5976
+    ],
+    [
+     12.9702,
+     77.5942
+    ],
+    [
+     12.9714,
+     77.5893
+    ],
+    [
+     12.976,
+     77.5881
+    ],
+    [
+     12.9808,
+     77.5898
+    ]
+   ]
+  },
+  {
+   "id": "w9000002",
+   "kind": "major",
+   "name": "Kasturba Road",
+   "closed": false,
+   "coords": [
+    [
+     12.97,
+     77.5952
+    ],
+    [
+     12.974,
+     77.5966
+    ],
+    [
+     12.9765,
+     77.5986
+    ],
+    [
+     12.9777,
+     77.6008
+    ]
+   ]
+  },
+  {
+   "id": "w9000003",
+   "kind": "major",
+   "name": "Ambedkar Veedhi",
+   "closed": false,
+   "coords": [
+    [
+     12.9803,
+     77.5872
+    ],
+    [
+     12.9806,
+     77.5935
+    ],
+    [
+     12.9794,
+     77.5985
+    ]
+   ]
+  },
+  {
+   "id": "w9000004",
+   "kind": "major",
+   "name": "Nrupathunga Road",
+   "closed": false,
+   "coords": [
+    [
+     12.97,
+     77.5868
+    ],
+    [
+     12.974,
+     77.5874
+    ],
+    [
+     12.9778,
+     77.5878
+    ]
+   ]
+  },
+  {
+   "id": "w9000005",
+   "kind": "major",
+   "name": "Mahatma Gandhi Road",
+   "closed": false,
+   "coords": [
+    [
+     12.9757,
+     77.6
+    ],
+    [
+     12.9752,
+     77.606
+    ]
+   ]
+  },
+  {
+   "id": "w9000006",
+   "kind": "major",
+   "name": "Raj Bhavan Road",
+   "closed": false,
+   "coords": [
+    [
+     12.9794,
+     77.5985
+    ],
+    [
+     12.983,
+     77.5935
+    ]
+   ]
+  },
+  {
+   "id": "w9000007",
+   "kind": "minor",
+   "name": "Sri Chamarajendra Road",
+   "closed": false,
+   "coords": [
+    [
+     12.979,
+     77.5905
+    ],
+    [
+     12.9765,
+     77.5932
+    ],
+    [
+     12.9741,
+     77.5946
+    ],
+    [
+     12.9712,
+     77.595
+    ]
+   ]
+  },
+  {
+   "id": "w9000008",
+   "kind": "minor",
+   "name": "Cubbon Park Road",
+   "closed": false,
+   "coords": [
+    [
+     12.976,
+     77.5884
+    ],
+    [
+     12.9763,
+     77.5925
+    ],
+    [
+     12.9756,
+     77.5966
+    ]
+   ]
+  },
+  {
+   "id": "w9000009",
+   "kind": "path",
+   "closed": false,
+   "coords": [
+    [
+     12.9785,
+     77.5935
+    ],
+    [
+     12.977,
+     77.5955
+    ],
+    [
+     12.9762,
+     77.5975
+    ]
+   ]
+  },
+  {
+   "id": "w9000010",
+   "kind": "path",
+   "closed": false,
+   "coords": [
+    [
+     12.9735,
+     77.5905
+    ],
+    [
+     12.9746,
+     77.593
+    ],
+    [
+     12.9733,
+     77.5958
+    ]
+   ]
+  },
+  {
+   "id": "w9000011",
+   "kind": "path",
+   "closed": false,
+   "coords": [
+    [
+     12.9775,
+     77.59
+    ],
+    [
+     12.9768,
+     77.5915
+    ],
+    [
+     12.9762,
+     77.5929
+    ],
+    [
+     12.9758,
+     77.5945
+    ]
+   ]
+  },
+  {
+   "id": "w9000012",
+   "kind": "path",
+   "closed": false,
+   "coords": [
+    [
+     12.9725,
+     77.592
+    ],
+    [
+     12.9718,
+     77.5935
+    ],
+    [
+     12.9726,
+     77.5948
+    ]
+   ]
+  }
+ ]
+}

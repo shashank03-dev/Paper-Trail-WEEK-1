@@ -1,0 +1,744 @@
+{
+ "meta": {
+  "preset": "dolores-park",
+  "center": {
+   "lat": 37.7596,
+   "lon": -122.4269
+  },
+  "radiusM": 900,
+  "source": "hand-traced",
+  "note": "Hand-traced approximation of OpenStreetMap data for offline demos. Run `pnpm fixtures:fetch` to replace with live OSM. © OpenStreetMap contributors (ODbL)."
+ },
+ "features": [
+  {
+   "id": "n9000117",
+   "kind": "bench",
+   "tags": {
+    "inscription": "yes"
+   },
+   "lat": 37.7595,
+   "lon": -122.4268,
+   "distanceM": 14,
+   "bearingDeg": 142
+  },
+  {
+   "id": "n9000115",
+   "kind": "drinking_water",
+   "tags": {},
+   "lat": 37.7592,
+   "lon": -122.4265,
+   "distanceM": 57,
+   "bearingDeg": 142
+  },
+  {
+   "id": "w9000094",
+   "kind": "park",
+   "name": "Mission Dolores Park",
+   "tags": {
+    "name": "Mission Dolores Park"
+   },
+   "lat": 37.76022,
+   "lon": -122.42734,
+   "distanceM": 79,
+   "bearingDeg": 331
+  },
+  {
+   "id": "n9000116",
+   "kind": "bench",
+   "tags": {},
+   "lat": 37.76,
+   "lon": -122.4277,
+   "distanceM": 83,
+   "bearingDeg": 302
+  },
+  {
+   "id": "n9000124",
+   "kind": "tree",
+   "tags": {
+    "species": "Cupressus macrocarpa"
+   },
+   "lat": 37.7594,
+   "lon": -122.4279,
+   "distanceM": 91,
+   "bearingDeg": 256
+  },
+  {
+   "id": "n9000118",
+   "kind": "bench",
+   "tags": {},
+   "lat": 37.7588,
+   "lon": -122.4274,
+   "distanceM": 99,
+   "bearingDeg": 206
+  },
+  {
+   "id": "n9000125",
+   "kind": "tree",
+   "tags": {},
+   "lat": 37.7603,
+   "lon": -122.4262,
+   "distanceM": 99,
+   "bearingDeg": 38
+  },
+  {
+   "id": "n9000114",
+   "kind": "drinking_water",
+   "tags": {},
+   "lat": 37.7605,
+   "lon": -122.427,
+   "distanceM": 100,
+   "bearingDeg": 355
+  },
+  {
+   "id": "n9000121",
+   "kind": "tree",
+   "tags": {
+    "species": "Phoenix canariensis",
+    "genus": "Phoenix"
+   },
+   "lat": 37.76,
+   "lon": -122.4258,
+   "distanceM": 106,
+   "bearingDeg": 65
+  },
+  {
+   "id": "n9000126",
+   "kind": "tree",
+   "tags": {
+    "leaf_type": "broadleaved"
+   },
+   "lat": 37.7586,
+   "lon": -122.4266,
+   "distanceM": 114,
+   "bearingDeg": 167
+  },
+  {
+   "id": "n9000122",
+   "kind": "tree",
+   "tags": {
+    "species": "Phoenix canariensis",
+    "genus": "Phoenix"
+   },
+   "lat": 37.759,
+   "lon": -122.4258,
+   "distanceM": 117,
+   "bearingDeg": 125
+  },
+  {
+   "id": "n9000110",
+   "kind": "man_made",
+   "name": "Dolores Park footbridge",
+   "tags": {
+    "name": "Dolores Park footbridge",
+    "man_made": "bridge"
+   },
+   "lat": 37.759,
+   "lon": -122.4281,
+   "distanceM": 125,
+   "bearingDeg": 238
+  },
+  {
+   "id": "n9000103",
+   "kind": "viewpoint",
+   "name": "Dolores Park hilltop",
+   "tags": {
+    "name": "Dolores Park hilltop"
+   },
+   "lat": 37.7587,
+   "lon": -122.4279,
+   "distanceM": 133,
+   "bearingDeg": 221
+  },
+  {
+   "id": "n9000127",
+   "kind": "street_lamp",
+   "tags": {},
+   "lat": 37.7598,
+   "lon": -122.4284,
+   "distanceM": 134,
+   "bearingDeg": 280
+  },
+  {
+   "id": "n9000102",
+   "kind": "playground",
+   "name": "Helen Diller Playground",
+   "tags": {
+    "name": "Helen Diller Playground"
+   },
+   "lat": 37.7607,
+   "lon": -122.4278,
+   "distanceM": 146,
+   "bearingDeg": 327
+  },
+  {
+   "id": "n9000101",
+   "kind": "memorial",
+   "name": "Mexican Liberty Bell replica",
+   "tags": {
+    "name": "Mexican Liberty Bell replica",
+    "historic": "memorial",
+    "material": "bronze"
+   },
+   "lat": 37.7609,
+   "lon": -122.4266,
+   "distanceM": 147,
+   "bearingDeg": 10
+  },
+  {
+   "id": "n9000119",
+   "kind": "waste_basket",
+   "tags": {},
+   "lat": 37.7611,
+   "lon": -122.4271,
+   "distanceM": 168,
+   "bearingDeg": 354
+  },
+  {
+   "id": "n9000100",
+   "kind": "memorial",
+   "name": "Miguel Hidalgo statue",
+   "tags": {
+    "name": "Miguel Hidalgo statue",
+    "historic": "memorial",
+    "memorial": "statue"
+   },
+   "lat": 37.7612,
+   "lon": -122.4263,
+   "distanceM": 186,
+   "bearingDeg": 17
+  },
+  {
+   "id": "n9000120",
+   "kind": "bicycle_parking",
+   "tags": {},
+   "lat": 37.7612,
+   "lon": -122.4259,
+   "distanceM": 198,
+   "bearingDeg": 26
+  },
+  {
+   "id": "n9000099",
+   "kind": "historic",
+   "name": "Golden Fire Hydrant",
+   "tags": {
+    "name": "Golden Fire Hydrant",
+    "historic": "yes",
+    "colour": "gold",
+    "start_date": "1906"
+   },
+   "lat": 37.7583,
+   "lon": -122.4285,
+   "distanceM": 202,
+   "bearingDeg": 224
+  },
+  {
+   "id": "n9000111",
+   "kind": "bus_stop",
+   "name": "Church St & 20th St",
+   "tags": {
+    "name": "Church St & 20th St"
+   },
+   "lat": 37.7584,
+   "lon": -122.4287,
+   "distanceM": 207,
+   "bearingDeg": 230
+  },
+  {
+   "id": "n9000108",
+   "kind": "cafe",
+   "name": "Dolores Park Cafe",
+   "tags": {
+    "name": "Dolores Park Cafe"
+   },
+   "lat": 37.7613,
+   "lon": -122.4256,
+   "distanceM": 221,
+   "bearingDeg": 31
+  },
+  {
+   "id": "n9000112",
+   "kind": "bus_stop",
+   "name": "Church St & 18th St",
+   "tags": {
+    "name": "Church St & 18th St"
+   },
+   "lat": 37.7614,
+   "lon": -122.4287,
+   "distanceM": 255,
+   "bearingDeg": 322
+  },
+  {
+   "id": "n9000106",
+   "kind": "cafe",
+   "name": "Bi-Rite Creamery",
+   "tags": {
+    "name": "Bi-Rite Creamery",
+    "cuisine": "ice_cream"
+   },
+   "lat": 37.7616,
+   "lon": -122.4252,
+   "distanceM": 268,
+   "bearingDeg": 34
+  },
+  {
+   "id": "n9000113",
+   "kind": "post_box",
+   "tags": {},
+   "lat": 37.7616,
+   "lon": -122.4286,
+   "distanceM": 268,
+   "bearingDeg": 326
+  },
+  {
+   "id": "n9000105",
+   "kind": "historic",
+   "name": "Mission High School",
+   "tags": {
+    "name": "Mission High School",
+    "historic": "building"
+   },
+   "lat": 37.762,
+   "lon": -122.4279,
+   "distanceM": 281,
+   "bearingDeg": 342
+  },
+  {
+   "id": "n9000123",
+   "kind": "tree",
+   "tags": {
+    "species": "Phoenix canariensis",
+    "genus": "Phoenix"
+   },
+   "lat": 37.7623,
+   "lon": -122.4258,
+   "distanceM": 315,
+   "bearingDeg": 18
+  },
+  {
+   "id": "n9000107",
+   "kind": "bakery",
+   "name": "Tartine Bakery",
+   "tags": {
+    "name": "Tartine Bakery"
+   },
+   "lat": 37.7614,
+   "lon": -122.4241,
+   "distanceM": 317,
+   "bearingDeg": 51
+  },
+  {
+   "id": "n9000128",
+   "kind": "street_lamp",
+   "tags": {},
+   "lat": 37.7631,
+   "lon": -122.4258,
+   "distanceM": 401,
+   "bearingDeg": 14
+  },
+  {
+   "id": "n9000109",
+   "kind": "mural",
+   "name": "MaestraPeace",
+   "tags": {
+    "name": "MaestraPeace",
+    "artwork_type": "mural"
+   },
+   "lat": 37.7618,
+   "lon": -122.4226,
+   "distanceM": 450,
+   "bearingDeg": 57
+  },
+  {
+   "id": "n9000104",
+   "kind": "historic",
+   "name": "Mission Dolores",
+   "tags": {
+    "name": "Mission Dolores",
+    "historic": "building",
+    "start_date": "1791"
+   },
+   "lat": 37.7642,
+   "lon": -122.427,
+   "distanceM": 512,
+   "bearingDeg": 359
+  }
+ ],
+ "ways": [
+  {
+   "id": "w9000078",
+   "kind": "major",
+   "name": "16th Street",
+   "closed": false,
+   "coords": [
+    [
+     37.7651,
+     -122.4345
+    ],
+    [
+     37.7648,
+     -122.428
+    ],
+    [
+     37.7645,
+     -122.42
+    ]
+   ]
+  },
+  {
+   "id": "w9000079",
+   "kind": "minor",
+   "name": "17th Street",
+   "closed": false,
+   "coords": [
+    [
+     37.7635,
+     -122.4345
+    ],
+    [
+     37.7632,
+     -122.428
+    ],
+    [
+     37.7629,
+     -122.42
+    ]
+   ]
+  },
+  {
+   "id": "w9000080",
+   "kind": "major",
+   "name": "18th Street",
+   "closed": false,
+   "coords": [
+    [
+     37.7618,
+     -122.4345
+    ],
+    [
+     37.7615,
+     -122.428
+    ],
+    [
+     37.7612,
+     -122.42
+    ]
+   ]
+  },
+  {
+   "id": "w9000081",
+   "kind": "minor",
+   "name": "20th Street",
+   "closed": false,
+   "coords": [
+    [
+     37.7586,
+     -122.4345
+    ],
+    [
+     37.7583,
+     -122.428
+    ],
+    [
+     37.758,
+     -122.42
+    ]
+   ]
+  },
+  {
+   "id": "w9000082",
+   "kind": "minor",
+   "name": "21st Street",
+   "closed": false,
+   "coords": [
+    [
+     37.757,
+     -122.4345
+    ],
+    [
+     37.7567,
+     -122.428
+    ],
+    [
+     37.7564,
+     -122.42
+    ]
+   ]
+  },
+  {
+   "id": "w9000083",
+   "kind": "minor",
+   "name": "22nd Street",
+   "closed": false,
+   "coords": [
+    [
+     37.7554,
+     -122.4345
+    ],
+    [
+     37.7551,
+     -122.428
+    ],
+    [
+     37.7548,
+     -122.42
+    ]
+   ]
+  },
+  {
+   "id": "w9000084",
+   "kind": "major",
+   "name": "Valencia Street",
+   "closed": false,
+   "coords": [
+    [
+     37.7665,
+     -122.4214
+    ],
+    [
+     37.7535,
+     -122.4218
+    ]
+   ]
+  },
+  {
+   "id": "w9000085",
+   "kind": "major",
+   "name": "Guerrero Street",
+   "closed": false,
+   "coords": [
+    [
+     37.7665,
+     -122.4235
+    ],
+    [
+     37.7535,
+     -122.4239
+    ]
+   ]
+  },
+  {
+   "id": "w9000086",
+   "kind": "major",
+   "name": "Dolores Street",
+   "closed": false,
+   "coords": [
+    [
+     37.7665,
+     -122.4256
+    ],
+    [
+     37.7535,
+     -122.426
+    ]
+   ]
+  },
+  {
+   "id": "w9000087",
+   "kind": "major",
+   "name": "Church Street",
+   "closed": false,
+   "coords": [
+    [
+     37.7665,
+     -122.4283
+    ],
+    [
+     37.7535,
+     -122.4287
+    ]
+   ]
+  },
+  {
+   "id": "w9000088",
+   "kind": "minor",
+   "name": "Sanchez Street",
+   "closed": false,
+   "coords": [
+    [
+     37.7665,
+     -122.4305
+    ],
+    [
+     37.7535,
+     -122.4309
+    ]
+   ]
+  },
+  {
+   "id": "w9000089",
+   "kind": "minor",
+   "name": "Noe Street",
+   "closed": false,
+   "coords": [
+    [
+     37.7665,
+     -122.4327
+    ],
+    [
+     37.7535,
+     -122.4331
+    ]
+   ]
+  },
+  {
+   "id": "w9000090",
+   "kind": "minor",
+   "name": "19th Street",
+   "closed": false,
+   "coords": [
+    [
+     37.76,
+     -122.4345
+    ],
+    [
+     37.7599,
+     -122.4285
+    ]
+   ]
+  },
+  {
+   "id": "w9000091",
+   "kind": "minor",
+   "name": "19th Street",
+   "closed": false,
+   "coords": [
+    [
+     37.7599,
+     -122.4258
+    ],
+    [
+     37.7598,
+     -122.42
+    ]
+   ]
+  },
+  {
+   "id": "w9000092",
+   "kind": "minor",
+   "name": "Cumberland Street",
+   "closed": false,
+   "coords": [
+    [
+     37.7591,
+     -122.4285
+    ],
+    [
+     37.7591,
+     -122.4329
+    ]
+   ]
+  },
+  {
+   "id": "w9000093",
+   "kind": "minor",
+   "name": "Liberty Street",
+   "closed": false,
+   "coords": [
+    [
+     37.7575,
+     -122.4216
+    ],
+    [
+     37.7575,
+     -122.4307
+    ]
+   ]
+  },
+  {
+   "id": "w9000094",
+   "kind": "park",
+   "name": "Mission Dolores Park",
+   "closed": true,
+   "coords": [
+    [
+     37.7615,
+     -122.4283
+    ],
+    [
+     37.7615,
+     -122.4259
+    ],
+    [
+     37.7583,
+     -122.4259
+    ],
+    [
+     37.7583,
+     -122.4283
+    ],
+    [
+     37.7615,
+     -122.4283
+    ]
+   ]
+  },
+  {
+   "id": "w9000095",
+   "kind": "path",
+   "closed": false,
+   "coords": [
+    [
+     37.7614,
+     -122.426
+    ],
+    [
+     37.7585,
+     -122.4281
+    ]
+   ]
+  },
+  {
+   "id": "w9000096",
+   "kind": "path",
+   "closed": false,
+   "coords": [
+    [
+     37.7614,
+     -122.4282
+    ],
+    [
+     37.7603,
+     -122.4275
+    ],
+    [
+     37.759,
+     -122.4262
+    ]
+   ]
+  },
+  {
+   "id": "w9000097",
+   "kind": "path",
+   "closed": false,
+   "coords": [
+    [
+     37.7598,
+     -122.4282
+    ],
+    [
+     37.7598,
+     -122.426
+    ]
+   ]
+  },
+  {
+   "id": "w9000098",
+   "kind": "path",
+   "closed": false,
+   "coords": [
+    [
+     37.7608,
+     -122.4282
+    ],
+    [
+     37.7606,
+     -122.4268
+    ],
+    [
+     37.7612,
+     -122.4262
+    ]
+   ]
+  }
+ ]
+}

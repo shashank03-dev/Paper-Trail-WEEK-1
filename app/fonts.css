@@ -1,0 +1,92 @@
+/* Self-hosted (OFL) fonts: no third-party requests when the app opens. */
+@font-face {
+  font-family: "Fraunces";
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  src: url("/fonts/fraunces-latin-400-normal.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Fraunces";
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+  src: url("/fonts/fraunces-latin-600-normal.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Fraunces";
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+  src: url("/fonts/fraunces-latin-700-normal.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Fraunces";
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+  src: url("/fonts/fraunces-latin-400-italic.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Inter";
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  src: url("/fonts/inter-latin-400-normal.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Inter";
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+  src: url("/fonts/inter-latin-500-normal.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Inter";
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+  src: url("/fonts/inter-latin-600-normal.woff2") format("woff2");
+}
+@font-face {
+  font-family: "IBM Plex Mono";
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  src: url("/fonts/ibm-plex-mono-latin-400-normal.woff2") format("woff2");
+}
+@font-face {
+  font-family: "IBM Plex Mono";
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+  src: url("/fonts/ibm-plex-mono-latin-500-normal.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Caveat";
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  src: url("/fonts/caveat-latin-400-normal.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Caveat";
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+  src: url("/fonts/caveat-latin-700-normal.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Reenie Beanie";
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  src: url("/fonts/reenie-beanie-latin-400-normal.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Nanum Pen Script";
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  src: url("/fonts/nanum-pen-script-latin-400-normal.woff2") format("woff2");
+}

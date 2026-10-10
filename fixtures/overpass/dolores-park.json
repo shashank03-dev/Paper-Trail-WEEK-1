@@ -1,0 +1,750 @@
+{
+ "elements": [
+  {
+   "type": "way",
+   "id": 9000078,
+   "tags": {
+    "highway": "secondary",
+    "name": "16th Street"
+   },
+   "geometry": [
+    {
+     "lat": 37.765100000000004,
+     "lon": -122.4345
+    },
+    {
+     "lat": 37.7648,
+     "lon": -122.428
+    },
+    {
+     "lat": 37.7645,
+     "lon": -122.42
+    }
+   ]
+  },
+  {
+   "type": "way",
+   "id": 9000079,
+   "tags": {
+    "highway": "residential",
+    "name": "17th Street"
+   },
+   "geometry": [
+    {
+     "lat": 37.7635,
+     "lon": -122.4345
+    },
+    {
+     "lat": 37.7632,
+     "lon": -122.428
+    },
+    {
+     "lat": 37.762899999999995,
+     "lon": -122.42
+    }
+   ]
+  },
+  {
+   "type": "way",
+   "id": 9000080,
+   "tags": {
+    "highway": "secondary",
+    "name": "18th Street"
+   },
+   "geometry": [
+    {
+     "lat": 37.7618,
+     "lon": -122.4345
+    },
+    {
+     "lat": 37.7615,
+     "lon": -122.428
+    },
+    {
+     "lat": 37.761199999999995,
+     "lon": -122.42
+    }
+   ]
+  },
+  {
+   "type": "way",
+   "id": 9000081,
+   "tags": {
+    "highway": "residential",
+    "name": "20th Street"
+   },
+   "geometry": [
+    {
+     "lat": 37.7586,
+     "lon": -122.4345
+    },
+    {
+     "lat": 37.7583,
+     "lon": -122.428
+    },
+    {
+     "lat": 37.757999999999996,
+     "lon": -122.42
+    }
+   ]
+  },
+  {
+   "type": "way",
+   "id": 9000082,
+   "tags": {
+    "highway": "residential",
+    "name": "21st Street"
+   },
+   "geometry": [
+    {
+     "lat": 37.757000000000005,
+     "lon": -122.4345
+    },
+    {
+     "lat": 37.7567,
+     "lon": -122.428
+    },
+    {
+     "lat": 37.7564,
+     "lon": -122.42
+    }
+   ]
+  },
+  {
+   "type": "way",
+   "id": 9000083,
+   "tags": {
+    "highway": "residential",
+    "name": "22nd Street"
+   },
+   "geometry": [
+    {
+     "lat": 37.7554,
+     "lon": -122.4345
+    },
+    {
+     "lat": 37.7551,
+     "lon": -122.428
+    },
+    {
+     "lat": 37.754799999999996,
+     "lon": -122.42
+    }
+   ]
+  },
+  {
+   "type": "way",
+   "id": 9000084,
+   "tags": {
+    "highway": "tertiary",
+    "name": "Valencia Street"
+   },
+   "geometry": [
+    {
+     "lat": 37.7665,
+     "lon": -122.42139999999999
+    },
+    {
+     "lat": 37.76,
+     "lon": -122.4216
+    },
+    {
+     "lat": 37.7535,
+     "lon": -122.4218
+    }
+   ]
+  },
+  {
+   "type": "way",
+   "id": 9000085,
+   "tags": {
+    "highway": "secondary",
+    "name": "Guerrero Street"
+   },
+   "geometry": [
+    {
+     "lat": 37.7665,
+     "lon": -122.42349999999999
+    },
+    {
+     "lat": 37.76,
+     "lon": -122.4237
+    },
+    {
+     "lat": 37.7535,
+     "lon": -122.4239
+    }
+   ]
+  },
+  {
+   "type": "way",
+   "id": 9000086,
+   "tags": {
+    "highway": "tertiary",
+    "name": "Dolores Street"
+   },
+   "geometry": [
+    {
+     "lat": 37.7665,
+     "lon": -122.42559999999999
+    },
+    {
+     "lat": 37.76,
+     "lon": -122.4258
+    },
+    {
+     "lat": 37.7535,
+     "lon": -122.426
+    }
+   ]
+  },
+  {
+   "type": "way",
+   "id": 9000087,
+   "tags": {
+    "highway": "tertiary",
+    "name": "Church Street"
+   },
+   "geometry": [
+    {
+     "lat": 37.7665,
+     "lon": -122.4283
+    },
+    {
+     "lat": 37.76,
+     "lon": -122.4285
+    },
+    {
+     "lat": 37.7535,
+     "lon": -122.4287
+    }
+   ]
+  },
+  {
+   "type": "way",
+   "id": 9000088,
+   "tags": {
+    "highway": "residential",
+    "name": "Sanchez Street"
+   },
+   "geometry": [
+    {
+     "lat": 37.7665,
+     "lon": -122.4305
+    },
+    {
+     "lat": 37.76,
+     "lon": -122.4307
+    },
+    {
+     "lat": 37.7535,
+     "lon": -122.43090000000001
+    }
+   ]
+  },
+  {
+   "type": "way",
+   "id": 9000089,
+   "tags": {
+    "highway": "residential",
+    "name": "Noe Street"
+   },
+   "geometry": [
+    {
+     "lat": 37.7665,
+     "lon": -122.4327
+    },
+    {
+     "lat": 37.76,
+     "lon": -122.4329
+    },
+    {
+     "lat": 37.7535,
+     "lon": -122.43310000000001
+    }
+   ]
+  },
+  {
+   "type": "way",
+   "id": 9000090,
+   "tags": {
+    "highway": "residential",
+    "name": "19th Street"
+   },
+   "geometry": [
+    {
+     "lat": 37.76,
+     "lon": -122.4345
+    },
+    {
+     "lat": 37.7599,
+     "lon": -122.4285
+    }
+   ]
+  },
+  {
+   "type": "way",
+   "id": 9000091,
+   "tags": {
+    "highway": "residential",
+    "name": "19th Street"
+   },
+   "geometry": [
+    {
+     "lat": 37.7599,
+     "lon": -122.4258
+    },
+    {
+     "lat": 37.7598,
+     "lon": -122.42
+    }
+   ]
+  },
+  {
+   "type": "way",
+   "id": 9000092,
+   "tags": {
+    "highway": "residential",
+    "name": "Cumberland Street"
+   },
+   "geometry": [
+    {
+     "lat": 37.7591,
+     "lon": -122.4285
+    },
+    {
+     "lat": 37.7591,
+     "lon": -122.4329
+    }
+   ]
+  },
+  {
+   "type": "way",
+   "id": 9000093,
+   "tags": {
+    "highway": "residential",
+    "name": "Liberty Street"
+   },
+   "geometry": [
+    {
+     "lat": 37.7575,
+     "lon": -122.4216
+    },
+    {
+     "lat": 37.7575,
+     "lon": -122.4307
+    }
+   ]
+  },
+  {
+   "type": "way",
+   "id": 9000094,
+   "tags": {
+    "leisure": "park",
+    "name": "Mission Dolores Park"
+   },
+   "geometry": [
+    {
+     "lat": 37.7615,
+     "lon": -122.4283
+    },
+    {
+     "lat": 37.7615,
+     "lon": -122.4259
+    },
+    {
+     "lat": 37.7583,
+     "lon": -122.4259
+    },
+    {
+     "lat": 37.7583,
+     "lon": -122.4283
+    },
+    {
+     "lat": 37.7615,
+     "lon": -122.4283
+    }
+   ]
+  },
+  {
+   "type": "way",
+   "id": 9000095,
+   "tags": {
+    "highway": "footway"
+   },
+   "geometry": [
+    {
+     "lat": 37.7614,
+     "lon": -122.426
+    },
+    {
+     "lat": 37.76,
+     "lon": -122.427
+    },
+    {
+     "lat": 37.7585,
+     "lon": -122.4281
+    }
+   ]
+  },
+  {
+   "type": "way",
+   "id": 9000096,
+   "tags": {
+    "highway": "footway"
+   },
+   "geometry": [
+    {
+     "lat": 37.7614,
+     "lon": -122.4282
+    },
+    {
+     "lat": 37.7603,
+     "lon": -122.4275
+    },
+    {
+     "lat": 37.759,
+     "lon": -122.4262
+    }
+   ]
+  },
+  {
+   "type": "way",
+   "id": 9000097,
+   "tags": {
+    "highway": "footway"
+   },
+   "geometry": [
+    {
+     "lat": 37.7598,
+     "lon": -122.4282
+    },
+    {
+     "lat": 37.7598,
+     "lon": -122.426
+    }
+   ]
+  },
+  {
+   "type": "way",
+   "id": 9000098,
+   "tags": {
+    "highway": "path"
+   },
+   "geometry": [
+    {
+     "lat": 37.7608,
+     "lon": -122.4282
+    },
+    {
+     "lat": 37.7606,
+     "lon": -122.4268
+    },
+    {
+     "lat": 37.7612,
+     "lon": -122.4262
+    }
+   ]
+  },
+  {
+   "type": "node",
+   "id": 9000099,
+   "lat": 37.7583,
+   "lon": -122.4285,
+   "tags": {
+    "historic": "yes",
+    "name": "Golden Fire Hydrant",
+    "start_date": "1906",
+    "colour": "gold"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9000100,
+   "lat": 37.7612,
+   "lon": -122.4263,
+   "tags": {
+    "historic": "memorial",
+    "memorial": "statue",
+    "name": "Miguel Hidalgo statue"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9000101,
+   "lat": 37.7609,
+   "lon": -122.4266,
+   "tags": {
+    "historic": "memorial",
+    "name": "Mexican Liberty Bell replica",
+    "material": "bronze"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9000102,
+   "lat": 37.7607,
+   "lon": -122.4278,
+   "tags": {
+    "leisure": "playground",
+    "name": "Helen Diller Playground"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9000103,
+   "lat": 37.7587,
+   "lon": -122.4279,
+   "tags": {
+    "tourism": "viewpoint",
+    "name": "Dolores Park hilltop"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9000104,
+   "lat": 37.7642,
+   "lon": -122.427,
+   "tags": {
+    "historic": "building",
+    "name": "Mission Dolores",
+    "start_date": "1791"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9000105,
+   "lat": 37.762,
+   "lon": -122.4279,
+   "tags": {
+    "historic": "building",
+    "name": "Mission High School"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9000106,
+   "lat": 37.7616,
+   "lon": -122.4252,
+   "tags": {
+    "amenity": "cafe",
+    "name": "Bi-Rite Creamery",
+    "cuisine": "ice_cream"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9000107,
+   "lat": 37.7614,
+   "lon": -122.4241,
+   "tags": {
+    "shop": "bakery",
+    "name": "Tartine Bakery"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9000108,
+   "lat": 37.7613,
+   "lon": -122.4256,
+   "tags": {
+    "amenity": "cafe",
+    "name": "Dolores Park Cafe"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9000109,
+   "lat": 37.7618,
+   "lon": -122.4226,
+   "tags": {
+    "tourism": "artwork",
+    "artwork_type": "mural",
+    "name": "MaestraPeace"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9000110,
+   "lat": 37.759,
+   "lon": -122.4281,
+   "tags": {
+    "man_made": "bridge",
+    "name": "Dolores Park footbridge"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9000111,
+   "lat": 37.7584,
+   "lon": -122.4287,
+   "tags": {
+    "highway": "bus_stop",
+    "name": "Church St & 20th St"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9000112,
+   "lat": 37.7614,
+   "lon": -122.4287,
+   "tags": {
+    "highway": "bus_stop",
+    "name": "Church St & 18th St"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9000113,
+   "lat": 37.7616,
+   "lon": -122.4286,
+   "tags": {
+    "amenity": "post_box"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9000114,
+   "lat": 37.7605,
+   "lon": -122.427,
+   "tags": {
+    "amenity": "drinking_water"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9000115,
+   "lat": 37.7592,
+   "lon": -122.4265,
+   "tags": {
+    "amenity": "drinking_water"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9000116,
+   "lat": 37.76,
+   "lon": -122.4277,
+   "tags": {
+    "amenity": "bench"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9000117,
+   "lat": 37.7595,
+   "lon": -122.4268,
+   "tags": {
+    "amenity": "bench",
+    "inscription": "yes"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9000118,
+   "lat": 37.7588,
+   "lon": -122.4274,
+   "tags": {
+    "amenity": "bench"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9000119,
+   "lat": 37.7611,
+   "lon": -122.4271,
+   "tags": {
+    "amenity": "waste_basket"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9000120,
+   "lat": 37.7612,
+   "lon": -122.4259,
+   "tags": {
+    "amenity": "bicycle_parking"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9000121,
+   "lat": 37.76,
+   "lon": -122.4258,
+   "tags": {
+    "natural": "tree",
+    "genus": "Phoenix",
+    "species": "Phoenix canariensis"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9000122,
+   "lat": 37.759,
+   "lon": -122.4258,
+   "tags": {
+    "natural": "tree",
+    "genus": "Phoenix",
+    "species": "Phoenix canariensis"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9000123,
+   "lat": 37.7623,
+   "lon": -122.4258,
+   "tags": {
+    "natural": "tree",
+    "genus": "Phoenix",
+    "species": "Phoenix canariensis"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9000124,
+   "lat": 37.7594,
+   "lon": -122.4279,
+   "tags": {
+    "natural": "tree",
+    "species": "Cupressus macrocarpa"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9000125,
+   "lat": 37.7603,
+   "lon": -122.4262,
+   "tags": {
+    "natural": "tree"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9000126,
+   "lat": 37.7586,
+   "lon": -122.4266,
+   "tags": {
+    "natural": "tree",
+    "leaf_type": "broadleaved"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9000127,
+   "lat": 37.7598,
+   "lon": -122.4284,
+   "tags": {
+    "highway": "street_lamp"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9000128,
+   "lat": 37.7631,
+   "lon": -122.4258,
+   "tags": {
+    "highway": "street_lamp"
+   }
+  }
+ ]
+}

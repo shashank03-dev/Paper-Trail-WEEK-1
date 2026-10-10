@@ -1,0 +1,565 @@
+{
+ "elements": [
+  {
+   "type": "way",
+   "id": 9000000,
+   "tags": {
+    "leisure": "park",
+    "name": "Cubbon Park"
+   },
+   "geometry": [
+    {
+     "lat": 12.9808,
+     "lon": 77.5898
+    },
+    {
+     "lat": 12.98,
+     "lon": 77.5958
+    },
+    {
+     "lat": 12.9772,
+     "lon": 77.599
+    },
+    {
+     "lat": 12.9732,
+     "lon": 77.5976
+    },
+    {
+     "lat": 12.9702,
+     "lon": 77.5942
+    },
+    {
+     "lat": 12.9714,
+     "lon": 77.5893
+    },
+    {
+     "lat": 12.976,
+     "lon": 77.5881
+    },
+    {
+     "lat": 12.9808,
+     "lon": 77.5898
+    }
+   ]
+  },
+  {
+   "type": "way",
+   "id": 9000001,
+   "tags": {
+    "natural": "wood",
+    "name": "Bamboo grove"
+   },
+   "geometry": [
+    {
+     "lat": 12.9756,
+     "lon": 77.5906
+    },
+    {
+     "lat": 12.9752,
+     "lon": 77.5922
+    },
+    {
+     "lat": 12.9743,
+     "lon": 77.592
+    },
+    {
+     "lat": 12.9745,
+     "lon": 77.5905
+    },
+    {
+     "lat": 12.9756,
+     "lon": 77.5906
+    }
+   ]
+  },
+  {
+   "type": "way",
+   "id": 9000002,
+   "tags": {
+    "highway": "primary",
+    "name": "Kasturba Road"
+   },
+   "geometry": [
+    {
+     "lat": 12.97,
+     "lon": 77.5952
+    },
+    {
+     "lat": 12.974,
+     "lon": 77.5966
+    },
+    {
+     "lat": 12.9765,
+     "lon": 77.5986
+    },
+    {
+     "lat": 12.9777,
+     "lon": 77.6008
+    }
+   ]
+  },
+  {
+   "type": "way",
+   "id": 9000003,
+   "tags": {
+    "highway": "secondary",
+    "name": "Ambedkar Veedhi"
+   },
+   "geometry": [
+    {
+     "lat": 12.9803,
+     "lon": 77.5872
+    },
+    {
+     "lat": 12.9806,
+     "lon": 77.5935
+    },
+    {
+     "lat": 12.9794,
+     "lon": 77.5985
+    }
+   ]
+  },
+  {
+   "type": "way",
+   "id": 9000004,
+   "tags": {
+    "highway": "primary",
+    "name": "Nrupathunga Road"
+   },
+   "geometry": [
+    {
+     "lat": 12.97,
+     "lon": 77.5868
+    },
+    {
+     "lat": 12.974,
+     "lon": 77.5874
+    },
+    {
+     "lat": 12.9778,
+     "lon": 77.5878
+    }
+   ]
+  },
+  {
+   "type": "way",
+   "id": 9000005,
+   "tags": {
+    "highway": "secondary",
+    "name": "Mahatma Gandhi Road"
+   },
+   "geometry": [
+    {
+     "lat": 12.9757,
+     "lon": 77.6
+    },
+    {
+     "lat": 12.9752,
+     "lon": 77.606
+    }
+   ]
+  },
+  {
+   "type": "way",
+   "id": 9000006,
+   "tags": {
+    "highway": "tertiary",
+    "name": "Raj Bhavan Road"
+   },
+   "geometry": [
+    {
+     "lat": 12.9794,
+     "lon": 77.5985
+    },
+    {
+     "lat": 12.983,
+     "lon": 77.5935
+    }
+   ]
+  },
+  {
+   "type": "way",
+   "id": 9000007,
+   "tags": {
+    "highway": "service",
+    "name": "Sri Chamarajendra Road"
+   },
+   "geometry": [
+    {
+     "lat": 12.979,
+     "lon": 77.5905
+    },
+    {
+     "lat": 12.9765,
+     "lon": 77.5932
+    },
+    {
+     "lat": 12.9741,
+     "lon": 77.5946
+    },
+    {
+     "lat": 12.9712,
+     "lon": 77.595
+    }
+   ]
+  },
+  {
+   "type": "way",
+   "id": 9000008,
+   "tags": {
+    "highway": "service",
+    "name": "Cubbon Park Road"
+   },
+   "geometry": [
+    {
+     "lat": 12.976,
+     "lon": 77.5884
+    },
+    {
+     "lat": 12.9763,
+     "lon": 77.5925
+    },
+    {
+     "lat": 12.9756,
+     "lon": 77.5966
+    }
+   ]
+  },
+  {
+   "type": "way",
+   "id": 9000009,
+   "tags": {
+    "highway": "footway"
+   },
+   "geometry": [
+    {
+     "lat": 12.9785,
+     "lon": 77.5935
+    },
+    {
+     "lat": 12.977,
+     "lon": 77.5955
+    },
+    {
+     "lat": 12.9762,
+     "lon": 77.5975
+    }
+   ]
+  },
+  {
+   "type": "way",
+   "id": 9000010,
+   "tags": {
+    "highway": "footway"
+   },
+   "geometry": [
+    {
+     "lat": 12.9735,
+     "lon": 77.5905
+    },
+    {
+     "lat": 12.9746,
+     "lon": 77.593
+    },
+    {
+     "lat": 12.9733,
+     "lon": 77.5958
+    }
+   ]
+  },
+  {
+   "type": "way",
+   "id": 9000011,
+   "tags": {
+    "highway": "path"
+   },
+   "geometry": [
+    {
+     "lat": 12.9775,
+     "lon": 77.59
+    },
+    {
+     "lat": 12.9768,
+     "lon": 77.5915
+    },
+    {
+     "lat": 12.9762,
+     "lon": 77.5929
+    },
+    {
+     "lat": 12.9758,
+     "lon": 77.5945
+    }
+   ]
+  },
+  {
+   "type": "way",
+   "id": 9000012,
+   "tags": {
+    "highway": "path"
+   },
+   "geometry": [
+    {
+     "lat": 12.9725,
+     "lon": 77.592
+    },
+    {
+     "lat": 12.9718,
+     "lon": 77.5935
+    },
+    {
+     "lat": 12.9726,
+     "lon": 77.5948
+    }
+   ]
+  },
+  {
+   "type": "node",
+   "id": 9000013,
+   "lat": 12.9746,
+   "lon": 77.5939,
+   "tags": {
+    "amenity": "library",
+    "name": "State Central Library",
+    "start_date": "1915",
+    "colour": "red"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9000014,
+   "lat": 12.979,
+   "lon": 77.5917,
+   "tags": {
+    "historic": "building",
+    "name": "Attara Kacheri",
+    "start_date": "1868",
+    "colour": "red"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9000015,
+   "lat": 12.9741,
+   "lon": 77.5959,
+   "tags": {
+    "historic": "building",
+    "name": "Government Museum"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9000016,
+   "lat": 12.9762,
+   "lon": 77.5944,
+   "tags": {
+    "historic": "building",
+    "name": "Cubbon Park Bandstand"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9000017,
+   "lat": 12.9757,
+   "lon": 77.5986,
+   "tags": {
+    "historic": "memorial",
+    "memorial": "statue",
+    "name": "Queen Victoria statue",
+    "material": "marble"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9000018,
+   "lat": 12.9771,
+   "lon": 77.5966,
+   "tags": {
+    "historic": "memorial",
+    "memorial": "statue",
+    "name": "King Edward VII statue"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9000019,
+   "lat": 12.9786,
+   "lon": 77.5926,
+   "tags": {
+    "historic": "memorial",
+    "memorial": "statue",
+    "name": "Sir Mark Cubbon statue"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9000020,
+   "lat": 12.9728,
+   "lon": 77.5928,
+   "tags": {
+    "leisure": "playground",
+    "name": "Jawahar Bal Bhavan"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9000021,
+   "lat": 12.9766,
+   "lon": 77.594,
+   "tags": {
+    "amenity": "fountain"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9000022,
+   "lat": 12.9744,
+   "lon": 77.5966,
+   "tags": {
+    "highway": "bus_stop",
+    "name": "Cubbon Park"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9000023,
+   "lat": 12.9788,
+   "lon": 77.5912,
+   "tags": {
+    "amenity": "post_box"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9000024,
+   "lat": 12.9758,
+   "lon": 77.5934,
+   "tags": {
+    "amenity": "drinking_water"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9000025,
+   "lat": 12.9735,
+   "lon": 77.5944,
+   "tags": {
+    "amenity": "drinking_water"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9000026,
+   "lat": 12.976,
+   "lon": 77.5925,
+   "tags": {
+    "amenity": "bench"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9000027,
+   "lat": 12.9751,
+   "lon": 77.595,
+   "tags": {
+    "amenity": "bench"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9000028,
+   "lat": 12.977,
+   "lon": 77.5935,
+   "tags": {
+    "amenity": "bench",
+    "inscription": "yes"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9000029,
+   "lat": 12.9765,
+   "lon": 77.5918,
+   "tags": {
+    "natural": "tree",
+    "species": "Samanea saman"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9000030,
+   "lat": 12.9754,
+   "lon": 77.5935,
+   "tags": {
+    "natural": "tree",
+    "genus": "Ficus"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9000031,
+   "lat": 12.9779,
+   "lon": 77.5948,
+   "tags": {
+    "natural": "tree",
+    "species": "Spathodea campanulata"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9000032,
+   "lat": 12.9739,
+   "lon": 77.5925,
+   "tags": {
+    "natural": "tree",
+    "species": "Peltophorum pterocarpum"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9000033,
+   "lat": 12.9768,
+   "lon": 77.5957,
+   "tags": {
+    "natural": "tree"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9000034,
+   "lat": 12.9749,
+   "lon": 77.5943,
+   "tags": {
+    "highway": "street_lamp"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9000035,
+   "lat": 12.9772,
+   "lon": 77.5925,
+   "tags": {
+    "highway": "street_lamp"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9000036,
+   "lat": 12.9737,
+   "lon": 77.5952,
+   "tags": {
+    "amenity": "cafe"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9000037,
+   "lat": 12.9719,
+   "lon": 77.5939,
+   "tags": {
+    "amenity": "waste_basket"
+   }
+  }
+ ]
+}
