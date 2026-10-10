@@ -12,7 +12,7 @@ function mulberry(seed: number) {
 }
 
 /** Uncoated paper, drawn in code: a warm wash, a few thousand fibres and some flecks. */
-export function drawPaper(ctx: CanvasRenderingContext2D, w: number, h: number, base = "#f3eee3") {
+export function drawPaper(ctx: CanvasRenderingContext2D, w: number, h: number, base = "#f8f5ee") {
   const r = mulberry(7);
   ctx.fillStyle = base;
   ctx.fillRect(0, 0, w, h);

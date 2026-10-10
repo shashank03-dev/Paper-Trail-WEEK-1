@@ -10,18 +10,14 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import {
-  motion,
-  useMotionValueEvent,
-  useReducedMotion,
-  useScroll,
-  useTransform,
-  type MotionValue,
-} from "motion/react";
+import { motion, useReducedMotion } from "motion/react";
+import { createTimeline } from "animejs";
 import { ArrowRight } from "lucide-react";
 import { Sheet } from "@/lib/zine/Sheet";
 import { demoZine } from "@/lib/demo/demoZine";
 import { ModelBadge } from "@/components/ModelBadge";
+import type { Rig } from "./StudioScene";
+import { SHEET_H, SHEET_W } from "./foldSheet";
 
 const StudioScene = dynamic(() => import("./StudioScene"), { ssr: false });
 
@@ -47,84 +43,259 @@ function hasWebGL(): boolean {
   }
 }
 
-const ramp = (v: number, a: number, b: number) => Math.min(1, Math.max(0, (v - a) / (b - a)));
 const EASE = [0.16, 1, 0.3, 1] as const;
 
 const CHAPTERS = [
   {
-    at: [0.12, 0.32],
     n: "i",
     title: "One sheet of paper.",
     body: "Every trail is a single page from your own printer, laid out as eight small pages around one cut.",
   },
   {
-    at: [0.36, 0.6],
     n: "ii",
     title: "Drawn from your actual streets.",
     body: "The map, the stops and the things to spot come from OpenStreetMap around where you start. Nothing is made up.",
   },
   {
-    at: [0.64, 0.84],
     n: "iii",
     title: "One cut, a few folds.",
     body: "Crease it along the lines and it becomes a booklet that fits a back pocket. No glue, no stapler.",
   },
   {
-    at: [0.87, 1],
     n: "iv",
     title: "Then the phone stays behind.",
     body: "Everything you need for the next half hour is on paper. No battery, no signal, no pings.",
   },
 ] as const;
 
-function Chapter({ p, c }: { p: MotionValue<number>; c: (typeof CHAPTERS)[number] }) {
-  const [a, b] = c.at;
-  const last = b >= 1;
-  const opacity = useTransform(p, (v) =>
-    Math.min(ramp(v, a, a + 0.035), last ? 1 : 1 - ramp(v, b - 0.035, b)),
-  );
-  const y = useTransform(
-    p,
-    (v) => 28 * (1 - ramp(v, a, a + 0.05)) - (last ? 0 : 18 * ramp(v, b - 0.04, b)),
-  );
-  const clip = useTransform(p, (v) => `inset(0 ${100 - 100 * ramp(v, a, a + 0.06)}% 0 0)`);
-  return (
-    <motion.div style={{ opacity, y }} className="absolute inset-x-0 bottom-0">
-      <div className="flex items-center gap-4">
-        <span className="font-serif text-[2.4rem] italic leading-none text-riso">{c.n}.</span>
-        <motion.span style={{ clipPath: clip }} className="h-px flex-1 bg-ink/25" aria-hidden />
-        <span className="label">{CHAPTERS.findIndex((x) => x.n === c.n) + 1} / 4</span>
-      </div>
-      <h3 className="headline mt-5 text-[clamp(2.1rem,1.3rem+2.6vw,3.6rem)]">{c.title}</h3>
-      <p className="lede mt-4 max-w-md">{c.body}</p>
-    </motion.div>
-  );
+/* ------------------------------------------------------------------ */
+/*  Poses. Positions are in the scene's units (100 mm); the timeline   */
+/*  below moves the paper between them while the folds open & close.  */
+/* ------------------------------------------------------------------ */
+
+type Pose = Pick<Rig, "x" | "y" | "z" | "s" | "rx" | "ry" | "rz"> & { fx?: number; fy?: number };
+interface Poses {
+  rest: Pose;
+  lift: Pose;
+  flat: Pose;
+  drift: Pose;
+  map: Pose;
+  upright: Pose;
+  land: Pose;
 }
 
-const WORDS = ["The", "walk", "app", "that"];
+// Page 2 (the map) is the top-right panel, printed upside down. The sheet turns
+// half a revolution about the map itself, so the map holds still at `at`
+// while the rest of the sheet swings round it.
+const mapPose = (s: number, at: [number, number]): Pose => ({
+  x: at[0],
+  y: at[1],
+  z: 0.5,
+  s,
+  rx: -0.02,
+  ry: 0.02,
+  rz: Math.PI - 0.02,
+  fx: (SHEET_W * 3) / 8,
+  fy: SHEET_H / 4,
+});
+
+const DESKTOP: Poses = {
+  rest: { x: 1.72, y: 0.05, z: 0.02, s: 1.62, rx: 0.06, ry: 0.04, rz: -0.16 },
+  lift: { x: 1.45, y: -0.02, z: 0.55, s: 1.5, rx: -0.14, ry: -0.32, rz: -0.07 },
+  flat: { x: 1.18, y: 0.02, z: 0.42, s: 1.02, rx: -0.08, ry: -0.06, rz: 0.015 },
+  drift: { x: 1.2, y: 0.02, z: 0.45, s: 1.04, rx: -0.04, ry: 0.05, rz: 0.01 },
+  map: mapPose(1.45, [1.12, -0.04]),
+  upright: { x: 1.45, y: 0.0, z: 0.6, s: 1.5, rx: -0.1, ry: 0.42, rz: 0.06 },
+  land: { x: 1.6, y: -0.12, z: 0.03, s: 1.45, rx: 0.04, ry: 0.0, rz: 0.16 },
+};
+const MOBILE: Poses = {
+  rest: { x: -0.22, y: 1.2, z: 0.02, s: 0.74, rx: 0.05, ry: 0, rz: -0.14 },
+  lift: { x: 0, y: 1.0, z: 0.4, s: 0.8, rx: -0.12, ry: -0.3, rz: -0.06 },
+  flat: { x: 0, y: 0.86, z: 0.3, s: 0.55, rx: -0.06, ry: 0, rz: 0 },
+  drift: { x: 0, y: 0.88, z: 0.32, s: 0.56, rx: -0.03, ry: 0.04, rz: 0.01 },
+  map: mapPose(1.0, [0, 0.82]),
+  upright: { x: 0, y: 0.82, z: 0.45, s: 1.0, rx: -0.1, ry: 0.4, rz: 0.05 },
+  land: { x: -0.2, y: 1.12, z: 0.03, s: 0.78, rx: 0.04, ry: 0, rz: 0.12 },
+};
+
+const folded = { top: 1, a: 1, b: 1, c: 1 };
+const initialRig = (p: Poses): Rig => ({ fx: 0, fy: 0, ...p.rest, ...folded, away: 0 });
+
+/**
+ * One anime.js timeline for the whole story. Time runs 0 → 1000 across the
+ * section's scroll; everything that moves in the hero (paper, folds, pencil,
+ * captions, the hero copy itself) is a track on it, so nothing can drift out
+ * of step. The playhead is driven by `useScrollScrub` below.
+ */
+function choreograph(
+  rig: Rig,
+  p: Poses,
+  el: {
+    hero: HTMLElement;
+    cue: HTMLElement;
+    veil: HTMLElement;
+    bar: HTMLElement;
+    chapters: HTMLElement[];
+  },
+) {
+  const tl = createTimeline({ defaults: { ease: "inOutSine" }, autoplay: false });
+  const pose = (to: Pose, at: number, dur: number, ease = "inOutCubic") =>
+    tl.add(rig, { fx: 0, fy: 0, ...to, duration: dur, ease }, at);
+  const fold = (key: "top" | "a" | "b" | "c", to: number, at: number, dur: number, ease: string) =>
+    tl.add(rig, { [key]: to, duration: dur, ease }, at);
+  const caption = (i: number, inAt: number, outAt?: number) => {
+    const c = el.chapters[i]!;
+    tl.add(c, { opacity: [0, 1], translateY: [28, 0], duration: 40, ease: "outCubic" }, inAt);
+    if (outAt !== undefined)
+      tl.add(c, { opacity: 0, translateY: -18, duration: 30, ease: "inCubic" }, outAt);
+  };
+
+  // The hero copy steps aside and the paper lifts off the desk; the pencil rolls away.
+  tl.add(
+    el.hero,
+    {
+      opacity: [1, 0],
+      translateY: [0, -80],
+      duration: 70,
+      ease: "inQuad",
+      // Faded hero links must not catch clicks meant for the story underneath.
+      onUpdate: () => {
+        el.hero.style.pointerEvents = Number(el.hero.style.opacity || 1) < 0.3 ? "none" : "";
+      },
+    },
+    10,
+  );
+  tl.add(el.cue, { opacity: [1, 0], duration: 30 }, 0);
+  tl.add(el.veil, { opacity: [0, 1], duration: 80 }, 120);
+  tl.add(rig, { away: 1, duration: 150, ease: "inOutQuad" }, 40);
+  pose(p.lift, 50, 110, "outCubic");
+
+  // Unfold: the concertina opens from the outer flap in, each crease a beat
+  // after the last, then the long crease lets the top row swing up.
+  fold("c", 0, 135, 115, "inOutSine");
+  fold("b", 0, 160, 115, "inOutSine");
+  fold("a", 0, 185, 115, "inOutSine");
+  fold("top", 0, 280, 95, "inOutQuad");
+  pose(p.flat, 160, 220, "inOutSine");
+  caption(0, 340, 480);
+  pose(p.drift, 380, 140, "inOutSine");
+
+  // Turn the sheet round and lean in on the map.
+  pose(p.map, 505, 110, "inOutCubic");
+  caption(1, 545, 700);
+  pose(p.flat, 665, 65, "inOutCubic");
+
+  // Fold it back up the way you would by hand: the long crease, then the concertina.
+  fold("top", 1, 725, 85, "inOutQuad");
+  fold("a", 1, 795, 100, "inOutSine");
+  fold("b", 1, 812, 100, "inOutSine");
+  fold("c", 1, 829, 100, "inOutSine");
+  pose(p.upright, 735, 168, "inOutSine");
+  caption(2, 740, 890);
+
+  // It stands up, then settles back onto the desk; the pencil rolls home.
+  caption(3, 920);
+  pose(p.land, 905, 95, "outCubic");
+  tl.add(rig, { away: 0, duration: 120, ease: "outQuad" }, 880);
+
+  tl.add(el.bar, { width: ["0%", "100%"], duration: 1000, ease: "linear" }, 0);
+  return tl;
+}
+
+/**
+ * Scroll progress through `section` (0 at its top, 1 when its end reaches the
+ * bottom of the window), eased toward the real position with frame-rate
+ * independent damping so a flick of the wheel glides instead of jumping.
+ * Runs only while the section is near the viewport; with reduced motion the
+ * playhead follows the scroll exactly.
+ */
+function scrub(section: HTMLElement, apply: (p: number) => void): () => void {
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const read = () => {
+    const r = section.getBoundingClientRect();
+    const len = r.height - window.innerHeight;
+    return len > 0 ? Math.min(1, Math.max(0, -r.top / len)) : 0;
+  };
+  let p = read();
+  let last = performance.now();
+  let raf = 0;
+  let visible = true;
+  apply(p);
+  const tick = (now: number) => {
+    const dt = Math.min(0.1, (now - last) / 1000);
+    last = now;
+    const target = read();
+    p = reduce ? target : p + (target - p) * (1 - Math.exp(-dt * 9));
+    if (Math.abs(target - p) < 0.0002) p = target;
+    apply(p);
+    raf = visible ? requestAnimationFrame(tick) : 0;
+  };
+  const io = new IntersectionObserver(
+    ([e]) => {
+      visible = !!e?.isIntersecting;
+      if (visible && !raf) {
+        last = performance.now();
+        raf = requestAnimationFrame(tick);
+      }
+    },
+    { rootMargin: "200px" },
+  );
+  io.observe(section);
+  raf = requestAnimationFrame(tick);
+  return () => {
+    cancelAnimationFrame(raf);
+    io.disconnect();
+  };
+}
 
 export function Studio() {
-  const ref = useRef<HTMLElement>(null);
-  const progress = useRef(0);
+  const section = useRef<HTMLElement>(null);
+  const hero = useRef<HTMLDivElement>(null);
+  const cue = useRef<HTMLDivElement>(null);
+  const veil = useRef<HTMLDivElement>(null);
+  const bar = useRef<HTMLDivElement>(null);
+  const chapters = useRef<(HTMLDivElement | null)[]>([]);
+  const rig = useRef<Rig>(initialRig(DESKTOP));
   const [ready, setReady] = useState(false);
   const [active, setActive] = useState(true);
+  const [mobile, setMobile] = useState(false);
   const [gl, setGl] = useState<boolean | null>(null);
   const reduce = useReducedMotion();
   const data = useMemo(() => demoZine(), []);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end end"] });
-  useMotionValueEvent(scrollYProgress, "change", (v) => (progress.current = v));
-  const heroOpacity = useTransform(scrollYProgress, (v) => 1 - ramp(v, 0.015, 0.075));
-  const heroY = useTransform(scrollYProgress, (v) => -80 * ramp(v, 0, 0.09));
-  const heroEvents = useTransform(scrollYProgress, (v) => (v < 0.05 ? "auto" : "none"));
-  const cue = useTransform(scrollYProgress, (v) => 1 - ramp(v, 0, 0.03));
-  const veil = useTransform(scrollYProgress, (v) => ramp(v, 0.08, 0.16));
-  const bar = useTransform(scrollYProgress, (v) => `${v * 100}%`);
   const onReady = useCallback(() => setReady(true), []);
   useEffect(() => setGl(hasWebGL()), []);
 
+  useEffect(() => {
+    const m = window.matchMedia("(max-width: 767px)");
+    const set = () => setMobile(m.matches);
+    set();
+    m.addEventListener("change", set);
+    return () => m.removeEventListener("change", set);
+  }, []);
+
+  // (Re)build the timeline for this layout, and scrub it with the scroll.
+  useEffect(() => {
+    const s = section.current;
+    if (!s || !hero.current || !cue.current || !veil.current || !bar.current) return;
+    const poses = mobile ? MOBILE : DESKTOP;
+    Object.assign(rig.current, initialRig(poses));
+    const tl = choreograph(rig.current, poses, {
+      hero: hero.current,
+      cue: cue.current,
+      veil: veil.current,
+      bar: bar.current,
+      chapters: chapters.current.filter((c): c is HTMLDivElement => !!c),
+    });
+    const stop = scrub(s, (p) => tl.seek(p * tl.duration));
+    return () => {
+      stop();
+      tl.revert();
+    };
+  }, [mobile]);
+
   // Stop drawing WebGL frames once the studio has scrolled away.
   useEffect(() => {
-    const el = ref.current;
+    const el = section.current;
     if (!el) return;
     const io = new IntersectionObserver(([e]) => setActive(!!e?.isIntersecting), {
       rootMargin: "120px",
@@ -148,10 +319,10 @@ export function Studio() {
 
   return (
     <section
-      ref={ref}
+      ref={section}
       id="unfold"
       aria-label="Paper Trail, unfolded"
-      className="relative h-[440vh]"
+      className="relative h-[460vh]"
     >
       {/* The sheet the 3D paper is printed from (also exactly what you'd print). */}
       <div
@@ -181,22 +352,19 @@ export function Studio() {
             : gl && (
                 <SceneBoundary fallback={still}>
                   <StudioScene
-                    progress={progress}
+                    rig={rig}
                     sheetId="studio-sheet"
                     onReady={onReady}
                     active={active}
+                    mobile={mobile}
                   />
                 </SceneBoundary>
               )}
         </motion.div>
 
         {/* Hero */}
-        <motion.div
-          style={
-            reduce
-              ? { opacity: heroOpacity, pointerEvents: heroEvents }
-              : { opacity: heroOpacity, y: heroY, pointerEvents: heroEvents }
-          }
+        <div
+          ref={hero}
           className="relative z-10 mx-auto flex h-full max-w-7xl flex-col justify-end px-[var(--gutter)] pb-[9svh] md:justify-center md:pb-0"
         >
           <div className="max-w-[40rem]">
@@ -211,7 +379,7 @@ export function Studio() {
             </motion.p>
             <h1 className="display mt-6 text-[clamp(3.3rem,1.4rem+7.4vw,8.4rem)]">
               <span className="block overflow-hidden pb-[0.06em]">
-                {WORDS.map((w, i) => (
+                {["The", "walk", "app", "that"].map((w, i) => (
                   <motion.span
                     key={w}
                     className="inline-block pr-[0.2em]"
@@ -269,10 +437,10 @@ export function Studio() {
               <ModelBadge />
             </motion.div>
           </div>
-        </motion.div>
+        </div>
 
-        <motion.div
-          style={{ opacity: cue }}
+        <div
+          ref={cue}
           className="pointer-events-none absolute inset-x-0 bottom-7 z-10 hidden justify-center md:flex"
         >
           <span className="label flex flex-col items-center gap-3">
@@ -281,26 +449,44 @@ export function Studio() {
               <span className="absolute inset-x-0 top-0 h-1/2 animate-[cue_1.8s_var(--ease-in-out-quart)_infinite] bg-ink" />
             </span>
           </span>
-        </motion.div>
+        </div>
 
         {/* A soft wash so chapter text stays readable over the paper. */}
-        <motion.div
+        <div
+          ref={veil}
           aria-hidden
-          style={{ opacity: veil }}
+          style={{ opacity: 0 }}
           className="pointer-events-none absolute inset-0 z-[5] bg-[linear-gradient(90deg,rgba(241,237,228,0.95)_0%,rgba(241,237,228,0.7)_30%,transparent_50%)] max-md:bg-[linear-gradient(0deg,rgba(241,237,228,0.98)_0%,rgba(241,237,228,0.85)_36%,transparent_56%)]"
         />
 
         <div className="pointer-events-none absolute inset-x-0 bottom-[8svh] z-10 mx-auto max-w-7xl px-[var(--gutter)] md:bottom-auto md:top-1/2 md:-translate-y-1/2">
           <div className="relative h-64 max-w-[30rem] md:h-80">
-            {CHAPTERS.map((c) => (
-              <Chapter key={c.n} p={scrollYProgress} c={c} />
+            {CHAPTERS.map((c, i) => (
+              <div
+                key={c.n}
+                ref={(el) => void (chapters.current[i] = el)}
+                style={{ opacity: 0 }}
+                className="absolute inset-x-0 bottom-0"
+              >
+                <div className="flex items-center gap-4">
+                  <span className="font-serif text-[2.4rem] italic leading-none text-riso">
+                    {c.n}.
+                  </span>
+                  <span className="h-px flex-1 bg-ink/25" aria-hidden />
+                  <span className="label">{i + 1} / 4</span>
+                </div>
+                <h3 className="headline mt-5 text-[clamp(2.1rem,1.3rem+2.6vw,3.6rem)]">
+                  {c.title}
+                </h3>
+                <p className="lede mt-4 max-w-md">{c.body}</p>
+              </div>
             ))}
           </div>
         </div>
 
         {/* Reading progress for the story, like a fold line being scored. */}
         <div className="absolute inset-x-0 bottom-0 z-10 h-[2px] bg-ink/5" aria-hidden>
-          <motion.div className="h-full bg-riso" style={{ width: bar }} />
+          <div ref={bar} className="h-full w-0 bg-riso" />
         </div>
       </div>
     </section>
