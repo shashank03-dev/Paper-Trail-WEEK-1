@@ -36,6 +36,8 @@ export interface TrailRecord {
   weather: Weather;
   localTime: string;
   model: string;
+  /** Provider label when the trail was written by a hosted API. */
+  hostedOn?: string;
   genPaths: Record<string, GenPath>;
   outsideMs?: number;
   report?: FieldReport;

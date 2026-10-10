@@ -31,6 +31,8 @@ export interface ZineData {
   repoUrl: string;
   locationLabel: string;
   durationMin: number;
+  /** Set when the words came from a hosted API (e.g. "the Gemini API"); changes the colophon. */
+  hostedOn?: string;
 }
 
 export interface Ink {

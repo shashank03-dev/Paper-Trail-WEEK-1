@@ -7,12 +7,13 @@ let lastProbe: { at: number; ok: boolean; key: string } | null = null;
 
 /** Is the model endpoint answering? Cached for 20 s. */
 export async function endpointUp(cfg: LlmConfig): Promise<boolean> {
-  const key = cfg.baseURL;
+  const p = cfg.providers[0]!;
+  const key = p.baseURL;
   if (lastProbe && lastProbe.key === key && Date.now() - lastProbe.at < 20_000) return lastProbe.ok;
   let ok = false;
   try {
-    const res = await fetch(`${cfg.baseURL.replace(/\/$/, "")}/models`, {
-      headers: { authorization: `Bearer ${cfg.apiKey}` },
+    const res = await fetch(`${p.baseURL.replace(/\/$/, "")}/models`, {
+      headers: { authorization: `Bearer ${p.apiKey}` },
       signal: AbortSignal.timeout(2500),
     });
     ok = res.ok;

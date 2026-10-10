@@ -52,6 +52,9 @@ export interface PublicConfig {
   modelVision: string;
   endpoint: string;
   endpointLabel: string;
+  /** True when Gemma runs on a hosted API rather than this machine. */
+  hosted: boolean;
+  providers: string[];
   deviceLabel: string;
   publicUrl: string;
   repoUrl: string;

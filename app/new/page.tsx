@@ -148,6 +148,7 @@ export default function NewTrail() {
         weather: weatherClean,
         localTime: ctx.localTime,
         model: cfg.modelText,
+        ...(cfg.hosted ? { hostedOn: cfg.endpointLabel } : {}),
         genPaths: {},
       });
       await adoptPendingSessions(id);

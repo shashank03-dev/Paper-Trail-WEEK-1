@@ -54,6 +54,7 @@ export function zineData(
     repoUrl: cfg?.repoUrl ?? "https://github.com/shashank03-dev/Paper-Trail-WEEK-1",
     locationLabel: t.location.label,
     durationMin: t.durationMin,
+    ...(t.hostedOn ? { hostedOn: t.hostedOn } : {}),
     ...over,
   };
 }

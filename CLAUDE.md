@@ -50,17 +50,19 @@ account, and must read as their own work.
 
 ## Product rules (never break these)
 
-- **Open models only.** Every AI call goes to the configured OpenAI-compatible
-  endpoint (`LLM_BASE_URL`, default local Ollama, `gemma4:e4b`). Never add a
-  closed-model API (OpenAI GPT, Anthropic, Gemini API) anywhere.
-- **Privacy.** Location, photos and handwriting go only to that endpoint. No
-  analytics, no accounts, no third-party fonts or CDNs at runtime. Trail
-  history lives in the browser (IndexedDB via Dexie).
+- **Gemma at the core.** Every AI call goes through `lib/llm/client.ts` to a
+  provider configured in `lib/config.ts`: local Ollama (default), Ollama
+  Cloud, or Google's Gemini API — all serving Gemma (open weights) by default.
+  Don't add other model APIs, and don't default to a closed model.
+- **Privacy.** Location, photos and handwriting go only to the configured
+  model provider. No analytics, no accounts, no third-party fonts or CDNs at
+  runtime. Trail history lives in the browser (IndexedDB via Dexie). Copy
+  that promises "never leaves your machine" must only show in local mode.
 - **Never print secrets.** Config comes from env vars; keep `.env.example`
   current when you add one.
 - **The zine is drawn in code.** Every graphic on the printed sheet is SVG /
-  rough.js. No stock images or generated images on paper. (The app UI may use
-  the MIT-licensed Fluent 3D emoji in `public/icons/3d`.)
+  rough.js. No stock images or generated images on paper. The site's 3D is
+  three.js / react-three-fiber built in this repo — no hosted scene files.
 - **Print accuracy is sacred.** The sheet layout lives in `lib/zine/layout.ts`
   (mm units). The renderer, the PDF export, the OMR and the panel crops all read
   from it — change geometry there and nowhere else.

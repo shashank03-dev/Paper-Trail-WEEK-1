@@ -557,7 +557,9 @@ export function BackPanel(p: PanelProps) {
   const blurb =
     d.panels.back?.blurb ??
     "Every line on this sheet points at something real. You found some of it. That counts.";
-  const colophon = `Written by Gemma 4 (${d.model}) running on ${d.deviceLabel}. Your location never left this machine.`;
+  const colophon = d.hostedOn
+    ? `Written by Gemma 4 (${d.model}) via ${d.hostedOn}. Paper Trail keeps nothing on its server; your trail lives in your browser.`
+    : `Written by Gemma 4 (${d.model}) running on ${d.deviceLabel}. Your location never left this machine.`;
   const qrY = cb.y + 27;
   return (
     <g>

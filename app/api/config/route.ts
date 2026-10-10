@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { endpointLabel, llmConfig, serverConfig } from "@/lib/config";
+import { endpointLabel, isHosted, llmConfig, serverConfig } from "@/lib/config";
 
 export const dynamic = "force-dynamic";
 
@@ -12,6 +12,8 @@ export async function GET(req: Request) {
     modelVision: l.modelVision,
     endpoint: s.allowEndpointOverride ? l.baseURL : "",
     endpointLabel: endpointLabel(l.baseURL),
+    hosted: isHosted(l),
+    providers: l.providers.map((p) => p.label),
     deviceLabel: s.deviceLabel,
     publicUrl: s.publicUrl,
     repoUrl: s.repoUrl,
