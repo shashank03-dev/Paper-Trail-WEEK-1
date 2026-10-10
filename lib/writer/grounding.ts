@@ -12,6 +12,23 @@ import { fitsEverywhere } from "@/lib/zine/boxes";
 
 export const MIN_GROUNDED = 6;
 
+/** Internal ids from the prompt: OSM-style feature ids (n123…, w123…, r123…) and waypoint tags (W1…). */
+const ID_RE = /\b(?:[nwr]\d{4,}|W\d{1,2})\b/g;
+
+/**
+ * Copy that will be printed must never show the ids we use to ground the
+ * model ("the fountain n9000024", "at W6"); names and descriptions only.
+ */
+export function idLeaks(texts: (string | undefined)[]): string[] {
+  const found = new Set<string>();
+  for (const t of texts) for (const m of (t ?? "").matchAll(ID_RE)) found.add(m[0]);
+  return found.size
+    ? [
+        `the text mentions internal ids (${[...found].join(", ")}); never print ids, describe each place in words or by its name`,
+      ]
+    : [];
+}
+
 /** Words that suggest a place name we were never given. */
 const PLACE_WORDS =
   /\b(street|st\.|road|rd\.|avenue|ave|lane|statue|cafe|café|bakery|shop|church|museum|library|fountain|park|square|bridge)\b/i;
@@ -29,6 +46,7 @@ export function ispyProblems(items: IspyItem[], ctx: WriterContext): string[] {
     p.push(
       `only ${grounded} I-Spy items are grounded; at least ${MIN_GROUNDED} need a featureId from the lists`,
     );
+  p.push(...idLeaks(items.flatMap((i) => [i.label, i.hint])));
   const labels = new Set<string>();
   for (const it of items) {
     const key = it.label.toLowerCase();
@@ -47,6 +65,7 @@ export function riddleProblems(r: Riddle, ctx: WriterContext): string[] {
     p.push(
       `riddle targetFeatureId "${r.targetFeatureId}" must be one of the WAYPOINT ids: ${[...wp].join(", ")}`,
     );
+  p.push(...idLeaks([r.text]));
   if (!fitsEverywhere("riddleText", r.text))
     p.push("riddle text is too long for its panel; make it shorter");
   return p;
@@ -56,6 +75,7 @@ export function planProblems(plan: TrailPlan, ctx: WriterContext): string[] {
   const p = [...ispyProblems(plan.ispy, ctx), ...riddleProblems(plan.riddle, ctx)];
   if (plan.listenStop > ctx.route.waypoints.length)
     p.push(`listenStop must be 1..${ctx.route.waypoints.length}`);
+  p.push(...idLeaks([plan.title, plan.subtitle, plan.sketchPrompt]));
   if (!fitsEverywhere("coverTitle", plan.title)) p.push("title too long for the cover");
   if (!fitsEverywhere("sketchPrompt", plan.sketchPrompt)) p.push("sketchPrompt too long");
   return p;
@@ -72,6 +92,7 @@ export function routeCopyProblems(c: RouteCopy, ctx: WriterContext): string[] {
   if (!ids.has(c.ifLost.featureId))
     p.push(`ifLost.featureId "${c.ifLost.featureId}" is not in the list`);
   if (!fitsEverywhere("ifLost", c.ifLost.text)) p.push("ifLost text too long");
+  p.push(...idLeaks([...c.stops.map((s) => s.text), c.ifLost.text]));
   return p;
 }
 
@@ -79,12 +100,17 @@ export function coverProblems(c: CoverCopy): string[] {
   const p: string[] = [];
   if (!fitsEverywhere("coverKicker", c.kicker.toUpperCase())) p.push("kicker too long");
   if (!fitsEverywhere("coverBlurb", c.blurb)) p.push("blurb too long");
+  p.push(...idLeaks([c.kicker, c.blurb]));
   return p;
 }
-export const listenProblems = (c: ListenCopy): string[] =>
-  fitsEverywhere("listenIntro", c.intro) ? [] : ["intro too long"];
-export const backProblems = (c: BackCopy): string[] =>
-  fitsEverywhere("backBlurb", c.blurb) ? [] : ["blurb too long"];
+export const listenProblems = (c: ListenCopy): string[] => [
+  ...(fitsEverywhere("listenIntro", c.intro) ? [] : ["intro too long"]),
+  ...idLeaks([c.intro]),
+];
+export const backProblems = (c: BackCopy): string[] => [
+  ...(fitsEverywhere("backBlurb", c.blurb) ? [] : ["blurb too long"]),
+  ...idLeaks([c.blurb]),
+];
 
 /** For evals: names in copy that don't appear in the features we gave the model. */
 export function suspiciousNames(text: string, ctx: WriterContext): string[] {

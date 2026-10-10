@@ -23,6 +23,12 @@ export interface ProviderConfig {
   systemRole: boolean;
   /** Use Ollama's native /api/chat with `format` instead of /v1 (local Ollama only). */
   native: boolean;
+  /**
+   * `reasoning_effort` to send, for endpoints where Gemma 4 thinks before it
+   * answers (the Gemini API does by default). "minimal" keeps answers fast and
+   * keeps the token budget for the JSON itself.
+   */
+  reasoningEffort?: "minimal" | "low" | "medium" | "high";
   hosted: boolean;
 }
 
@@ -85,6 +91,7 @@ const DEFAULTS: Record<
     systemRole: false,
     native: false,
     hosted: true,
+    reasoningEffort: "minimal",
   },
   "openai-compat": {
     id: "openai-compat",
@@ -147,8 +154,16 @@ function resolve(id: ProviderId, generic: boolean): ProviderConfig {
       (generic ? bool("LLM_SYSTEM_ROLE") : undefined) ??
       d.systemRole,
     native: id === "ollama" && env("LLM_OLLAMA_NATIVE") === "true",
+    ...effort(env(`${d.prefix}_REASONING_EFFORT`) ?? d.reasoningEffort),
     hosted: id === "ollama" ? !local : d.hosted,
   };
+}
+
+const EFFORTS = ["minimal", "low", "medium", "high"] as const;
+/** `X_REASONING_EFFORT=off` sends nothing; an unknown value is ignored. */
+function effort(v: string | undefined): Pick<ProviderConfig, "reasoningEffort"> {
+  const e = EFFORTS.find((x) => x === v);
+  return e ? { reasoningEffort: e } : {};
 }
 
 export function serverConfig() {

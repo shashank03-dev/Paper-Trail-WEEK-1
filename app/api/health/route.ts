@@ -1,12 +1,31 @@
 import { NextResponse } from "next/server";
-import { endpointLabel, llmConfig, serverConfig } from "@/lib/config";
+import { endpointLabel, llmConfig, serverConfig, type LlmConfig } from "@/lib/config";
 import { createChat, approxTokens } from "@/lib/llm/client";
+import { route } from "@/lib/server/http";
+import { gateStats } from "@/lib/server/chat";
 
 export const dynamic = "force-dynamic";
 
-/** Pings the model with a tiny prompt: { ok, model, latencyMs, tokensPerSec }. */
-export async function GET(req: Request) {
-  const cfg = llmConfig(req.headers);
+interface Health {
+  ok: boolean;
+  model: string;
+  where: string;
+  latencyMs: number;
+  tokensPerSec: number | null;
+  mode: "live" | "replay" | "down";
+  error?: string;
+}
+
+/*
+ * The model badge on every page asks for this, so a real ping per visitor would
+ * spend the provider's quota on page views. Results are cached for a minute and
+ * concurrent callers share one in-flight ping; `?fresh=1` (Settings → Test
+ * connection) always pings.
+ */
+const TTL_MS = 60_000;
+const memo = new Map<string, { at: number; value: Promise<Health> }>();
+
+async function ping(cfg: LlmConfig): Promise<Health> {
   const t0 = Date.now();
   try {
     const chat = createChat({ ...cfg, timeoutMs: Math.min(cfg.timeoutMs, 60_000) });
@@ -17,27 +36,43 @@ export async function GET(req: Request) {
       maxTokens: 8,
     });
     const tokens = r.completionTokens ?? approxTokens(r.content);
-    return NextResponse.json({
+    return {
       ok: true,
       model: cfg.modelText,
       where: endpointLabel(cfg.baseURL),
       latencyMs: Date.now() - t0,
       tokensPerSec: r.ms > 0 ? Math.round((tokens / (r.ms / 1000)) * 10) / 10 : null,
       mode: "live",
-    });
+    };
   } catch (e) {
-    const demo = serverConfig().demoMode;
-    return NextResponse.json(
-      {
-        ok: false,
-        model: cfg.modelText,
-        where: endpointLabel(cfg.baseURL),
-        latencyMs: Date.now() - t0,
-        tokensPerSec: null,
-        mode: demo ? "replay" : "down",
-        error: String((e as Error).message).slice(0, 160),
-      },
-      { status: demo ? 200 : 503 },
-    );
+    return {
+      ok: false,
+      model: cfg.modelText,
+      where: endpointLabel(cfg.baseURL),
+      latencyMs: Date.now() - t0,
+      tokensPerSec: null,
+      mode: serverConfig().demoMode ? "replay" : "down",
+      error: String((e as Error).message).slice(0, 160),
+    };
   }
 }
+
+/** Is the model answering? `{ ok, model, where, latencyMs, tokensPerSec, mode }`. */
+export const GET = route("health", async (req, rc) => {
+  const cfg = llmConfig(req.headers);
+  const key = `${cfg.providers.map((p) => `${p.id}@${p.baseURL}`).join(",")}|${cfg.modelText}`;
+  const fresh = new URL(req.url).searchParams.get("fresh") === "1";
+  let hit = memo.get(key);
+  const cached = !fresh && !!hit && Date.now() - hit.at < TTL_MS;
+  if (!cached) {
+    hit = { at: Date.now(), value: ping(cfg) };
+    memo.set(key, hit);
+  }
+  const h = await hit!.value;
+  rc.note({ ok: h.ok, cached });
+  const status = h.ok || h.mode === "replay" ? 200 : 503;
+  return NextResponse.json(
+    { ...h, cached, gate: gateStats() },
+    { status, headers: { "cache-control": "no-store" } },
+  );
+});

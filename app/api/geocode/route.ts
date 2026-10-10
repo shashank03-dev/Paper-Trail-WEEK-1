@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { serverConfig } from "@/lib/config";
 import { cached } from "@/lib/server/cache";
-import { jsonError, parseBody } from "@/lib/server/http";
+import { jsonError, parseBody, route } from "@/lib/server/http";
 import { PRESETS } from "@/lib/presets";
 
 export const dynamic = "force-dynamic";
@@ -23,10 +23,11 @@ function politely<T>(fn: () => Promise<T>): Promise<T> {
   return run;
 }
 
-export async function POST(req: Request) {
+export const POST = route("geocode", async (req, rc) => {
   const b = await parseBody(req, Body);
   if (!b.ok) return b.res;
   const s = serverConfig();
+  rc.note({ source: s.demoMode ? "presets" : "nominatim" });
   if (s.demoMode) {
     const q = b.data.q.toLowerCase();
     const hits = PRESETS.filter((p) => `${p.name} ${p.city}`.toLowerCase().includes(q));
@@ -72,4 +73,4 @@ export async function POST(req: Request) {
       `Search is unavailable (${(e as Error).message}). Use your location, the map, or a preset.`,
     );
   }
-}
+});

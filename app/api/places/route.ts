@@ -3,7 +3,7 @@ import { z } from "zod";
 import { serverConfig } from "@/lib/config";
 import { cached } from "@/lib/server/cache";
 import { nearestPreset, presetPlaces } from "@/lib/server/fixtures";
-import { jsonError, parseBody } from "@/lib/server/http";
+import { jsonError, parseBody, route } from "@/lib/server/http";
 import { normalizeOverpass, overpassQuery, type OverpassResponse } from "@/lib/places/overpass";
 import { bearingDeg, distanceM } from "@/lib/geo";
 import type { Places } from "@/lib/schemas";
@@ -17,7 +17,7 @@ const Body = z.object({
   presetId: z.string().max(40).optional(),
 });
 
-export async function POST(req: Request) {
+export const POST = route("places", async (req, rc) => {
   const b = await parseBody(req, Body);
   if (!b.ok) return b.res;
   const { lat, lon, radiusM } = b.data;
@@ -26,6 +26,7 @@ export async function POST(req: Request) {
   if (presetId) {
     const p = await presetPlaces(presetId);
     if (!p) return jsonError(404, "Unknown preset.");
+    rc.note({ source: "fixture" });
     return NextResponse.json({ ...recenter(p, lat, lon, radiusM), source: "fixture", presetId });
   }
   try {
@@ -46,6 +47,7 @@ export async function POST(req: Request) {
         return normalizeOverpass((await res.json()) as OverpassResponse, lat, lon, radiusM);
       },
     );
+    rc.note({ source: "osm", features: places.features.length });
     return NextResponse.json({ ...places, source: "osm" });
   } catch (e) {
     return jsonError(
@@ -53,7 +55,7 @@ export async function POST(req: Request) {
       `Couldn't reach OpenStreetMap (${(e as Error).message}). Try a demo preset.`,
     );
   }
-}
+});
 
 /** Fixture data is stored around the preset centre; re-measure from where the walk starts. */
 function recenter(p: Places, lat: number, lon: number, radiusM: number): Places {

@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { ExpectedSchema } from "@/lib/schemas";
-import { parseBody, sse } from "@/lib/server/http";
+import { parseBody, route, sse } from "@/lib/server/http";
 import { chatFor } from "@/lib/server/chat";
 import { readSheet } from "@/lib/reader/read";
 
@@ -26,28 +26,38 @@ const Body = z.object({
 });
 
 /** The reader: per-panel Gemma vision + OMR, streamed panel by panel. */
-export async function POST(req: Request) {
+export const POST = route("read", async (req, rc) => {
   const b = await parseBody(req, Body);
   if (!b.ok) return b.res;
-  const { chat, mode, cfg } = await chatFor(req.headers, "_reader");
-  return sse(async (send) => {
-    send({ type: "status", model: cfg.modelVision, mode });
-    const r = await readSheet({
-      chat,
-      model: cfg.modelVision,
-      panels: b.data.panelImages,
-      wholeSheet: b.data.wholeSheet,
-      expected: b.data.expected,
-      omr: b.data.omr,
-      mode: b.data.mode,
-      onStep: (step) => send({ type: "step", ...step }),
-    });
-    send({
-      type: "report",
-      report: r.report,
-      labels: r.labels,
-      timings: r.timings,
-      paths: r.paths,
-    });
-  });
-}
+  const ac = new AbortController();
+  rc.signal.addEventListener("abort", () => ac.abort());
+  const { chat, mode, cfg, usage } = await chatFor(req.headers, "_reader", ac.signal);
+  return sse(
+    async (send, signal) => {
+      signal.addEventListener("abort", () => ac.abort());
+      send({ type: "status", model: cfg.modelVision, mode });
+      const r = await readSheet({
+        chat,
+        model: cfg.modelVision,
+        panels: b.data.panelImages,
+        wholeSheet: b.data.wholeSheet,
+        expected: b.data.expected,
+        omr: b.data.omr,
+        mode: b.data.mode,
+        onStep: (step) => send({ type: "step", ...step }),
+      });
+      send({
+        type: "report",
+        report: r.report,
+        labels: r.labels,
+        timings: r.timings,
+        paths: r.paths,
+      });
+    },
+    {
+      rid: rc.rid,
+      route: "read",
+      note: () => ({ calls: usage.calls, modelMs: usage.ms, provider: usage.providers.join(",") }),
+    },
+  );
+});

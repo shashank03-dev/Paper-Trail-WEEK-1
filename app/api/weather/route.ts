@@ -3,7 +3,7 @@ import { z } from "zod";
 import { serverConfig } from "@/lib/config";
 import { cached } from "@/lib/server/cache";
 import { nearestPreset, presetWeather } from "@/lib/server/fixtures";
-import { parseBody } from "@/lib/server/http";
+import { parseBody, route } from "@/lib/server/http";
 import type { Weather } from "@/lib/schemas";
 import { codeToCondition } from "@/lib/weather";
 
@@ -24,12 +24,13 @@ const MILD: Weather = {
   isDaylight: true,
 };
 
-export async function POST(req: Request) {
+export const POST = route("weather", async (req, rc) => {
   const b = await parseBody(req, Body);
   if (!b.ok) return b.res;
   const { lat, lon } = b.data;
   const presetId =
     b.data.presetId ?? (serverConfig().demoMode ? nearestPreset(lat, lon).id : undefined);
+  rc.note({ source: presetId ? "fixture" : "open-meteo" });
   if (presetId)
     return NextResponse.json({ ...((await presetWeather(presetId)) ?? MILD), source: "fixture" });
   try {
@@ -80,4 +81,4 @@ export async function POST(req: Request) {
     // Weather is a nicety; never block a trail on it.
     return NextResponse.json({ ...MILD, source: "default" });
   }
-}
+});

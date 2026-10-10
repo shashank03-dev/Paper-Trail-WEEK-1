@@ -4,9 +4,11 @@ import { join } from "node:path";
 
 const DAY = 24 * 60 * 60 * 1000;
 const mem = new Map<string, { at: number; value: unknown }>();
+/** Identical lookups that arrive together share one upstream request. */
+const inflight = new Map<string, Promise<unknown>>();
 const MAX = 200;
 
-/** In-memory LRU + on-disk JSON cache in .cache/, 24 h. */
+/** In-memory LRU + on-disk JSON cache in .cache/ (24 h by default), with single-flight. */
 export async function cached<T>(
   ns: string,
   key: string,
@@ -30,7 +32,16 @@ export async function cached<T>(
   } catch {
     /* miss */
   }
-  const value = await fn();
+  const pending = inflight.get(k) as Promise<T> | undefined;
+  if (pending) return pending;
+  const run = fn();
+  inflight.set(k, run);
+  let value: T;
+  try {
+    value = await run;
+  } finally {
+    inflight.delete(k);
+  }
   const entry = { at: Date.now(), value };
   remember(k, entry);
   try {

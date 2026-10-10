@@ -1,6 +1,7 @@
 import OpenAI from "openai";
 import type { LlmConfig, ProviderConfig } from "@/lib/config";
 import type { Chat, ChatMessage, ChatRequest, ChatResult } from "./types";
+import { isOpen, openUntil, recordFailure, recordSuccess, retryAfterMs } from "./breaker";
 
 /**
  * The only way Paper Trail talks to a model: OpenAI-compatible endpoints
@@ -9,11 +10,18 @@ import type { Chat, ChatMessage, ChatRequest, ChatResult } from "./types";
  */
 export function createChat(cfg: LlmConfig): Chat {
   const primary = cfg.providers[0]!;
-  const chats = cfg.providers.map((p) => ({ p, chat: createProviderChat(p, cfg.timeoutMs) }));
-  if (chats.length === 1) return chats[0]!.chat;
+  const chats = cfg.providers.map((p) => ({
+    p,
+    key: `${p.id}|${p.baseURL}`,
+    chat: createProviderChat(p, cfg.timeoutMs),
+  }));
   return async (req, opts) => {
+    // Providers whose circuit is open (failing recently) are skipped; if every
+    // one is open, try the one that recovers soonest rather than dead-ending.
+    let order = chats.filter((c) => !isOpen(c.key));
+    if (!order.length) order = [...chats].sort((a, b) => openUntil(a.key) - openUntil(b.key));
     let last: unknown;
-    for (const { p, chat } of chats) {
+    for (const { p, key, chat } of order) {
       // Callers name the primary's models; map them onto this provider's.
       const model =
         req.model === primary.modelVision
@@ -22,10 +30,14 @@ export function createChat(cfg: LlmConfig): Chat {
             ? p.modelText
             : req.model;
       try {
-        return await chat({ ...req, model }, opts);
+        const r = await chat({ ...req, model }, opts);
+        recordSuccess(key);
+        return { ...r, provider: p.id };
       } catch (e) {
         last = e;
-        if (opts?.signal?.aborted || !retryable(e)) throw e;
+        if (opts?.signal?.aborted) throw e;
+        if (!retryable(e)) throw e;
+        recordFailure(key, (e as { status?: number }).status === 429 ? retryAfterMs(e) : undefined);
       }
     }
     throw last;
@@ -103,6 +115,7 @@ function createProviderChat(p: ProviderConfig, timeoutMs: number): Chat {
       }) as OpenAI.Chat.ChatCompletionMessageParam[],
       temperature: req.temperature ?? 0.7,
       ...(req.maxTokens ? { max_tokens: req.maxTokens } : {}),
+      ...(p.reasoningEffort ? { reasoning_effort: p.reasoningEffort } : {}),
       ...(req.schema && useSchema
         ? {
             response_format: {
@@ -131,11 +144,11 @@ function createProviderChat(p: ProviderConfig, timeoutMs: number): Chat {
         }
         if (chunk.usage?.completion_tokens) completionTokens = chunk.usage.completion_tokens;
       }
-      return { content, ms: Date.now() - t0, completionTokens };
+      return { content: stripThoughts(content), ms: Date.now() - t0, completionTokens };
     }
     const res = await client.chat.completions.create(body, { signal: opts?.signal });
     return {
-      content: res.choices[0]?.message?.content ?? "",
+      content: stripThoughts(res.choices[0]?.message?.content ?? ""),
       ms: Date.now() - t0,
       completionTokens: res.usage?.completion_tokens,
     };
@@ -196,6 +209,15 @@ function createNativeOllamaChat(p: ProviderConfig, timeoutMs: number): Chat {
     opts?.onDelta?.(content);
     return { content, ms: Date.now() - t0, completionTokens: j.eval_count };
   };
+}
+
+/**
+ * Gemma 4 can think out loud before answering (`<thought>…</thought>`); the
+ * answer is what follows. An unclosed thought means the budget ran out mid-way.
+ */
+export function stripThoughts(text: string): string {
+  const t = text.replace(/<thought>[\s\S]*?<\/thought>/g, "");
+  return /<thought>/.test(t) ? t.slice(0, t.indexOf("<thought>")).trim() : t.trim();
 }
 
 /** Rough token count when the server doesn't report usage. */

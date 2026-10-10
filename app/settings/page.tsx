@@ -25,7 +25,7 @@ export default function Settings() {
   const run = async () => {
     setTest({ state: "busy", text: "Pinging the model…" });
     try {
-      const r = await fetch("/api/health", { headers: llmHeaders() });
+      const r = await fetch("/api/health?fresh=1", { headers: llmHeaders() });
       const j = (await r.json()) as {
         ok: boolean;
         model: string;

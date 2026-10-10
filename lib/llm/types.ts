@@ -19,6 +19,8 @@ export interface ChatResult {
   content: string;
   ms: number;
   completionTokens?: number;
+  /** Which provider answered, when it came through a provider chain. */
+  provider?: string;
 }
 
 export interface ChatOptions {
