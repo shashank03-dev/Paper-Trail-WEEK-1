@@ -29,9 +29,13 @@
     "eval:writer": "tsx --tsconfig tsconfig.scripts.json scripts/eval-writer.ts"
   },
   "dependencies": {
+    "@react-three/fiber": "9.3.0",
     "dexie": "^4.2.1",
     "dexie-react-hooks": "^4.2.0",
     "leaflet": "1.9.4",
+    "lenis": "1.3.11",
+    "lucide-react": "0.544.0",
+    "motion": "12.23.12",
     "nanoid": "^5.1.6",
     "next": "15.5.27",
     "openai": "^5.23.2",
@@ -41,11 +45,13 @@
     "react-dom": "19.1.1",
     "react-leaflet": "5.0.0",
     "roughjs": "4.6.6",
+    "three": "0.180.0",
     "zod": "^4.1.12"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.10.2",
     "@eslint/eslintrc": "^3.3.1",
+    "@fontsource-variable/fraunces": "5.2.8",
     "@fontsource/caveat": "^5.2.8",
     "@fontsource/fraunces": "^5.2.8",
     "@fontsource/ibm-plex-mono": "^5.2.7",
@@ -60,8 +66,10 @@
     "@types/qrcode": "^1.5.5",
     "@types/react": "^19.1.12",
     "@types/react-dom": "^19.1.9",
+    "@types/three": "0.180.0",
     "eslint": "^9.36.0",
     "eslint-config-next": "15.5.27",
+    "geist": "1.5.1",
     "jpeg-js": "0.4.4",
     "opentype.js": "1.3.4",
     "pngjs": "7.0.0",

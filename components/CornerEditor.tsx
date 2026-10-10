@@ -39,7 +39,7 @@ export function CornerEditor({
     );
   const r = Math.max(width, height) / 70;
   return (
-    <div className="relative mx-auto w-full max-w-3xl overflow-hidden rounded-xl border-2 border-ink bg-ink">
+    <div className="relative mx-auto w-full max-w-3xl overflow-hidden rounded-xl shadow-[inset_0_0_0_1px_var(--color-line-2)] bg-ink">
       <img
         src={src}
         alt="Your photo of the sheet"

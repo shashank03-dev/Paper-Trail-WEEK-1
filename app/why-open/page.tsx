@@ -1,49 +1,52 @@
-import { Icon3D, type Icon3DName } from "@/components/Icon3D";
+import { HardDrive, KeyRound, Map, Printer, RefreshCw } from "lucide-react";
+import { Reveal } from "@/components/Reveal";
 
-export const metadata = { title: "Why open models? — Paper Trail" };
+export const metadata = { title: "Why an open model — Paper Trail" };
 
-const POINTS: { icon: Icon3DName; title: string; body: string }[] = [
+const POINTS = [
   {
-    icon: "lock",
-    title: "Privacy",
-    body: "Paper Trail reads a map of where you live and a photo of your handwriting. With Gemma running in Ollama on your own machine, neither leaves it. There are no accounts, no analytics, and your trail history lives in this browser’s IndexedDB.",
+    icon: HardDrive,
+    title: "It can run on your own computer",
+    body: "Paper Trail reads a map of where you live and a photo of your handwriting. With Gemma running in Ollama on your machine, neither leaves it. If you'd rather not install anything, the same open model also runs on Ollama Cloud or Google's Gemini API.",
   },
   {
-    icon: "printer",
-    title: "Offline",
-    body: "Once the sheet is printed, the adventure needs no network at all. It’s paper. Demo mode even works with no internet, using cached map data and recorded model output (clearly labelled as a replay).",
+    icon: Printer,
+    title: "It works offline once printed",
+    body: "After printing, the walk needs no network at all. It's paper. Demo mode even works without internet, using saved maps and recorded answers (clearly labelled as a replay).",
   },
   {
-    icon: "gear",
-    title: "Swap the model",
-    body: "Change one env var to move between gemma4:e2b and gemma4:e4b, or any open-weights model your endpoint serves. The repo includes an eval harness so you can measure what the swap costs in accuracy and speed.",
+    icon: RefreshCw,
+    title: "You can swap the model",
+    body: "Change one setting to move between Gemma sizes, or between your laptop and the cloud. The project includes tests that measure what each swap costs in accuracy and speed.",
   },
   {
-    icon: "book",
-    title: "Apache 2.0",
-    body: "Gemma’s weights are licensed for anyone to run. A school, a library or a scout group can print 30 trails for free, on their own hardware, without anyone’s API key.",
+    icon: KeyRound,
+    title: "Anyone can run it for free",
+    body: "Gemma's weights are licensed so that a school, a library or a scout group can print thirty trails on their own hardware, without anyone's API key.",
   },
   {
-    icon: "map",
-    title: "Why not a closed API?",
-    body: "A closed API would mean sending a map of your neighbourhood and a picture of your notes to someone else’s server for every walk. For a tool whose whole point is leaving the screen behind, that felt wrong.",
+    icon: Map,
+    title: "Why it matters here",
+    body: "This is an app about leaving the screen behind. It felt wrong to send a map of your street and a picture of your notes to a closed model every time you go for a walk.",
   },
 ];
 
 export default function WhyOpen() {
   return (
-    <div className="mx-auto max-w-3xl px-4 pb-10 pt-2 sm:px-6">
-      <p className="kicker">Open innovation</p>
-      <h1 className="display riso mt-1 text-4xl sm:text-5xl">Why open models?</h1>
-      <ul className="mt-10 grid gap-6">
-        {POINTS.map((p) => (
-          <li key={p.title} className="card flex gap-5 p-6">
-            <Icon3D name={p.icon} size={56} className="shrink-0" />
+    <div className="mx-auto max-w-4xl px-5 pb-16 pt-32 sm:px-8 sm:pt-36">
+      <p className="eyebrow">Open by design</p>
+      <h1 className="display mt-4 text-[clamp(2.6rem,1.6rem+3.6vw,4.6rem)]">
+        Why an <em className="text-grass">open</em> model?
+      </h1>
+      <ul className="mt-14 grid gap-4">
+        {POINTS.map(({ icon: Icon, title, body }, i) => (
+          <Reveal as="li" key={title} delay={i * 0.05} className="panel flex gap-6 p-7">
+            <Icon size={22} strokeWidth={1.5} className="mt-1 shrink-0 text-grass" />
             <div>
-              <h2 className="display text-2xl">{p.title}</h2>
-              <p className="mt-2 leading-relaxed text-ink/80">{p.body}</p>
+              <h2 className="h3 text-2xl">{title}</h2>
+              <p className="mt-2 leading-relaxed text-fg-2">{body}</p>
             </div>
-          </li>
+          </Reveal>
         ))}
       </ul>
     </div>

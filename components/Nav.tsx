@@ -1,59 +1,94 @@
+"use client";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { Settings } from "lucide-react";
+import { Logo } from "./Logo";
 import { ModelBadge } from "./ModelBadge";
-import { Icon3D } from "./Icon3D";
+
+const LINKS = [
+  { href: "/#how", label: "How it works" },
+  { href: "/book", label: "Trail Book" },
+];
 
 export function Nav() {
+  const path = usePathname();
   return (
-    <header className="no-print mx-auto flex w-full max-w-6xl items-center justify-between gap-3 px-4 py-4 sm:px-6">
-      <Link href="/" className="group flex items-center gap-2" aria-label="Paper Trail home">
-        <Icon3D name="footprints" size={30} className="wiggle hidden min-[400px]:block" />
-        <span className="display riso whitespace-nowrap text-lg sm:text-2xl">Paper Trail</span>
-      </Link>
-      <nav aria-label="Main" className="flex items-center gap-1 sm:gap-2">
-        <Link
-          href="/new"
-          className="whitespace-nowrap rounded-lg px-2 py-1.5 text-sm font-semibold hover:bg-desk sm:px-3"
-        >
-          New trail
+    <header className="no-print fixed inset-x-0 top-0 z-50 flex justify-center px-3 pt-3 sm:pt-4">
+      <div className="glass flex w-full max-w-5xl items-center justify-between gap-2 rounded-full py-1.5 pl-4 pr-1.5">
+        <Link href="/" aria-label="Paper Trail home" className="shrink-0">
+          <Logo />
         </Link>
-        <Link
-          href="/book"
-          className="whitespace-nowrap rounded-lg px-2 py-1.5 text-sm font-semibold hover:bg-desk sm:px-3"
-        >
-          Trail Book
-        </Link>
-        <Link
-          href="/settings"
-          className="whitespace-nowrap rounded-lg px-2 py-1.5 text-sm font-semibold hover:bg-desk sm:px-3"
-          aria-label="Settings"
-        >
-          <Icon3D name="gear" size={22} />
-        </Link>
-        <span className="hidden md:inline-flex">
-          <ModelBadge compact />
-        </span>
-      </nav>
+        <nav aria-label="Main" className="flex items-center gap-0.5 sm:gap-1">
+          {LINKS.map((l) => (
+            <Link
+              key={l.href}
+              href={l.href}
+              className={`hidden rounded-full px-3 py-2 text-[0.88rem] transition-colors hover:text-fg sm:block ${path === l.href ? "text-fg" : "text-fg-2"}`}
+            >
+              {l.label}
+            </Link>
+          ))}
+          <span className="mx-2 hidden lg:inline-flex">
+            <ModelBadge compact />
+          </span>
+          <Link
+            href="/settings"
+            aria-label="Settings"
+            className="grid h-9 w-9 place-items-center rounded-full text-fg-2 transition-colors hover:bg-white/5 hover:text-fg"
+          >
+            <Settings size={17} strokeWidth={1.6} />
+          </Link>
+          <Link href="/new" className="btn btn-primary btn-sm">
+            Make a trail
+          </Link>
+        </nav>
+      </div>
     </header>
   );
 }
 
 export function Footer() {
   return (
-    <footer className="no-print mx-auto mt-24 w-full max-w-6xl px-4 pb-10 text-sm text-muted sm:px-6">
-      <div className="flex flex-col gap-2 border-t-2 border-dashed border-line pt-6 sm:flex-row sm:items-center sm:justify-between">
-        <p>
-          Paper Trail · open source · MIT · map data ©{" "}
-          <a className="underline" href="https://www.openstreetmap.org/copyright">
-            OpenStreetMap contributors
-          </a>
-        </p>
-        <p className="mono text-xs">
-          No accounts. No analytics. Your trails live in this browser.{" "}
-          <Link href="/why-open" className="underline">
-            Why open models?
+    <footer className="no-print relative mx-auto w-full max-w-6xl px-5 pb-10 pt-24 text-sm text-fg-3 sm:px-8">
+      <div className="hairline mb-8" />
+      <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
+        <div className="max-w-xs">
+          <Logo />
+          <p className="mt-3 leading-relaxed">
+            A printed walk for the streets around you. Open source, MIT licensed.
+          </p>
+        </div>
+        <div className="grid grid-cols-2 gap-x-12 gap-y-2">
+          <Link className="link w-fit hover:text-fg" href="/new">
+            Make a trail
           </Link>
-        </p>
+          <Link className="link w-fit hover:text-fg" href="/book">
+            Trail Book
+          </Link>
+          <Link className="link w-fit hover:text-fg" href="/why-open">
+            Why an open model
+          </Link>
+          <Link className="link w-fit hover:text-fg" href="/fold-test">
+            Fold test
+          </Link>
+          <a
+            className="link w-fit hover:text-fg"
+            href="https://github.com/shashank03-dev/Paper-Trail-WEEK-1"
+          >
+            Source code
+          </a>
+          <Link className="link w-fit hover:text-fg" href="/settings">
+            Settings
+          </Link>
+        </div>
       </div>
+      <p className="mono mt-10 text-[0.7rem] leading-relaxed">
+        Map data ©{" "}
+        <a className="link" href="https://www.openstreetmap.org/copyright">
+          OpenStreetMap contributors
+        </a>{" "}
+        · Weather by Open-Meteo · No accounts, no tracking. Your trails live in this browser.
+      </p>
     </footer>
   );
 }

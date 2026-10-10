@@ -11,43 +11,51 @@ interface Health {
   mode: "live" | "replay" | "down";
 }
 
-/** "Runs on Gemma 4 · on your machine" with the live model status. */
-export function ModelBadge({ compact = false }: { compact?: boolean }) {
+let cached: Promise<Health> | null = null;
+function health(): Promise<Health> {
+  if (!cached)
+    cached = fetch("/api/health", { headers: llmHeaders() })
+      .then((r) => r.json() as Promise<Health>)
+      .catch(() => ({
+        ok: false,
+        model: "gemma4",
+        where: "local",
+        latencyMs: 0,
+        tokensPerSec: null,
+        mode: "down" as const,
+      }));
+  return cached;
+}
+
+/** Live model status: "Gemma 4 · gemma4:e4b · on your machine". */
+export function ModelBadge({
+  compact = false,
+  className = "",
+}: {
+  compact?: boolean;
+  className?: string;
+}) {
   const [h, setH] = useState<Health | null>(null);
   useEffect(() => {
     let alive = true;
-    fetch("/api/health", { headers: llmHeaders() })
-      .then((r) => r.json())
-      .then((j: Health) => alive && setH(j))
-      .catch(
-        () =>
-          alive &&
-          setH({
-            ok: false,
-            model: "gemma4:e4b",
-            where: "local",
-            latencyMs: 0,
-            tokensPerSec: null,
-            mode: "down",
-          }),
-      );
+    void health().then((x) => alive && setH(x));
     return () => {
       alive = false;
     };
   }, []);
-  const dot = !h ? "bg-line" : h.ok ? "bg-teal" : h.mode === "replay" ? "bg-sun" : "bg-pink";
-  const status = !h
+  const color = !h ? "bg-fg-3" : h.ok ? "bg-grass" : h.mode === "replay" ? "bg-sun" : "bg-ember";
+  const where = !h
     ? "checking…"
     : h.ok
       ? h.where === "local"
         ? "on your machine"
-        : `on ${h.where}`
+        : `via ${h.where}`
       : h.mode === "replay"
-        ? "replay (model offline)"
+        ? "replay mode"
         : "model offline";
   return (
     <span
-      className="mono inline-flex items-center gap-2 rounded-full border-2 border-ink bg-card px-3 py-1.5 text-[0.72rem] leading-none shadow-[0_3px_0_var(--color-ink)]"
+      className={`mono inline-flex items-center gap-2 text-[0.72rem] text-fg-2 ${className}`}
       role="status"
       aria-live="polite"
       title={
@@ -56,17 +64,16 @@ export function ModelBadge({ compact = false }: { compact?: boolean }) {
           : undefined
       }
     >
-      <span className={`relative inline-block h-2.5 w-2.5 rounded-full ${dot}`}>
+      <span className={`dot-live ${color}`}>
         {h?.ok && (
-          <span className={`absolute inset-0 animate-ping rounded-full ${dot} opacity-60`} />
+          <span className={`absolute inset-0 animate-ping rounded-full ${color} opacity-50`} />
         )}
       </span>
       {compact ? (
         <span>{h?.model ?? "gemma4"}</span>
       ) : (
         <span>
-          Runs on Gemma 4 · <span className="text-muted">{h?.model ?? "gemma4:e4b"}</span> ·{" "}
-          {status}
+          Runs on Gemma 4 · <span className="text-fg-3">{h?.model ?? "…"}</span> · {where}
         </span>
       )}
     </span>

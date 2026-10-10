@@ -138,7 +138,7 @@ export default function PostcardPage({ params }: { params: Promise<{ id: string 
   if (t === undefined) return null;
   if (!t?.report)
     return (
-      <p className="mx-auto max-w-xl px-6 py-20 text-center">
+      <p className="mx-auto max-w-xl px-6 pb-20 pt-40 text-center text-fg-2">
         No field report yet.{" "}
         <Link className="underline" href={`/return/${id}`}>
           Read your sheet first.
@@ -146,14 +146,14 @@ export default function PostcardPage({ params }: { params: Promise<{ id: string 
       </p>
     );
   return (
-    <div className="mx-auto max-w-5xl px-4 pb-10 pt-2 sm:px-6">
+    <div className="mx-auto max-w-5xl px-5 pb-16 pt-32 sm:px-8 sm:pt-36">
       <div className="flex items-end justify-between gap-4">
-        <h1 className="display riso text-4xl">Reply postcard</h1>
+        <h1 className="display text-[clamp(2.4rem,1.6rem+3vw,4rem)]">Reply postcard</h1>
         <button type="button" className="btn btn-primary" onClick={() => window.print()}>
           Print postcard
         </button>
       </div>
-      <div className="paper-card mt-6 overflow-hidden">
+      <div className="paper mt-8 overflow-hidden">
         <Postcard t={t} />
       </div>
       <PrintPortal paper={t.paper}>

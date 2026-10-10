@@ -49,12 +49,12 @@ export function Booklet({ data }: { data: ZineData }) {
       >
         <div
           className="spread relative mx-auto grid aspect-[1.32] grid-cols-2"
-          style={{ filter: "drop-shadow(0 20px 30px rgb(60 40 10 / .28))" }}
+          style={{ filter: "drop-shadow(0 30px 50px rgb(0 0 0 / .6))" }}
         >
-          <div className={`relative ${left ? "bg-card" : ""}`}>
+          <div className={`relative ${left ? "bg-[#fffdf8]" : ""}`}>
             <Page p={left} />
           </div>
-          <div className={`relative ${right ? "bg-card" : ""}`}>
+          <div className={`relative ${right ? "bg-[#fffdf8]" : ""}`}>
             <Page p={right} />
           </div>
           {turning === "back" && <BackLeaf front={cur[0]} back={prev[1]} Page={Page} />}
@@ -71,7 +71,7 @@ export function Booklet({ data }: { data: ZineData }) {
         >
           ← Back
         </button>
-        <span className="mono text-sm" aria-live="polite">
+        <span className="mono text-sm text-fg-2" aria-live="polite">
           {cur.filter(Boolean).join(" · ")} / 8
         </span>
         <button

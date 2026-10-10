@@ -4,7 +4,7 @@ import { use, useEffect, useMemo, useRef, useState } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
 import { CornerEditor } from "@/components/CornerEditor";
 import { FieldReport } from "@/components/FieldReport";
-import { Icon3D } from "@/components/Icon3D";
+import { ArrowRight, Camera, Check, Loader2 } from "lucide-react";
 import { db } from "@/lib/client/db";
 import { screenMs as screenMsOf } from "@/lib/client/db";
 import { postSSE } from "@/lib/client/api";
@@ -194,47 +194,73 @@ export default function ReturnPage({ params }: { params: Promise<{ id: string }>
   };
 
   if (trail === undefined)
-    return <p className="mx-auto max-w-5xl px-6 py-20 text-muted">Unfolding…</p>;
+    return <p className="mx-auto max-w-5xl px-6 pb-20 pt-40 text-fg-3">Unfolding…</p>;
 
   const points = trail?.plan?.ispy.map((i) => i.points) ?? labels.map(() => 10);
   const outsideMs =
     trail?.outsideMs ??
     (trail?.printedAt && photo ? Math.min(OUTSIDE_CAP, photo.at - trail.printedAt) : null);
+  const STEPS = ["Photo", "Corners", "Reading", "Report"];
+  const stepIndex = { upload: 0, corners: 1, reading: 2, report: 3 }[step];
 
   return (
-    <div className="mx-auto max-w-6xl px-4 pb-10 pt-2 sm:px-6">
+    <div className="mx-auto max-w-6xl px-5 pb-16 pt-32 sm:px-8 sm:pt-36">
       {step !== "report" && (
-        <>
-          <p className="kicker">{trail?.plan?.title ?? "Paper Trail"} · return</p>
-          <h1 className="display riso mt-1 text-4xl sm:text-5xl">Welcome back.</h1>
-        </>
+        <div className="flex flex-wrap items-end justify-between gap-6">
+          <div>
+            <p className="eyebrow">{trail?.plan?.title ?? "Paper Trail"}</p>
+            <h1 className="display mt-4 text-[clamp(2.6rem,1.6rem+3.6vw,4.6rem)]">
+              Welcome <em className="text-grass">back.</em>
+            </h1>
+          </div>
+          <ol
+            className="mono flex items-center gap-2 text-[0.7rem] uppercase tracking-[0.14em]"
+            aria-label="Progress"
+          >
+            {STEPS.map((label, i) => (
+              <li
+                key={label}
+                className={`flex items-center gap-2 ${i === stepIndex ? "text-fg" : i < stepIndex ? "text-grass" : "text-fg-3"}`}
+                aria-current={i === stepIndex ? "step" : undefined}
+              >
+                <span
+                  className={`grid h-5 w-5 place-items-center rounded-full text-[0.6rem] ${i < stepIndex ? "bg-grass text-bg" : i === stepIndex ? "bg-fg text-bg" : "shadow-[inset_0_0_0_1px_var(--color-line-2)]"}`}
+                >
+                  {i < stepIndex ? <Check size={11} strokeWidth={3} /> : i + 1}
+                </span>
+                {label}
+                {i < STEPS.length - 1 && <span className="mx-1 h-px w-5 bg-line-2" aria-hidden />}
+              </li>
+            ))}
+          </ol>
+        </div>
       )}
       {!trail && (
         <p
-          className="mt-4 max-w-2xl rounded-xl border-2 border-sun bg-[#fff6dc] px-4 py-3 text-sm"
+          className="mt-6 max-w-2xl rounded-2xl bg-sun/10 px-4 py-3 text-sm text-sun shadow-[inset_0_0_0_1px_rgb(244_194_122/0.3)]"
           role="note"
         >
           This trail lives on the device that made it. Open this link there, or upload the photo
-          here and I&rsquo;ll read it anyway.
+          here and we&rsquo;ll read it anyway.
         </p>
       )}
 
       {step === "upload" && (
-        <section className="mt-8 grid items-center gap-8 md:grid-cols-[1fr_1.1fr]">
+        <section className="mt-12 grid items-center gap-12 md:grid-cols-[1fr_1fr]">
           <div>
-            <p className="text-lg leading-relaxed">
-              Unfold your sheet and take one photo of the printed side. Lay it flat, get all four
-              black corner squares in the frame, and avoid harsh shadows.
+            <p className="lede max-w-md">
+              Unfold your sheet and take one photo of the printed side. Lay it flat in good light,
+              with all four black corner squares in the frame.
             </p>
-            <div className="mt-6 flex flex-wrap gap-3">
+            <div className="mt-8 flex flex-wrap gap-3">
               <button
                 type="button"
-                className="btn btn-primary btn-xl"
+                className="btn btn-primary btn-lg"
                 onClick={() => fileRef.current?.click()}
               >
-                <Icon3D name="camera" size={30} /> Take or upload a photo
+                <Camera size={18} strokeWidth={1.7} /> Take or upload a photo
               </button>
-              <button type="button" className="btn" onClick={useSample}>
+              <button type="button" className="btn btn-lg" onClick={useSample}>
                 Try a sample photo
               </button>
             </div>
@@ -248,45 +274,60 @@ export default function ReturnPage({ params }: { params: Promise<{ id: string }>
               data-testid="photo-input"
               onChange={(e) => e.target.files?.[0] && onFile(e.target.files[0])}
             />
-            <p className="mono mt-4 text-xs text-muted">
-              The photo is read by {trail?.model ?? "Gemma"} at your configured endpoint. It is not
-              stored anywhere else.
+            <p className="mono mt-6 text-[0.72rem] leading-relaxed text-fg-3">
+              The photo is read by {trail?.model ?? "Gemma"}
+              {trail?.hostedOn ? ` via ${trail.hostedOn}` : " on your configured endpoint"}. It
+              isn&rsquo;t stored anywhere else.
             </p>
           </div>
-          <div className="relative grid place-items-center">
+          <div className="relative mx-auto w-full max-w-md" aria-hidden>
             <div className="stage">
-              <div className="paper-card grid aspect-[1.3] w-72 rotate-[-6deg] place-items-center bg-card [transform:rotateX(22deg)_rotateZ(-8deg)]">
-                <Icon3D name="pencil" size={90} float tilt={14} />
+              <div className="paper relative aspect-[1.29] w-full overflow-hidden [transform:rotateX(28deg)_rotateZ(-7deg)]">
+                <div className="absolute inset-[6%] grid grid-cols-4 grid-rows-2 gap-[3%]">
+                  {Array.from({ length: 8 }, (_, i) => (
+                    <div
+                      key={i}
+                      className="rounded-[2px] shadow-[inset_0_0_0_1px_rgb(26_25_21/0.18)]"
+                    />
+                  ))}
+                </div>
+                {[
+                  "left-[3%] top-[4%]",
+                  "right-[3%] top-[4%]",
+                  "left-[3%] bottom-[4%]",
+                  "right-[3%] bottom-[4%]",
+                ].map((pos) => (
+                  <span
+                    key={pos}
+                    className={`absolute h-[7%] w-[5.4%] bg-paper-ink ${pos} shadow-[inset_0_0_0_3px_#efeae0,inset_0_0_0_6px_#1a1915]`}
+                  />
+                ))}
               </div>
             </div>
-            <Icon3D
-              name="camera"
-              size={84}
-              float
-              tilt={-10}
-              className="float-delay-2 absolute -top-4 right-6"
-            />
+            <p className="mono mt-6 text-center text-[0.7rem] uppercase tracking-[0.14em] text-fg-3">
+              Get all four corner squares in
+            </p>
           </div>
         </section>
       )}
 
       {step === "corners" && photo && (
-        <section className="mt-6" aria-labelledby="corners-h">
-          <h2 id="corners-h" className="display text-2xl">
+        <section className="mt-10" aria-labelledby="corners-h">
+          <h2 id="corners-h" className="h3 text-2xl">
             {conf >= 0.5 ? (
-              <span data-testid="corners-found">
-                Corners found <span className="text-teal">✓</span>
+              <span data-testid="corners-found" className="inline-flex items-center gap-2">
+                Corners found <Check size={20} className="text-grass" />
               </span>
             ) : (
-              "Drag the dots onto the four black corner squares"
+              "Drag the dots onto the four corner squares"
             )}
           </h2>
-          <p className="mt-1 text-sm text-muted">
+          <p className="mt-2 text-sm text-fg-3">
             {conf >= 0.5
-              ? "Adjust if they look off, then read."
-              : "We couldn't spot all four markers. Place each dot on the centre of a corner square."}
+              ? "Adjust them if they look off, then read the sheet."
+              : "We couldn't spot all four markers. Put each dot on the middle of a corner square."}
           </p>
-          <div className="mt-4">
+          <div className="mt-6">
             <CornerEditor
               src={photo.src}
               width={photo.img.width}
@@ -296,16 +337,16 @@ export default function ReturnPage({ params }: { params: Promise<{ id: string }>
               snapped={conf >= 0.5}
             />
           </div>
-          <div className="mt-5 flex flex-wrap gap-3">
+          <div className="mt-6 flex flex-wrap justify-center gap-3">
             <button
               type="button"
-              className="btn btn-primary btn-xl"
+              className="btn btn-primary btn-lg"
               onClick={read}
               data-testid="read"
             >
-              <Icon3D name="magnifier" size={28} /> Read my sheet
+              Read my sheet <ArrowRight size={18} className="arrow" />
             </button>
-            <button type="button" className="btn" onClick={() => setStep("upload")}>
+            <button type="button" className="btn btn-lg" onClick={() => setStep("upload")}>
               Retake
             </button>
           </div>
@@ -313,15 +354,15 @@ export default function ReturnPage({ params }: { params: Promise<{ id: string }>
       )}
 
       {step === "reading" && (
-        <section className="mt-8" aria-live="polite" aria-labelledby="reading-h">
-          <h2 id="reading-h" className="display text-2xl">
-            Gemma is reading your pencil…
+        <section className="mt-12" aria-live="polite" aria-labelledby="reading-h">
+          <h2 id="reading-h" className="h3 flex items-center gap-3 text-2xl">
+            <Loader2 size={20} className="animate-spin text-grass" /> Reading your pencil…
           </h2>
-          <ul className="mt-5 grid grid-cols-2 gap-4 md:grid-cols-4">
+          <ul className="mt-8 grid grid-cols-2 gap-5 md:grid-cols-4">
             {READ_PAGES.map(({ page, label }) => (
-              <li key={page} className="flex flex-col gap-2">
+              <li key={page} className="flex flex-col gap-3">
                 <div
-                  className={`paper-card overflow-hidden ${reading === page ? "scan ring-4 ring-teal" : ""}`}
+                  className={`paper overflow-hidden !rounded-[3px] transition-shadow ${reading === page ? "scan ring-2 ring-grass" : ""}`}
                 >
                   {panels[page] ? (
                     <img
@@ -330,12 +371,12 @@ export default function ReturnPage({ params }: { params: Promise<{ id: string }>
                       className="block w-full"
                     />
                   ) : (
-                    <div className="aspect-[0.66] animate-pulse bg-desk" />
+                    <div className="aspect-[0.65] animate-pulse bg-paper-2" />
                   )}
                 </div>
-                <p className="text-sm">
-                  <span className="font-semibold">{label}</span>{" "}
-                  <span className="hand text-xl text-teal">
+                <p className="text-sm text-fg-2">
+                  <span className="font-medium text-fg">{label}</span>{" "}
+                  <span className="hand block text-[1.4rem] leading-none text-grass">
                     {notes[page] ?? (reading === page ? "reading…" : "")}
                   </span>
                 </p>
@@ -343,13 +384,13 @@ export default function ReturnPage({ params }: { params: Promise<{ id: string }>
             ))}
           </ul>
           {reading === 0 && (
-            <p className="mt-4 text-sm text-muted">The Trail Office is writing back…</p>
+            <p className="mt-6 text-sm text-fg-3">The Trail Office is writing back…</p>
           )}
         </section>
       )}
 
       {step === "report" && report && (
-        <div className="mt-2">
+        <div>
           <FieldReport
             title={trail?.plan?.title ?? "Your trail"}
             date={trail?.returnedAt ?? Date.now()}
@@ -366,12 +407,12 @@ export default function ReturnPage({ params }: { params: Promise<{ id: string }>
             onAddToBook={() => void (trail ? db().trails.update(id, { inBook: true }) : undefined)}
           />
           {!trail && (
-            <p className="mt-4 text-sm text-muted">
+            <p className="mt-4 text-sm text-fg-3">
               This report isn&rsquo;t saved: the trail lives on another device.
             </p>
           )}
-          <p className="mt-8 text-center">
-            <Link href="/book" className="underline">
+          <p className="mt-12 text-center">
+            <Link href="/book" className="link text-fg-2">
               Open your Trail Book →
             </Link>
           </p>
@@ -380,7 +421,7 @@ export default function ReturnPage({ params }: { params: Promise<{ id: string }>
 
       {error && (
         <p
-          className="mt-4 rounded-xl border-2 border-pink bg-[#ffe9ef] px-4 py-3 text-sm"
+          className="mt-6 rounded-2xl bg-ember/10 px-4 py-3 text-sm text-ember shadow-[inset_0_0_0_1px_rgb(255_138_107/0.3)]"
           role="alert"
         >
           {error}

@@ -44,7 +44,7 @@ export default function LocationPicker({
   return (
     <div
       ref={el}
-      className="h-72 w-full overflow-hidden rounded-xl border-2 border-ink"
+      className="h-72 w-full overflow-hidden rounded-xl shadow-[inset_0_0_0_1px_var(--color-line-2)]"
       aria-label="Map: click to choose where the walk starts"
       role="application"
     />

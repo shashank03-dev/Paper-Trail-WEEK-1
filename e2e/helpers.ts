@@ -6,7 +6,10 @@ export const FIXED_NOW = new Date("2026-10-10T10:00:00Z");
 export async function makeTrail(page: Page, preset = "dolores-park"): Promise<string> {
   await page.clock.setFixedTime(FIXED_NOW);
   await page.goto("/");
-  await page.getByRole("link", { name: /make my trail/i }).click();
+  await page
+    .getByRole("link", { name: /make my trail/i })
+    .first()
+    .click();
   await page.waitForURL("**/new");
   await page.locator(`[data-preset="${preset}"]`).click();
   await page.getByTestId("fold").click();

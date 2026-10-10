@@ -5,7 +5,7 @@ import { useLiveQuery } from "dexie-react-hooks";
 import { Booklet } from "@/components/Booklet";
 import { FoldGuide } from "@/components/FoldGuide";
 import { GoOverlay } from "@/components/GoOverlay";
-import { Icon3D } from "@/components/Icon3D";
+import { Download, Loader2, Printer, ScanSearch } from "lucide-react";
 import { PrintPortal } from "@/components/PrintPortal";
 import { SheetStage } from "@/components/SheetStage";
 import { Sheet } from "@/lib/zine/Sheet";
@@ -173,14 +173,14 @@ export default function TrailPage({ params }: { params: Promise<{ id: string }> 
   };
 
   if (trail === undefined)
-    return <p className="mx-auto max-w-5xl px-6 py-20 text-muted">Unfolding…</p>;
+    return <p className="mx-auto max-w-5xl px-6 pb-20 pt-40 text-fg-3">Unfolding…</p>;
   if (trail === null)
     return (
-      <div className="mx-auto max-w-xl px-6 py-20 text-center">
-        <Icon3D name="magnifier" size={80} className="mx-auto" />
-        <h1 className="display mt-4 text-3xl">No trail here.</h1>
-        <p className="mt-2 text-muted">Trails live in the browser that made them.</p>
-        <Link href="/new" className="btn btn-primary mt-6">
+      <div className="mx-auto max-w-xl px-6 pb-20 pt-40 text-center">
+        <ScanSearch size={36} strokeWidth={1.3} className="mx-auto text-fg-3" />
+        <h1 className="h2 mt-6 text-4xl">No trail here.</h1>
+        <p className="lede mt-3">Trails are saved in the browser that made them.</p>
+        <Link href="/new" className="btn btn-primary mt-8">
           Make a new one
         </Link>
       </div>
@@ -192,30 +192,37 @@ export default function TrailPage({ params }: { params: Promise<{ id: string }> 
   const paths = Object.values(trail.genPaths);
   const replay = paths.includes("replay") || meta.mode === "replay";
   const fallback = paths.includes("fallback");
+  const progressPct = Math.round(((8 - pending.length) / 8) * 100);
 
   return (
-    <div className="mx-auto max-w-6xl px-4 pb-10 pt-2 sm:px-6">
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <p className="kicker">
+    <div className="mx-auto max-w-6xl px-5 pb-16 pt-32 sm:px-8 sm:pt-36">
+      <div className="flex flex-wrap items-end justify-between gap-6">
+        <div className="max-w-3xl">
+          <p className="eyebrow">
             No. {String(trail.edition).padStart(3, "0")} · {trail.location.label} ·{" "}
             {trail.durationMin} min
           </p>
-          <h1 className="display riso mt-1 text-3xl sm:text-5xl">
-            {trail.plan?.title ?? "Printing your trail…"}
+          <h1 className="display mt-4 text-[clamp(2.3rem,1.4rem+3.2vw,4.2rem)]">
+            {trail.plan?.title ?? <span className="text-fg-3">Writing your trail…</span>}
           </h1>
           {trail.plan && (
-            <p className="display mt-2 text-lg italic text-ink/70">{trail.plan.subtitle}</p>
+            <p className="serif-italic mt-3 text-xl text-fg-2">{trail.plan.subtitle}</p>
           )}
         </div>
-        <p className="mono text-xs text-muted" aria-live="polite" data-testid="gen-meta">
-          {trail.model} · {meta.where}
-          {meta.tps ? ` · ${meta.tps} tok/s` : ""}
-          {replay && <span className="ml-2 rounded bg-sun px-1.5 py-0.5 text-ink">replay</span>}
+        <p
+          className="mono flex flex-wrap items-center gap-2 text-[0.72rem] text-fg-3"
+          aria-live="polite"
+          data-testid="gen-meta"
+        >
+          <span>
+            {trail.model} · {meta.where}
+            {meta.tps ? ` · ${meta.tps} tok/s` : ""}
+          </span>
+          {replay && <span className="rounded-full bg-sun/15 px-2 py-0.5 text-sun">replay</span>}
           {fallback && (
             <span
-              className="ml-2 rounded bg-desk px-1.5 py-0.5 text-ink"
-              title="Some panels used the deterministic template because the model was unavailable or kept failing validation."
+              className="rounded-full bg-white/5 px-2 py-0.5 text-fg-2"
+              title="Some pages used the built-in template because the model was unavailable or kept failing checks."
             >
               template
             </span>
@@ -225,20 +232,26 @@ export default function TrailPage({ params }: { params: Promise<{ id: string }> 
 
       {!done && (
         <div
-          className="mt-5 flex items-center gap-3 rounded-2xl border-2 border-dashed border-ink/30 bg-card/60 px-4 py-3"
+          className="panel mt-8 flex items-center gap-4 px-5 py-4"
           role="status"
           aria-live="polite"
         >
-          <Icon3D name="printer" size={36} className="animate-bounce" />
-          <span className="text-sm">
-            {meta.status || "Warming up the press…"}{" "}
-            <span className="mono text-xs text-muted">({8 - pending.length}/8 pages)</span>
-          </span>
+          <Loader2 size={18} className="shrink-0 animate-spin text-grass" />
+          <span className="text-sm text-fg-2">{meta.status || "Warming up…"}</span>
+          <div className="ml-auto flex items-center gap-3">
+            <div className="h-1 w-32 overflow-hidden rounded-full bg-white/10">
+              <div
+                className="h-full rounded-full bg-grass transition-[width] duration-700"
+                style={{ width: `${progressPct}%` }}
+              />
+            </div>
+            <span className="mono text-xs text-fg-3">{8 - pending.length}/8</span>
+          </div>
         </div>
       )}
       {error && (
         <p
-          className="mt-4 rounded-xl border-2 border-pink bg-[#ffe9ef] px-4 py-3 text-sm"
+          className="mt-4 rounded-2xl bg-ember/10 px-4 py-3 text-sm text-ember shadow-[inset_0_0_0_1px_rgb(255_138_107/0.3)]"
           role="alert"
         >
           {error}
@@ -246,16 +259,20 @@ export default function TrailPage({ params }: { params: Promise<{ id: string }> 
       )}
 
       <div
-        className="no-print mt-6 flex flex-wrap items-center gap-2"
+        className="no-print mt-10 flex flex-wrap items-center gap-2"
         role="toolbar"
         aria-label="Sheet options"
       >
-        <div className="flex gap-1" role="radiogroup" aria-label="View">
+        <div
+          className="flex gap-1 rounded-full bg-white/[0.03] p-1 shadow-[inset_0_0_0_1px_var(--color-line)]"
+          role="radiogroup"
+          aria-label="View"
+        >
           <button
             type="button"
             role="radio"
             aria-checked={view === "flat"}
-            className="chip"
+            className="chip !h-9 !shadow-none"
             onClick={() => setView("flat")}
           >
             Flat sheet
@@ -264,7 +281,7 @@ export default function TrailPage({ params }: { params: Promise<{ id: string }> 
             type="button"
             role="radio"
             aria-checked={view === "folded"}
-            className="chip"
+            className="chip !h-9 !shadow-none"
             onClick={() => setView("folded")}
             disabled={!done}
           >
@@ -277,7 +294,7 @@ export default function TrailPage({ params }: { params: Promise<{ id: string }> 
           aria-pressed={trail.color}
           onClick={() => save({ color: !trail.color })}
         >
-          <Icon3D name="palette" size={22} /> {trail.color ? "Colour" : "B&W"}
+          {trail.color ? "Colour" : "Black & white"}
         </button>
         <button
           type="button"
@@ -293,7 +310,12 @@ export default function TrailPage({ params }: { params: Promise<{ id: string }> 
         </button>
         <div className="ml-auto flex flex-wrap gap-2">
           <button type="button" className="btn" onClick={pdf} disabled={!done || pdfBusy}>
-            {pdfBusy ? "Making PDF…" : "Download PDF"}
+            {pdfBusy ? (
+              <Loader2 size={16} className="animate-spin" />
+            ) : (
+              <Download size={16} strokeWidth={1.6} />
+            )}{" "}
+            {pdfBusy ? "Making PDF…" : "PDF"}
           </button>
           <button
             type="button"
@@ -302,12 +324,12 @@ export default function TrailPage({ params }: { params: Promise<{ id: string }> 
             disabled={!done}
             data-testid="print"
           >
-            <Icon3D name="printer" size={22} /> Print
+            <Printer size={17} strokeWidth={1.7} /> Print
           </button>
         </div>
       </div>
 
-      <div className="mt-6" data-testid="sheet-preview">
+      <div className="mt-8" data-testid="sheet-preview">
         {view === "flat" || !done ? (
           <SheetStage
             data={data}
@@ -327,23 +349,24 @@ export default function TrailPage({ params }: { params: Promise<{ id: string }> 
         )}
       </div>
       {done && view === "flat" && (
-        <p className="no-print mt-3 text-center text-xs text-muted">
-          Hover a panel to re-roll it. The preview is the print, 1:1.{" "}
-          {trail.paper === "letter" ? "Letter" : "A4"}, landscape, no margins, “actual size”.
+        <p className="no-print mt-4 text-center text-xs text-fg-3">
+          Hover a page to rewrite just that page. Print at actual size:{" "}
+          {trail.paper === "letter" ? "US Letter" : "A4"}, landscape, no margins.
         </p>
       )}
 
       {done && (
-        <section className="no-print mt-12" aria-labelledby="fold-guide">
-          <h2 id="fold-guide" className="display flex items-center gap-2 text-2xl">
-            <Icon3D name="scissors" size={34} /> One cut, six folds
+        <section className="no-print mt-24" aria-labelledby="fold-guide">
+          <p className="eyebrow">After printing</p>
+          <h2 id="fold-guide" className="h2 mt-3 text-4xl">
+            One cut, six folds.
           </h2>
-          <div className="mt-4">
+          <div className="mt-8">
             <FoldGuide />
           </div>
-          <p className="mt-4 text-sm text-muted">
+          <p className="mt-6 text-sm text-fg-3">
             Not sure the pages land in order? Print the{" "}
-            <Link className="underline" href="/fold-test">
+            <Link className="link text-fg-2" href="/fold-test">
               fold test
             </Link>{" "}
             first.

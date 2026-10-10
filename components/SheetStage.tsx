@@ -37,7 +37,7 @@ export function SheetStage({
   return (
     <div className="stage w-full" onPointerMove={onMove} onPointerLeave={reset}>
       <div ref={ref} className="tilt relative">
-        <div className="sheet-shadow relative overflow-hidden rounded-[3px] bg-card">
+        <div className="sheet-shadow relative overflow-hidden rounded-[3px] bg-[#fffdf8]">
           <Sheet data={data} pending={pending} className="sheet-svg" id={svgId} />
           {onReroll &&
             ([1, 3, 4, 5, 6, 7, 8] as PageNo[]).map((p) => {
@@ -58,9 +58,9 @@ export function SheetStage({
                   aria-label={`Regenerate page ${p}`}
                 >
                   <span
-                    className={`mono rounded-md border-2 border-ink bg-sun px-2 py-1 text-[0.7rem] font-semibold shadow-[0_2px_0_var(--color-ink)] ${rerolling === p ? "animate-pulse" : ""}`}
+                    className={`mono rounded-full bg-bg/85 px-2.5 py-1 text-[0.68rem] text-grass shadow-[inset_0_0_0_1px_rgb(201_238_115/0.4)] backdrop-blur ${rerolling === p ? "animate-pulse" : ""}`}
                   >
-                    ↻ {rerolling === p ? "re-writing…" : `re-roll p.${p}`}
+                    ↻ {rerolling === p ? "rewriting…" : `rewrite page ${p}`}
                   </span>
                 </button>
               );
