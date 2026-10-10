@@ -117,10 +117,11 @@ export function providerIds(): ProviderId[] {
   return auto.length ? auto : ["ollama"];
 }
 
-function resolve(id: ProviderId, primary: boolean, single: boolean): ProviderConfig {
+function resolve(id: ProviderId, generic: boolean): ProviderConfig {
   const d = DEFAULTS[id];
-  // The generic LLM_* vars configure the primary provider (and keep old setups working).
-  const generic = primary || single;
+  // `generic`: the generic LLM_* vars configure the first local Ollama / custom endpoint
+  // (and keep old setups working). Hosted providers only read their own prefixed
+  // vars, so a leftover LLM_BASE_URL never sends Gemini requests to the wrong place.
   const baseURL =
     env(`${d.prefix}_BASE_URL`) ?? (generic ? env("LLM_BASE_URL") : undefined) ?? d.baseURL;
   const local =
@@ -165,7 +166,8 @@ export function serverConfig() {
 /** LLM config, optionally overridden per request by the Settings page (models always; endpoint only if allowed). */
 export function llmConfig(headers?: Headers): LlmConfig {
   const ids = providerIds();
-  const providers = ids.map((id, i) => resolve(id, i === 0, ids.length === 1));
+  const firstLocal = ids.findIndex((id) => id === "ollama" || id === "openai-compat");
+  const providers = ids.map((id, i) => resolve(id, i === firstLocal));
   const primary = providers[0]!;
   if (headers) {
     const mt = headers.get("x-pt-model-text");

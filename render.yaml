@@ -1,0 +1,38 @@
+# Render Blueprint — the live site. Gemma is served by a hosted API, so there's
+# nothing to install and no GPU to rent. Set the key(s) in the Render dashboard.
+#   LLM_PROVIDER=gemini            → GEMINI_API_KEY (Google AI Studio)
+#   LLM_PROVIDER=ollama-cloud      → OLLAMA_API_KEY (ollama.com)
+#   LLM_PROVIDER=gemini,ollama-cloud → both, with automatic fallback
+# To run Gemma on Render itself instead, use deploy/render-with-ollama.yaml.
+services:
+  - type: web
+    name: papertrail-web
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: starter
+    healthCheckPath: /api/config
+    envVars:
+      - key: LLM_PROVIDER
+        value: gemini,ollama-cloud
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: OLLAMA_API_KEY
+        sync: false
+      - key: GEMINI_MODEL_TEXT
+        value: gemma-4-26b-a4b-it
+      - key: GEMINI_MODEL_VISION
+        value: gemma-4-26b-a4b-it
+      - key: OLLAMA_CLOUD_MODEL_TEXT
+        value: gemma4:31b
+      - key: OLLAMA_CLOUD_MODEL_VISION
+        value: gemma4:31b
+      - key: LLM_TIMEOUT_MS
+        value: "120000"
+      - key: DEMO_MODE
+        value: "false"
+      - key: ALLOW_ENDPOINT_OVERRIDE
+        value: "false"
+      - key: NOMINATIM_EMAIL
+        sync: false
+      - key: PUBLIC_URL
+        sync: false

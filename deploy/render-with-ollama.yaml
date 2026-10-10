@@ -1,4 +1,5 @@
-# Render Blueprint: Render as the AI runtime. Gemma runs in a private service
+# Render Blueprint (alternative): Render as the AI runtime.
+# Use it by pointing Render at this file (Blueprint path: deploy/render-with-ollama.yaml). Gemma runs in a private service
 # next to the web app, so no closed API is anywhere in the stack.
 # Plan note: gemma4:e2b needs ≥ 8 GB RAM on CPU. It's slow (see README), which
 # is why the zine streams panel by panel.

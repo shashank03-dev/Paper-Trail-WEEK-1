@@ -55,6 +55,25 @@ describe("provider selection", () => {
     expect(c.providers[1]!.modelText).toBe("gemma-4-31b-it");
   });
 
+  it("ignores local-only LLM_* vars for hosted providers", () => {
+    clean();
+    vi.stubEnv("LLM_PROVIDER", "gemini,ollama");
+    vi.stubEnv("GEMINI_API_KEY", "g");
+    vi.stubEnv("LLM_BASE_URL", "http://ollama:11434/v1");
+    vi.stubEnv("LLM_MODEL_TEXT", "gemma4:e4b");
+    const c = llmConfig();
+    expect(c.providers[0]).toMatchObject({
+      id: "gemini",
+      baseURL: "https://generativelanguage.googleapis.com/v1beta/openai/",
+      modelText: "gemma-4-26b-a4b-it",
+    });
+    expect(c.providers[1]).toMatchObject({
+      id: "ollama",
+      baseURL: "http://ollama:11434/v1",
+      modelText: "gemma4:e4b",
+    });
+  });
+
   it("treats a Docker-network Ollama as local, not hosted", () => {
     clean();
     vi.stubEnv("LLM_BASE_URL", "http://papertrail-ollama:11434/v1");

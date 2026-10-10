@@ -25,6 +25,10 @@ services:
       PUBLIC_URL: ${PUBLIC_URL:-http://localhost:3000}
       NOMINATIM_EMAIL: ${NOMINATIM_EMAIL:-you@example.com}
       DEMO_MODE: ${DEMO_MODE:-false}
+      # Optional: use a hosted Gemma instead of (or as a fallback to) the local one.
+      LLM_PROVIDER: ${LLM_PROVIDER:-}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      OLLAMA_API_KEY: ${OLLAMA_API_KEY:-}
     ports:
       - "3000:3000"
     restart: unless-stopped
