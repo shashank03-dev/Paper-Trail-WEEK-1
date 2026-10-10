@@ -314,7 +314,7 @@ export function QR({
     }
   }
   return (
-    <g>
+    <g data-qr>
       <rect x={x} y={y} width={size} height={size} fill="#FFFFFF" />
       <path d={d} fill={color} shapeRendering="crispEdges" />
     </g>

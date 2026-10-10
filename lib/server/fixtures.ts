@@ -34,7 +34,7 @@ export function nearestPreset(lat: number, lon: number) {
 
 /** Recorded Gemma output for a preset + task (fixtures/llm/<preset>/<task>.json). */
 export async function replayContent(presetId: string, task: string): Promise<string | null> {
-  if (!presetById(presetId) || !/^[\w-]+$/.test(task)) return null;
+  if ((presetId !== "_reader" && !presetById(presetId)) || !/^[\w-]+$/.test(task)) return null;
   try {
     const j = JSON.parse(await readFile(dir("llm", presetId, `${task}.json`), "utf8")) as {
       content: string;

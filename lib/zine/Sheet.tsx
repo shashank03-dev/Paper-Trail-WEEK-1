@@ -1,5 +1,5 @@
 import { panelTransform, PAGES, sheetGeometry, FIDUCIAL_INNER, type PageNo } from "./layout";
-import { makeRough, hashSeed } from "./rough";
+import { makeRough, zineSeed } from "./rough";
 import { inks, type ZineData } from "./primitives";
 import { Folio, PANEL_COMPONENTS } from "./panels";
 import { Scissors } from "./glyphs";
@@ -20,7 +20,7 @@ export function Sheet({ data, pending = [], className, paperBg = true, id, title
   const g = sheetGeometry(data.paper);
   const k = inks(data.color);
   const featureById = new Map(data.features.map((f) => [f.id, f]));
-  const seed = hashSeed(data.id);
+  const seed = zineSeed(data);
   return (
     <svg
       id={id}

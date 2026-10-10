@@ -65,3 +65,8 @@ export function hashSeed(s: string): number {
   }
   return (h >>> 0) % 2147483646 || 1;
 }
+
+/** Wobbles come from the trail's content, so the same trail always draws the same lines. */
+export function zineSeed(d: { locationLabel: string; edition: number; date: string }): number {
+  return hashSeed(`${d.locationLabel}|${d.edition}|${d.date}`);
+}

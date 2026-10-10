@@ -29,7 +29,7 @@ const Body = z.object({
 export async function POST(req: Request) {
   const b = await parseBody(req, Body);
   if (!b.ok) return b.res;
-  const { chat, mode, cfg } = await chatFor(req.headers);
+  const { chat, mode, cfg } = await chatFor(req.headers, "_reader");
   return sse(async (send) => {
     send({ type: "status", model: cfg.modelVision, mode });
     const r = await readSheet({

@@ -43,7 +43,7 @@ function thump() {
 }
 
 const VERDICT: Record<Report["riddle"]["verdict"], { label: string; cls: string }> = {
-  correct: { label: "Right!", cls: "bg-teal text-white" },
+  correct: { label: "Right!", cls: "bg-teal-deep text-white" },
   close: { label: "Close", cls: "bg-sun" },
   incorrect: { label: "Not quite", cls: "bg-desk" },
   blank: { label: "Left blank", cls: "bg-desk" },
@@ -95,32 +95,33 @@ export function FieldReport(p: ReportProps) {
           <h2 id="report-title" className="display mt-1 text-3xl sm:text-4xl">
             {p.title}
           </h2>
-          <div className="mt-6 flex items-end gap-3">
-            <span className="display text-6xl text-pink" data-testid="score">
-              {s.total}
-            </span>
-            <span className="pb-2 text-sm text-muted">
-              points · spotted {s.spotted} of {s.of}
-            </span>
-          </div>
-
-          {/* The stamp slams onto the report. */}
-          <div
-            className="stage pointer-events-none absolute right-4 top-4 sm:right-8 sm:top-8"
-            aria-hidden={!stamped}
-          >
-            {stamped && (
-              <div
-                className="slam stamp grid w-40 place-items-center px-3 py-3 text-center sm:w-48"
-                data-testid="stamp"
-              >
-                <div className="text-[0.6rem]">The Trail Office</div>
-                <div className="display my-1 text-2xl normal-case tracking-normal">
-                  {s.total} pts
+          <div className="mt-6 flex flex-wrap items-center justify-between gap-4">
+            <div className="flex items-end gap-3">
+              <span className="display text-6xl text-rose" data-testid="score">
+                {s.total}
+              </span>
+              <span className="pb-2 text-sm text-muted">
+                points · spotted {s.spotted} of {s.of}
+              </span>
+            </div>
+            {/* The stamp slams onto the report. */}
+            <div
+              className="stage pointer-events-none min-h-[6.5rem] min-w-[11rem]"
+              aria-hidden={!stamped}
+            >
+              {stamped && (
+                <div
+                  className="slam stamp grid w-44 place-items-center px-3 py-3 text-center"
+                  data-testid="stamp"
+                >
+                  <div className="text-[0.6rem]">The Trail Office</div>
+                  <div className="display my-1 text-2xl normal-case tracking-normal">
+                    {s.total} pts
+                  </div>
+                  <div className="text-[0.6rem]">{dateStr} · walked</div>
                 </div>
-                <div className="text-[0.6rem]">{dateStr} · walked</div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
 
           <h3 className="display mt-8 flex items-center gap-2 text-xl">
@@ -147,7 +148,7 @@ export function FieldReport(p: ReportProps) {
                   <span className="flex-1 font-medium">
                     {p.labels[it.index] ?? `Item ${it.index + 1}`}
                   </span>
-                  <span className="mono text-xs text-pink">{p.points[it.index] ?? 0}</span>
+                  <span className="mono text-xs text-rose">{p.points[it.index] ?? 0}</span>
                   {p.debug && (
                     <span className="mono text-[0.6rem] text-muted">
                       g:{it.gemma === null || it.gemma === undefined ? "–" : it.gemma ? "✓" : "✗"}{" "}
@@ -168,7 +169,7 @@ export function FieldReport(p: ReportProps) {
             {listen.map(([k, val]) => (
               <div key={k} className="border-b-2 border-dashed border-line pb-2">
                 <dt className="text-xs font-semibold text-muted">{k}</dt>
-                <dd className={`hand text-3xl leading-tight ${val ? "text-ink" : "text-muted/60"}`}>
+                <dd className={`hand text-3xl leading-tight ${val ? "text-ink" : "text-muted"}`}>
                   {val ?? "(left blank)"}
                 </dd>
               </div>
@@ -238,7 +239,7 @@ export function FieldReport(p: ReportProps) {
                   <div className="flex-1 bg-teal" />
                 </div>
                 <p className="display mt-3 text-xl">
-                  Your screen was <span className="text-pink">{pct}%</span> of this adventure.
+                  Your screen was <span className="text-rose">{pct}%</span> of this adventure.
                 </p>
               </>
             ) : (

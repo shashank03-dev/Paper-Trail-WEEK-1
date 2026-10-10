@@ -14,7 +14,6 @@ import { db, type TrailRecord } from "@/lib/client/db";
 import { getConfig, postJSON, postSSE, type PublicConfig } from "@/lib/client/api";
 import { contextFromTrail, zineData } from "@/lib/client/trail";
 import { useScreenTime } from "@/lib/client/useScreenTime";
-import { downloadSheetPdf } from "@/lib/client/pdf";
 import { saveSettings, loadSettings } from "@/lib/client/settings";
 import type { CopyPanel, GenPath, Panels, Paper, RegenPanel, TrailPlan } from "@/lib/schemas";
 
@@ -164,6 +163,7 @@ export default function TrailPage({ params }: { params: Promise<{ id: string }> 
     if (!svg) return;
     setPdfBusy(true);
     try {
+      const { downloadSheetPdf } = await import("@/lib/client/pdf");
       await downloadSheetPdf(svg, `paper-trail-${id}.pdf`);
     } catch (e) {
       setError(`PDF export failed (${(e as Error).message}). Use Print → Save as PDF instead.`);

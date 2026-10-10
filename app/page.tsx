@@ -38,7 +38,7 @@ export default function Landing() {
           <p className="kicker mb-4">Hacktoberfest · Touch Grass · an open-model zine press</p>
           <h1 className="display riso text-[clamp(2.3rem,5.2vw,4.3rem)]">
             Every touch-grass app wants to come with you.
-            <span className="mt-3 block text-pink [text-shadow:none]">This one stays home.</span>
+            <span className="mt-3 block text-rose [text-shadow:none]">This one stays home.</span>
           </h1>
           <p className="mt-6 max-w-xl text-lg leading-relaxed text-ink/80">
             Paper Trail turns your real neighbourhood into a one-sheet, 8-page paper zine written by
@@ -86,13 +86,15 @@ export default function Landing() {
             tilt={10}
             className="float-delay-3 float-slow absolute -bottom-2 right-10 z-20 hidden sm:block"
           />
-          <FoldingZine />
+          <div className="px-8 sm:px-0">
+            <FoldingZine />
+          </div>
         </div>
       </section>
 
       <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6" aria-labelledby="how">
         <h2 id="how" className="display text-3xl sm:text-4xl">
-          The screen is the <span className="text-pink">shortest</span> part.
+          The screen is the <span className="text-rose">shortest</span> part.
         </h2>
         <p className="mt-3 max-w-2xl text-ink/75">
           And we prove it: every trail ends with a <strong>Screen vs Outside</strong> counter.

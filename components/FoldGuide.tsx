@@ -167,7 +167,7 @@ export function FoldGuide() {
     <ol className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
       {STEPS.map((s, i) => (
         <li key={i} className="fold-step paper-card p-3">
-          <p className="mono text-xs text-pink">step {i + 1}</p>
+          <p className="mono text-xs text-rose">step {i + 1}</p>
           {s.svg}
           <p className="mt-1 text-[0.8rem] leading-snug">{s.title}</p>
         </li>

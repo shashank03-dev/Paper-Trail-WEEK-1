@@ -28,7 +28,8 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
-  output: "standalone",
+  // Docker / Render builds set NEXT_OUTPUT=standalone.
+  ...(process.env.NEXT_OUTPUT === "standalone" ? { output: "standalone" as const } : {}),
   poweredByHeader: false,
   reactStrictMode: true,
   // Fixtures are read at runtime by the API routes; ship them with the standalone build.

@@ -1,5 +1,5 @@
 import { sheetGeometry, type PageNo } from "./layout";
-import { makeRough, hashSeed } from "./rough";
+import { makeRough, zineSeed } from "./rough";
 import { inks, type ZineData } from "./primitives";
 import { Folio, PANEL_COMPONENTS } from "./panels";
 
@@ -16,7 +16,7 @@ export function PageSvg({
   const g = sheetGeometry(data.paper);
   const k = inks(data.color);
   const featureById = new Map(data.features.map((f) => [f.id, f]));
-  const rc = makeRough(hashSeed(data.id) + page * 104729);
+  const rc = makeRough(zineSeed(data) + page * 104729);
   const Panel = PANEL_COMPONENTS[page];
   return (
     <svg

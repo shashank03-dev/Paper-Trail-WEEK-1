@@ -93,19 +93,19 @@ export default function TrailBook() {
     <div className="mx-auto max-w-6xl px-4 pb-10 pt-2 sm:px-6">
       <p className="kicker">Kept in this browser only</p>
       <h1 className="display riso mt-1 text-4xl sm:text-5xl">Trail Book</h1>
-      <dl className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-4">
+      <ul className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-4" aria-label="Totals">
         {stats.map((s) => (
-          <div key={s.k} className="card flex items-center gap-3 p-4">
+          <li key={s.k} className="card flex items-center gap-3 p-4">
             <Icon3D name={s.icon} size={40} />
             <div>
-              <dd className="display text-2xl" data-testid={`stat-${s.k.replace(/\s/g, "-")}`}>
+              <p className="display text-2xl" data-testid={`stat-${s.k.replace(/\s/g, "-")}`}>
                 {s.v}
-              </dd>
-              <dt className="text-xs text-muted">{s.k}</dt>
+              </p>
+              <p className="text-xs text-muted">{s.k}</p>
             </div>
-          </div>
+          </li>
         ))}
-      </dl>
+      </ul>
       {shelf.length === 0 ? (
         <div className="mt-16 grid place-items-center text-center">
           <Icon3D name="book" size={110} float tilt={-6} />

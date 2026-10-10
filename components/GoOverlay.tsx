@@ -24,7 +24,7 @@ export function GoOverlay({ trailId, onClose }: { trailId: string; onClose: () =
       <div className="pop-in max-w-xl text-center">
         <Icon3D name="phone-off" size={120} float tilt={-8} className="mx-auto" />
         <h2 id="go-title" className="display mt-6 text-5xl sm:text-7xl">
-          Put your phone down. <span className="text-pink">Go.</span>
+          Put your phone down. <span className="text-rose">Go.</span>
         </h2>
         <p className="mt-6 text-lg text-paper/75">
           We&rsquo;ll count when you&rsquo;re back. (Nothing is ticking on this screen. That&rsquo;s

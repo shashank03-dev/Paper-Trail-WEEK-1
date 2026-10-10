@@ -6,25 +6,25 @@ export function Nav() {
   return (
     <header className="no-print mx-auto flex w-full max-w-6xl items-center justify-between gap-3 px-4 py-4 sm:px-6">
       <Link href="/" className="group flex items-center gap-2" aria-label="Paper Trail home">
-        <Icon3D name="footprints" size={34} className="wiggle" />
-        <span className="display riso text-xl sm:text-2xl">Paper Trail</span>
+        <Icon3D name="footprints" size={30} className="wiggle hidden min-[400px]:block" />
+        <span className="display riso whitespace-nowrap text-lg sm:text-2xl">Paper Trail</span>
       </Link>
       <nav aria-label="Main" className="flex items-center gap-1 sm:gap-2">
         <Link
           href="/new"
-          className="rounded-lg px-2 py-1.5 text-sm font-semibold hover:bg-desk sm:px-3"
+          className="whitespace-nowrap rounded-lg px-2 py-1.5 text-sm font-semibold hover:bg-desk sm:px-3"
         >
           New trail
         </Link>
         <Link
           href="/book"
-          className="rounded-lg px-2 py-1.5 text-sm font-semibold hover:bg-desk sm:px-3"
+          className="whitespace-nowrap rounded-lg px-2 py-1.5 text-sm font-semibold hover:bg-desk sm:px-3"
         >
           Trail Book
         </Link>
         <Link
           href="/settings"
-          className="rounded-lg px-2 py-1.5 text-sm font-semibold hover:bg-desk sm:px-3"
+          className="whitespace-nowrap rounded-lg px-2 py-1.5 text-sm font-semibold hover:bg-desk sm:px-3"
           aria-label="Settings"
         >
           <Icon3D name="gear" size={22} />
