@@ -14,27 +14,36 @@ const MM_DEFAULTS: Options = {
 
 export type Rough = ReturnType<typeof makeRough>;
 
-/** A seeded generator so the same trail always draws the same wobbles. */
+/**
+ * A seeded generator so the same trail always draws the same wobbles. Each
+ * shape's seed comes from its own parameters (not call order), so rendering
+ * twice — server and client, or React StrictMode — gives identical paths.
+ */
 export function makeRough(seed: number) {
   const gen = rough.generator();
-  let n = 0;
-  const opts = (o: Options = {}): Options => ({
+  const opts = (key: string, o: Options = {}): Options => ({
     ...MM_DEFAULTS,
-    seed: (seed + ++n * 7919) % 2147483647 || 1,
+    seed: (hashSeed(`${seed}|${key}|${o.stroke ?? ""}`) % 2147483646) + 1,
     ...o,
   });
+  const k = (...a: unknown[]) =>
+    a.map((x) => (typeof x === "number" ? x.toFixed(2) : JSON.stringify(x))).join(",");
   return {
     line: (x1: number, y1: number, x2: number, y2: number, o?: Options) =>
-      gen.line(x1, y1, x2, y2, opts(o)),
+      gen.line(x1, y1, x2, y2, opts(k("l", x1, y1, x2, y2), o)),
     rect: (x: number, y: number, w: number, h: number, o?: Options) =>
-      gen.rectangle(x, y, w, h, opts(o)),
-    circle: (x: number, y: number, d: number, o?: Options) => gen.circle(x, y, d, opts(o)),
+      gen.rectangle(x, y, w, h, opts(k("r", x, y, w, h), o)),
+    circle: (x: number, y: number, d: number, o?: Options) =>
+      gen.circle(x, y, d, opts(k("c", x, y, d), o)),
     ellipse: (x: number, y: number, w: number, h: number, o?: Options) =>
-      gen.ellipse(x, y, w, h, opts(o)),
-    linear: (pts: [number, number][], o?: Options) => gen.linearPath(pts, opts(o)),
-    curve: (pts: [number, number][], o?: Options) => gen.curve(pts, opts(o)),
-    polygon: (pts: [number, number][], o?: Options) => gen.polygon(pts, opts(o)),
-    path: (d: string, o?: Options) => gen.path(d, opts(o)),
+      gen.ellipse(x, y, w, h, opts(k("e", x, y, w, h), o)),
+    linear: (pts: [number, number][], o?: Options) =>
+      gen.linearPath(pts, opts(k("lp", pts.length, pts[0], pts[pts.length - 1]), o)),
+    curve: (pts: [number, number][], o?: Options) =>
+      gen.curve(pts, opts(k("cv", pts.length, pts[0], pts[pts.length - 1]), o)),
+    polygon: (pts: [number, number][], o?: Options) =>
+      gen.polygon(pts, opts(k("pg", pts.length, pts[0], pts[1]), o)),
+    path: (d: string, o?: Options) => gen.path(d, opts(k("p", d.length, d.slice(0, 40)), o)),
     toPaths: (d: Drawable) => gen.toPaths(d),
   };
 }

@@ -372,8 +372,9 @@ export function Doodle({
             stroke: k.pink,
             strokeWidth: 0.25,
             fill: k.color ? k.pink : undefined,
-            fillStyle: "dots",
-            hachureGap: 0.7,
+            // Not "dots": rough.js jitters dots with an unseeded random.
+            fillStyle: "hachure",
+            hachureGap: 0.8,
           })}
         />
       );
