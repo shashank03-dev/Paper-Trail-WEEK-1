@@ -11,3 +11,9 @@ playwright-report
 blob-report
 evals/out
 .DS_Store
+
+# Launch video: keep the deliverables, not the regenerable intermediates
+!video/out
+video/build/zine.json
+video/out/stills
+video/out/.paper-trail-*

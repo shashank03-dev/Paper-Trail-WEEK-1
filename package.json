@@ -26,7 +26,9 @@
     "fixtures:record": "tsx --tsconfig tsconfig.scripts.json scripts/record-llm.ts",
     "fixtures:photos": "tsx --tsconfig tsconfig.scripts.json scripts/make-synthetic-sheets.ts",
     "eval:reader": "tsx --tsconfig tsconfig.scripts.json scripts/eval-reader.ts",
-    "eval:writer": "tsx --tsconfig tsconfig.scripts.json scripts/eval-writer.ts"
+    "eval:writer": "tsx --tsconfig tsconfig.scripts.json scripts/eval-writer.ts",
+    "video:zine": "tsx --tsconfig tsconfig.scripts.json video/scripts/export-zine.ts",
+    "video:render": "tsx --tsconfig tsconfig.scripts.json video/render.ts"
   },
   "dependencies": {
     "@react-three/fiber": "9.3.0",
