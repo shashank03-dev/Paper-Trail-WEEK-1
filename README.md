@@ -2,7 +2,7 @@
 
 **Every touch-grass app wants to come with you. This one stays home.**
 
-Paper Trail turns your real neighbourhood into a one-sheet, 8-page paper zine written by an open model (Gemma 4, running on your machine), so your phone can stay home. When you get back, Gemma reads your pencil ticks, handwriting and sketches from one photo and stamps your Trail Book.
+Paper Trail turns your real neighbourhood into a one-sheet, 8-page paper zine written by an open model (Gemma 4 — on your own machine, or through Ollama Cloud or the Gemini API), so your phone can stay home. When you get back, Gemma reads your pencil ticks, handwriting and sketches from one photo and stamps your Trail Book.
 
 ![TODO: hero GIF — the sheet printing panel by panel, then folding](docs/media/hero.gif)
 
@@ -38,7 +38,9 @@ Paper Trail turns your real neighbourhood into a one-sheet, 8-page paper zine wr
 6. **Come back, take one photo.** The browser finds the four printed corner markers, solves a homography, warps the photo flat, cuts it into panels and measures ink in every checkbox. Gemma gets **four small, focused crops** (I-Spy, Listen, Riddle, Sketch), each with what it should expect to see. Where Gemma and the tick-counter agree, it's high confidence; where they disagree, you get one tap to fix it.
 7. **The Field Report:** your handwriting transcribed in a handwriting font, the riddle judged kindly, your sketch described ("a tree with three branches, like it's waving at you"), a note from *The Trail Office*, a rubber stamp, and the **Screen vs Outside** counter.
 
-Every graphic on the sheet is drawn in code (SVG + rough.js): the map, the weather glyph, the stamp, the QR code. No stock images, no image generation, **zero external assets on paper**. The app chrome uses Microsoft's MIT-licensed Fluent 3D emoji, self-hosted.
+Every graphic on the sheet is drawn in code (SVG + rough.js): the map, the weather glyph, the stamp, the QR code. No stock images, no image generation, **zero external assets on paper**.
+
+The site itself is a dark, cinematic "night walk" design: the landing page is a real-time three.js scene in which **the actual printed sheet** (rasterised into a texture and split into its eight quarter-panels with real hinges) folds into a booklet and unfolds as you scroll, under a warm "desk lamp" over a slow topographic-contour shader. Everything is built in this repo and self-hosted — no hosted 3D scenes, no CDNs.
 
 ## Quick start
 
@@ -59,15 +61,29 @@ To scan the QR code on page 8 with a phone, set `PUBLIC_URL` to your machine's L
 
 **No model handy?** `DEMO_MODE=true pnpm dev` uses the cached presets and, if Ollama isn't reachable, replays recorded output. The UI shows a yellow **replay** badge so it's never mistaken for live inference.
 
+### Hosted Gemma (no install — best for a public site)
+
+Get a key from [Google AI Studio](https://aistudio.google.com/apikey) or [ollama.com](https://ollama.com/settings/keys), then:
+
+```bash
+GEMINI_API_KEY=…  pnpm dev                       # Gemma 4 (gemma-4-26b-a4b-it) on the Gemini API
+OLLAMA_API_KEY=…  pnpm dev                       # Gemma 4 (gemma4:31b) on Ollama Cloud
+LLM_PROVIDER=gemini,ollama-cloud GEMINI_API_KEY=… OLLAMA_API_KEY=… pnpm dev   # with fallback
+```
+
+The provider is picked from the keys you set (or `LLM_PROVIDER`). With several, the next one is tried when one fails or rate-limits. Gemma on the Gemini API doesn't take a separate system prompt or a JSON schema, so Paper Trail folds the system prompt into the request and puts the schema in the prompt; the usual zod + retry loop does the rest. When a hosted API writes the zine, the colophon on page 8 and the app copy say so — the "never left this machine" line only prints in local mode.
+
 ### Docker
 
 ```bash
 docker compose up            # web on :3000, Ollama on :11434 (first start pulls the model)
 ```
 
-### Render (Render as the AI runtime)
+### Render
 
-`render.yaml` is a Blueprint with two services:
+**Live site (recommended):** `render.yaml` deploys just the web app. Add `GEMINI_API_KEY` and/or `OLLAMA_API_KEY` in the dashboard; it defaults to `LLM_PROVIDER=gemini,ollama-cloud`.
+
+**Render as the AI runtime:** `deploy/render-with-ollama.yaml` is a Blueprint with two services:
 
 - **`papertrail-ollama`** — a private service built from `ollama/ollama`, a 20 GB persistent disk at `/root/.ollama`, and a start script that pulls `gemma4:e2b` on first boot, then serves (`OLLAMA_NUM_PARALLEL=1`, `OLLAMA_MAX_LOADED_MODELS=1`, `OLLAMA_KEEP_ALIVE=24h`). Use a plan with **≥ 8 GB RAM**.
 - **`papertrail-web`** — the Next.js app with `LLM_BASE_URL=http://papertrail-ollama:11434/v1`.
@@ -78,10 +94,15 @@ On CPU it's slow: TODO: _measured tok/s on Render_. That's why the zine streams 
 
 | Variable | Default | |
 | --- | --- | --- |
-| `LLM_BASE_URL` | `http://localhost:11434/v1` | Any OpenAI-compatible endpoint serving an **open** model |
+| `LLM_PROVIDER` | auto | `ollama`, `ollama-cloud`, `gemini`, `openai-compat`, or a comma list (fallback chain). Auto = Gemini if `GEMINI_API_KEY` is set, then Ollama Cloud, else local Ollama |
+| `GEMINI_API_KEY` | — | Google AI Studio key |
+| `GEMINI_MODEL_TEXT` / `_VISION` | `gemma-4-26b-a4b-it` | or `gemma-4-31b-it` |
+| `OLLAMA_API_KEY` | — | ollama.com key (Ollama Cloud) |
+| `OLLAMA_CLOUD_MODEL_TEXT` / `_VISION` | `gemma4:31b` | |
+| `LLM_BASE_URL` | `http://localhost:11434/v1` | Local Ollama / custom OpenAI-compatible endpoint |
 | `LLM_API_KEY` | `ollama` | |
-| `LLM_MODEL_TEXT` | `gemma4:e4b` | The writer |
-| `LLM_MODEL_VISION` | `gemma4:e4b` | The reader |
+| `LLM_MODEL_TEXT` | `gemma4:e4b` | The writer (local / custom) |
+| `LLM_MODEL_VISION` | `gemma4:e4b` | The reader (local / custom) |
 | `LLM_TIMEOUT_MS` | `120000` | |
 | `LLM_OLLAMA_NATIVE` | `false` | Use Ollama's `/api/chat` with `format: <schema>` instead of `/v1` |
 | `NOMINATIM_EMAIL` | — | Required by the Nominatim usage policy |
@@ -118,7 +139,7 @@ The committed `evals/results/*.md` were produced against the mock model and say 
 
 ## Why open models
 
-- **My home location and my handwriting never leave my machine.** The model runs in Ollama next to the app. There are no accounts and no analytics; your trails live in your browser's IndexedDB.
+- **My home location and my handwriting never leave my machine** when Gemma runs in Ollama next to the app. For people who can't install anything, the same open model runs on Ollama Cloud or the Gemini API — and the app tells you which one wrote your zine. There are no accounts and no analytics; your trails live in your browser's IndexedDB.
 - **It works offline after printing.** It's paper.
 - **Swap the model with one env var.** `gemma4:e2b` ↔ `gemma4:e4b` and measure the trade-off with the evals.
 - **Apache-2.0 weights** mean a school, library or scout group can run it for free, on their own hardware.
@@ -130,7 +151,7 @@ The committed `evals/results/*.md` were produced against the mock model and say 
 pnpm lint && pnpm typecheck && pnpm test && pnpm test:e2e
 ```
 
-- **Unit (Vitest, 69 tests):** imposition, panel rotation, homography + warp on a synthetic image, fiducial detection and OMR on synthetic phone photos, route selection, Overpass normalisation, `fitText`, schemas, grounding, the retry and fallback loop (with a fake model that returns broken JSON and hallucinated ids first), riddle judging, scoring.
+- **Unit (Vitest, 79 tests):** providers and the fallback chain, imposition, panel rotation, homography + warp on a synthetic image, fiducial detection and OMR on synthetic phone photos, route selection, Overpass normalisation, `fitText`, schemas, grounding, the retry and fallback loop (with a fake model that returns broken JSON and hallucinated ids first), riddle judging, scoring.
 - **E2E (Playwright, 8 tests):** a production build against `scripts/mock-llm.ts`. Setup → generate → 8 panels → a visual snapshot of the flat sheet; the return flow with a synthetic photo → auto corners → Field Report → stamp → Trail Book; a trail from another device; settings → test connection; axe on landing, setup, preview, report and the Trail Book (no serious violations).
 - `pnpm mock:llm` runs the mock model (it is not a model; it answers schema-valid JSON from the prompt so the whole app can be exercised without a GPU).
 
@@ -152,7 +173,7 @@ Code map: `lib/zine/` (layout, imposition, text metrics, the SVG sheet), `lib/wr
 - Map data © [OpenStreetMap contributors](https://www.openstreetmap.org/copyright) (ODbL), printed on page 2 of every zine.
 - Weather by [Open-Meteo](https://open-meteo.com/). Geocoding by Nominatim.
 - [rough.js](https://roughjs.com/) by Preet Shihn for every wobbly line.
-- [Fluent Emoji](https://github.com/microsoft/fluentui-emoji) 3D icons © Microsoft, MIT.
-- Fonts: Fraunces, Inter, IBM Plex Mono, Caveat, Reenie Beanie, Nanum Pen Script (SIL OFL), self-hosted.
+- [three.js](https://threejs.org/) + [react-three-fiber](https://r3f.docs.pmnd.rs/), [Motion](https://motion.dev/), [Lenis](https://lenis.darkroom.engineering/) and [Lucide](https://lucide.dev/) icons.
+- Fonts: Fraunces, Geist, Inter, IBM Plex Mono, Caveat, Reenie Beanie, Nanum Pen Script (SIL OFL), self-hosted.
 - Inspired by the **I-Spy** spotter books (1948 onward), whose readers mailed in a finished book and got a reward back by post.
 - Gemma 4 by Google DeepMind, served by [Ollama](https://ollama.com/).

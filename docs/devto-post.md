@@ -88,7 +88,7 @@ Measured so far (no model needed): the corner markers were found on **30 of 30**
 
 The writer eval runs 36 trails per model (3 places × 3 lengths × 4 kinds of company) and counts schema-valid-first-try, grounding, hallucinated places after validation (it should be zero, and the test suite has a fake model that hallucinates a statue on purpose), and whether everything fits its panel. TODO: one line on what surprised you.
 
-I built it with an AI coding agent and recorded every session with Entire. They're on a side branch of the repo, so you can see exactly how each piece came together. 69 unit tests and 8 browser tests run the whole app, preview to Trail Book, against a mock model.
+I built it with an AI coding agent and recorded every session with Entire. They're on a side branch of the repo, so you can see exactly how each piece came together. 79 unit tests and 8 browser tests run the whole app, preview to Trail Book, against a mock model.
 
 ## Why Open Innovation Matters Here
 

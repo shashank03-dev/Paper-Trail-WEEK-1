@@ -24,4 +24,4 @@ Each checkpoint links a commit on `main` to the session that produced it, so you
 1. A written brief (`build-prompt.md`) with hard rules: open models only, privacy, never dead-end, print accuracy.
 2. A design pass (`docs/design.md`) before code: the sheet as one mm-exact SVG, text metrics from font files, fiducials in the panel footers, two-stage generation.
 3. Milestones, each committed with the app runnable: paper → writer → reader → polish → proof.
-4. Tests written alongside: 69 unit tests and 8 Playwright e2e tests against a mock model, plus eval harnesses for real Gemma.
+4. Tests written alongside: 79 unit tests and 8 Playwright e2e tests against a mock model, plus eval harnesses for real Gemma.
