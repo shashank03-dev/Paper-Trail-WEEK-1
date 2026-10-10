@@ -1,0 +1,81 @@
+{
+  "name": "paper-trail",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "An open model folds your real neighborhood into a one-sheet paper zine, so your phone can stay home.",
+  "license": "MIT",
+  "packageManager": "pnpm@10.28.0",
+  "engines": {
+    "node": ">=20.11"
+  },
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint . && prettier --check .",
+    "format": "prettier --write .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "playwright test",
+    "mock:llm": "tsx --tsconfig tsconfig.scripts.json scripts/mock-llm.ts",
+    "fonts:metrics": "tsx --tsconfig tsconfig.scripts.json scripts/gen-font-metrics.ts",
+    "fixtures:seed": "tsx --tsconfig tsconfig.scripts.json scripts/seed-fixtures.ts",
+    "fixtures:fetch": "tsx --tsconfig tsconfig.scripts.json scripts/fetch-fixtures.ts",
+    "fixtures:record": "tsx --tsconfig tsconfig.scripts.json scripts/record-llm.ts",
+    "fixtures:photos": "tsx --tsconfig tsconfig.scripts.json scripts/make-synthetic-sheets.ts",
+    "eval:reader": "tsx --tsconfig tsconfig.scripts.json scripts/eval-reader.ts",
+    "eval:writer": "tsx --tsconfig tsconfig.scripts.json scripts/eval-writer.ts"
+  },
+  "dependencies": {
+    "dexie": "^4.2.1",
+    "dexie-react-hooks": "^4.2.0",
+    "leaflet": "1.9.4",
+    "nanoid": "^5.1.6",
+    "next": "15.5.27",
+    "openai": "^5.23.2",
+    "pdf-lib": "1.17.1",
+    "qrcode": "1.5.4",
+    "react": "19.1.1",
+    "react-dom": "19.1.1",
+    "react-leaflet": "5.0.0",
+    "roughjs": "4.6.6",
+    "zod": "^4.1.12"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.10.2",
+    "@eslint/eslintrc": "^3.3.1",
+    "@fontsource/caveat": "^5.2.8",
+    "@fontsource/fraunces": "^5.2.8",
+    "@fontsource/ibm-plex-mono": "^5.2.7",
+    "@fontsource/inter": "^5.2.8",
+    "@fontsource/nanum-pen-script": "^5.2.8",
+    "@fontsource/reenie-beanie": "^5.2.8",
+    "@playwright/test": "1.56.1",
+    "@tailwindcss/postcss": "4.1.18",
+    "@types/leaflet": "^1.9.20",
+    "@types/node": "^22.18.0",
+    "@types/pngjs": "^6.0.5",
+    "@types/qrcode": "^1.5.5",
+    "@types/react": "^19.1.12",
+    "@types/react-dom": "^19.1.9",
+    "eslint": "^9.36.0",
+    "eslint-config-next": "15.5.27",
+    "jpeg-js": "0.4.4",
+    "opentype.js": "1.3.4",
+    "pngjs": "7.0.0",
+    "prettier": "^3.6.2",
+    "tailwindcss": "4.1.18",
+    "tsx": "^4.20.6",
+    "typescript": "5.9.3",
+    "vitest": "3.2.4"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "sharp",
+      "unrs-resolver"
+    ]
+  }
+}

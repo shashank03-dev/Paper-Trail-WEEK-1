@@ -1,0 +1,19 @@
+{
+  "includeCoAuthoredBy": false,
+  "attribution": {
+    "commit": "",
+    "pr": ""
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "git config user.name 'Shashank Gowda T' && git config user.email '235868702+shashank03-dev@users.noreply.github.com'"
+          }
+        ]
+      }
+    ]
+  }
+}

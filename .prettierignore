@@ -1,0 +1,12 @@
+.next
+node_modules
+pnpm-lock.yaml
+fixtures
+evals/out
+evals/results
+public
+lib/zine/metrics.generated.ts
+test-results
+playwright-report
+e2e/__screenshots__
+*.md
