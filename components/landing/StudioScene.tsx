@@ -4,7 +4,15 @@ import { useEffect, useMemo, useRef, useState, type RefObject } from "react";
 import * as THREE from "three";
 import { svgToCanvas } from "@/lib/client/raster";
 import { paperBackTexture } from "./paperTexture";
-import { SHEET_H, SHEET_W, foldVertices, footprintCentre } from "./foldSheet";
+import {
+  CAMERA_FOV,
+  CAMERA_Z,
+  DESK_Z,
+  SHEET_H,
+  SHEET_W,
+  foldVertices,
+  footprintCentre,
+} from "./foldSheet";
 
 /**
  * The landing still life: the real printed sheet lying on a bone-white desk
@@ -36,11 +44,15 @@ export interface Rig {
   fy: number;
   // The pencil: 0 = resting by the paper … 1 = rolled out of frame.
   away: number;
+  // Where the pencil rests (fixed per layout): position, angle, scale.
+  penX: number;
+  penY: number;
+  penR: number;
+  penS: number;
 }
 
-export const DESK_Z = -0.42;
-const SEG_X = 168;
-const SEG_Y = 96;
+// Paper resolution: fine enough for smooth creases; coarser on weak phones.
+const SEGS = { high: [168, 96], low: [96, 56] } as const;
 const clamp01 = (t: number) => Math.min(1, Math.max(0, t));
 
 /* ------------------------------ paper ------------------------------- */
@@ -50,11 +62,13 @@ function Paper({
   pointer,
   texture,
   still,
+  low,
 }: {
   rig: RefObject<Rig>;
   pointer: RefObject<{ x: number; y: number }>;
   texture: THREE.Texture | null;
   still: boolean;
+  low: boolean;
 }) {
   const root = useRef<THREE.Group>(null);
   const focus = useRef<THREE.Group>(null);
@@ -62,7 +76,8 @@ function Paper({
   const motion = useRef({ prev: null as null | number[], flex: 0, cx: 0, cy: 0, px: 0, py: 0 });
 
   const { geometry, flat } = useMemo(() => {
-    const g = new THREE.PlaneGeometry(SHEET_W, SHEET_H, SEG_X, SEG_Y);
+    const [sx, sy] = SEGS[low ? "low" : "high"];
+    const g = new THREE.PlaneGeometry(SHEET_W, SHEET_H, sx, sy);
     const pos = g.attributes.position as THREE.BufferAttribute;
     const flat = new Float32Array(pos.count * 2);
     for (let i = 0; i < pos.count; i++) {
@@ -71,7 +86,7 @@ function Paper({
     }
     pos.setUsage(THREE.DynamicDrawUsage);
     return { geometry: g, flat };
-  }, []);
+  }, [low]);
   useEffect(() => () => geometry.dispose(), [geometry]);
 
   const back = useMemo(
@@ -186,15 +201,16 @@ function Pencil({ rig, mobile }: { rig: RefObject<Rig>; mobile: boolean }) {
     // It rolls away across its own length's normal, turning by exactly the distance travelled.
     const travel = r.away * (mobile ? 1.6 : 1.3);
     ref.current.position.set(
-      mobile ? 0.52 + travel : 1.55,
-      mobile ? 1.3 : -1.38 - travel,
-      DESK_Z + R,
+      r.penX + (mobile ? travel : 0),
+      r.penY - (mobile ? 0 : travel),
+      DESK_Z + R * r.penS,
     );
-    ref.current.rotation.set(0, 0, mobile ? 1.05 : 0.14);
-    if (body.current) body.current.rotation.x = (mobile ? -1 : 1) * (travel / R);
+    ref.current.rotation.set(0, 0, r.penR);
+    ref.current.scale.setScalar(r.penS);
+    if (body.current) body.current.rotation.x = (mobile ? -1 : 1) * (travel / (R * r.penS));
   });
   return (
-    <group ref={ref} scale={mobile ? 0.44 : 1}>
+    <group ref={ref}>
       <group ref={body}>
         <group rotation={[0, 0, Math.PI / 2]}>
           <mesh material={mats.lacquer} castShadow>
@@ -241,12 +257,15 @@ export default function StudioScene({
   sheetId,
   active,
   mobile,
+  low = false,
   onReady,
 }: {
   rig: RefObject<Rig>;
   sheetId: string;
   active: boolean;
   mobile: boolean;
+  /** A weak device: lower pixel ratio, coarser paper, smaller shadows. */
+  low?: boolean;
   onReady?: () => void;
 }) {
   const [texture, setTexture] = useState<THREE.Texture | null>(null);
@@ -279,7 +298,7 @@ export default function StudioScene({
       const svg = document.getElementById(sheetId) as unknown as SVGSVGElement | null;
       if (svg) {
         try {
-          const c = await svgToCanvas(svg, 8);
+          const c = await svgToCanvas(svg, low ? 5 : 8);
           if (cancelled) return;
           const tex = new THREE.CanvasTexture(c);
           tex.colorSpace = THREE.SRGBColorSpace;
@@ -294,14 +313,14 @@ export default function StudioScene({
     return () => {
       cancelled = true;
     };
-  }, [sheetId, onReady]);
+  }, [sheetId, onReady, low]);
 
   return (
     <Canvas
-      dpr={[1, 1.75]}
+      dpr={low ? [1, 1.25] : [1, 1.75]}
       frameloop={active ? "always" : "never"}
       shadows={{ type: THREE.VSMShadowMap }}
-      camera={{ position: [0, 0, 7], fov: 30 }}
+      camera={{ position: [0, 0, CAMERA_Z], fov: CAMERA_FOV }}
       gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
       onCreated={({ gl }) => {
         gl.setClearColor(0x000000, 0);
@@ -316,9 +335,9 @@ export default function StudioScene({
         intensity={3}
         color="#fff4e2"
         castShadow
-        shadow-mapSize={[2048, 2048]}
+        shadow-mapSize={low ? [1024, 1024] : [2048, 2048]}
         shadow-radius={9}
-        shadow-blurSamples={20}
+        shadow-blurSamples={low ? 8 : 20}
         shadow-bias={-0.0004}
         shadow-camera-left={-5}
         shadow-camera-right={5}
@@ -329,7 +348,7 @@ export default function StudioScene({
       />
       <directionalLight position={[4, -2, 3]} intensity={0.5} color="#dfe6ff" />
       <Desk />
-      <Paper rig={rig} pointer={pointer} texture={texture} still={still} />
+      <Paper rig={rig} pointer={pointer} texture={texture} still={still} low={low} />
       <Pencil rig={rig} mobile={mobile} />
     </Canvas>
   );

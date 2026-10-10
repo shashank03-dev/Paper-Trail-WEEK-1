@@ -5,7 +5,8 @@ import { AnimatePresence, motion } from "motion/react";
 import { PageSvg } from "@/lib/zine/PageSvg";
 import type { ZineData } from "@/lib/zine/primitives";
 import { svgToCanvas } from "@/lib/client/raster";
-import { rackSize } from "./ZineRackScene";
+import { rackSize } from "./rackLayout";
+import { deviceTier } from "@/lib/client/device";
 
 const Scene = dynamic(() => import("./ZineRackScene"), { ssr: false });
 
@@ -68,11 +69,14 @@ export function ZineRack({
   const [gl, setGl] = useState<boolean | null>(null);
   const [hover, setHover] = useState<{ id: string; x: number; y: number } | null>(null);
   const [active, setActive] = useState(false);
+  const [low, setLow] = useState(false);
   const box = useRef<HTMLDivElement>(null);
   const key = zines.map((z) => `${z.id}:${z.points ?? ""}:${z.title}`).join("|");
 
   useEffect(() => {
-    setGl(hasWebGL());
+    const t = deviceTier();
+    setLow(t === "low");
+    setGl(t !== "still" && hasWebGL());
     const set = () => {
       const w = box.current?.clientWidth ?? window.innerWidth;
       setCols(Math.max(2, Math.min(maxCols, Math.floor(w / 190))));
@@ -94,6 +98,7 @@ export function ZineRack({
   }, [maxCols]);
 
   useEffect(() => {
+    if (!gl) return; // the hidden covers only render once WebGL is confirmed
     let cancelled = false;
     void (async () => {
       await document.fonts.ready;
@@ -116,7 +121,7 @@ export function ZineRack({
       cancelled = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [key, uid]);
+  }, [key, uid, gl]);
 
   const { c, w, h } = rackSize(zines.length, cols);
   const hz = hover ? zines.find((z) => z.id === hover.id) : null;
@@ -124,17 +129,20 @@ export function ZineRack({
   return (
     <div ref={box} className="relative w-full" aria-hidden>
       <div className="relative mx-auto" style={{ maxWidth: `${c * 210 + 170}px` }}>
-        <div className="pointer-events-none fixed -left-[9999px] top-0 w-[400px] opacity-0">
-          {zines.map((z) => (
-            <PageSvg key={z.id} id={`${uid}-${z.id}`} data={z.data} page={1} />
-          ))}
-        </div>
+        {gl && (
+          <div className="pointer-events-none fixed -left-[9999px] top-0 w-[400px] opacity-0">
+            {zines.map((z) => (
+              <PageSvg key={z.id} id={`${uid}-${z.id}`} data={z.data} page={1} />
+            ))}
+          </div>
+        )}
         <div style={{ aspectRatio: `${w} / ${h}` }} className="w-full">
           {gl && (
             <Scene
               items={zines.map((z) => ({ id: z.id, cover: covers[z.id] ?? null }))}
               cols={cols}
               active={active}
+              low={low}
               onOpen={onOpen}
               onHover={(id, x, y) => setHover(id ? { id, x, y } : null)}
             />

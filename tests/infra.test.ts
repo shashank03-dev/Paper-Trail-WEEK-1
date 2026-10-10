@@ -123,3 +123,21 @@ describe("printed copy never shows internal ids", () => {
     expect(idLeaks(["91 m W, hug it", "Walk 2 min to the bandstand", "W. 4th Street"])).toEqual([]);
   });
 });
+
+describe("daily model budget", () => {
+  it("allows the limit, then fails fast; 0 is a kill switch; off disables it", async () => {
+    const { BudgetError, createBudget } = await import("@/lib/server/chat");
+    const b = createBudget("3");
+    b.take();
+    b.take();
+    b.take();
+    expect(() => b.take()).toThrow(BudgetError);
+    expect(b.stats()).toEqual({ used: 3, limit: 3 });
+    expect(() => createBudget("0").take()).toThrow(BudgetError);
+    const off = createBudget("off");
+    for (let i = 0; i < 5000; i++) off.take();
+    expect(off.stats().limit).toBeNull();
+    expect(createBudget("").stats().limit).toBe(2000);
+    expect(createBudget("2k").stats().limit).toBe(2000);
+  });
+});

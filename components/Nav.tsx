@@ -188,6 +188,12 @@ export function Footer() {
                 href: "https://github.com/shashank03-dev/Paper-Trail-WEEK-1",
                 label: "Source code",
               },
+              { href: "/privacy", label: "Privacy" },
+              { href: "/terms", label: "Terms" },
+              {
+                href: "https://github.com/shashank03-dev/Paper-Trail-WEEK-1/issues",
+                label: "Report a problem",
+              },
             ]}
           />
         </div>

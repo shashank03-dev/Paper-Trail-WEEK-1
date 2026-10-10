@@ -28,6 +28,8 @@ services:
         value: gemma4:31b
       - key: LLM_TIMEOUT_MS
         value: "120000"
+      - key: LLM_DAILY_CALL_BUDGET
+        value: "2000"
       - key: DEMO_MODE
         value: "false"
       - key: ALLOW_ENDPOINT_OVERRIDE

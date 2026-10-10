@@ -10,14 +10,15 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { motion, useReducedMotion } from "motion/react";
+import { motion } from "motion/react";
 import { createTimeline } from "animejs";
 import { ArrowRight } from "lucide-react";
 import { Sheet } from "@/lib/zine/Sheet";
 import { demoZine } from "@/lib/demo/demoZine";
 import { ModelBadge } from "@/components/ModelBadge";
+import { deviceTier, type Tier } from "@/lib/client/device";
 import type { Rig } from "./StudioScene";
-import { SHEET_H, SHEET_W } from "./foldSheet";
+import { CAMERA_FOV, CAMERA_Z, DESK_Z, SHEET_H, SHEET_W } from "./foldSheet";
 
 const StudioScene = dynamic(() => import("./StudioScene"), { ssr: false });
 
@@ -119,7 +120,53 @@ const MOBILE: Poses = {
 };
 
 const folded = { top: 1, a: 1, b: 1, c: 1 };
-const initialRig = (p: Poses): Rig => ({ fx: 0, fy: 0, ...p.rest, ...folded, away: 0 });
+type Pen = Pick<Rig, "penX" | "penY" | "penR" | "penS">;
+const DESKTOP_PEN: Pen = { penX: 1.55, penY: -1.38, penR: 0.14, penS: 1 };
+const initialRig = (p: Poses, pen: Pen): Rig => ({
+  fx: 0,
+  fy: 0,
+  ...p.rest,
+  ...folded,
+  away: 0,
+  ...pen,
+});
+
+/**
+ * Phones vary a lot in height, so the resting booklet and pencil are fitted
+ * into the band actually left free between the nav and the hero copy, measured
+ * on the page, instead of fixed numbers that overlap the headline on short screens.
+ */
+function fitPhone(copyTop: number): { poses: Poses; pen: Pen } {
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  const worldPerPx =
+    (2 * Math.tan(((CAMERA_FOV / 2) * Math.PI) / 180) * (CAMERA_Z - (DESK_Z + 0.05))) / vh;
+  const navBottom = 72;
+  const band = copyTop - navBottom - 14;
+  if (band < 110) {
+    // No room above the copy on this screen: the booklet waits just above the
+    // frame and drops in as the story starts; the pencil sits this one out.
+    const above = { ...MOBILE.rest, y: (vh / 2 + 200) * worldPerPx };
+    return {
+      poses: { ...MOBILE, rest: above },
+      pen: { penX: 0, penY: (vh / 2 + 300) * worldPerPx, penR: 1.05, penS: 0.001 },
+    };
+  }
+  const centreY = (vh / 2 - (navBottom + band / 2 + 4)) * worldPerPx;
+  const s = (Math.min(band * 0.86, 250) * worldPerPx) / (SHEET_H / 2);
+  const x = (vw * 0.38 - vw / 2) * worldPerPx;
+  const rest = { x, y: centreY, z: 0.02, s, rx: 0.05, ry: 0, rz: -0.14 };
+  const penLen = (band * 0.92 * worldPerPx) / Math.sin(1.05);
+  return {
+    poses: { ...MOBILE, rest, land: { ...rest, z: 0.03, rz: 0.12 } },
+    pen: {
+      penX: (vw * 0.74 - vw / 2) * worldPerPx,
+      penY: centreY,
+      penR: 1.05,
+      penS: Math.min(0.5, penLen / 1.85),
+    },
+  };
+}
 
 /**
  * One anime.js timeline for the whole story. Time runs 0 → 1000 across the
@@ -255,15 +302,53 @@ export function Studio() {
   const veil = useRef<HTMLDivElement>(null);
   const bar = useRef<HTMLDivElement>(null);
   const chapters = useRef<(HTMLDivElement | null)[]>([]);
-  const rig = useRef<Rig>(initialRig(DESKTOP));
+  const copy = useRef<HTMLDivElement>(null);
+  const rig = useRef<Rig>(initialRig(DESKTOP, DESKTOP_PEN));
+  // Re-fit the scene when the window really changes size (rotation, a resized
+  // desktop window); not for the address bar sliding in and out while scrolling.
+  const [viewport, setViewport] = useState("");
+  useEffect(() => {
+    let t = 0;
+    let last = { w: innerWidth, h: innerHeight };
+    const on = () => {
+      window.clearTimeout(t);
+      t = window.setTimeout(() => {
+        if (innerWidth === last.w && Math.abs(innerHeight - last.h) < 120) return;
+        last = { w: innerWidth, h: innerHeight };
+        setViewport(`${innerWidth}x${innerHeight}`);
+      }, 200);
+    };
+    window.addEventListener("resize", on);
+    return () => {
+      window.removeEventListener("resize", on);
+      window.clearTimeout(t);
+    };
+  }, []);
   const [ready, setReady] = useState(false);
   const [active, setActive] = useState(true);
   const [mobile, setMobile] = useState(false);
   const [gl, setGl] = useState<boolean | null>(null);
-  const reduce = useReducedMotion();
+  const [tier, setTier] = useState<Tier>("high");
   const data = useMemo(() => demoZine(), []);
   const onReady = useCallback(() => setReady(true), []);
-  useEffect(() => setGl(hasWebGL()), []);
+  // WebGL waits until the page has loaded and the browser is idle, so it never
+  // competes with the first paint; the still sheet shows on devices that can't.
+  useEffect(() => {
+    const t = deviceTier();
+    setTier(t);
+    if (t === "still" || !hasWebGL()) return setGl(false);
+    let idle = 0;
+    const start = () => {
+      const ric = window.requestIdleCallback ?? ((cb: () => void) => window.setTimeout(cb, 200));
+      idle = ric(() => setGl(true), { timeout: 1500 } as IdleRequestOptions);
+    };
+    if (document.readyState === "complete") start();
+    else window.addEventListener("load", start, { once: true });
+    return () => {
+      window.removeEventListener("load", start);
+      window.cancelIdleCallback?.(idle);
+    };
+  }, []);
 
   useEffect(() => {
     const m = window.matchMedia("(max-width: 767px)");
@@ -277,8 +362,9 @@ export function Studio() {
   useEffect(() => {
     const s = section.current;
     if (!s || !hero.current || !cue.current || !veil.current || !bar.current) return;
-    const poses = mobile ? MOBILE : DESKTOP;
-    Object.assign(rig.current, initialRig(poses));
+    const fit = mobile && copy.current ? fitPhone(copy.current.offsetTop) : null;
+    const poses = fit ? fit.poses : DESKTOP;
+    Object.assign(rig.current, initialRig(poses, fit ? fit.pen : DESKTOP_PEN));
     const tl = choreograph(rig.current, poses, {
       hero: hero.current,
       cue: cue.current,
@@ -291,7 +377,7 @@ export function Studio() {
       stop();
       tl.revert();
     };
-  }, [mobile]);
+  }, [mobile, viewport]);
 
   // Stop drawing WebGL frames once the studio has scrolled away.
   useEffect(() => {
@@ -324,13 +410,16 @@ export function Studio() {
       aria-label="Paper Trail, unfolded"
       className="relative h-[460vh]"
     >
-      {/* The sheet the 3D paper is printed from (also exactly what you'd print). */}
-      <div
-        aria-hidden
-        className="pointer-events-none fixed -left-[9999px] top-0 w-[1100px] opacity-0"
-      >
-        <Sheet data={data} id="studio-sheet" paperBg={false} />
-      </div>
+      {/* The sheet the 3D paper is printed from (also exactly what you'd print).
+          Client-only, and only when WebGL will use it: it isn't page content. */}
+      {gl && (
+        <div
+          aria-hidden
+          className="pointer-events-none fixed -left-[9999px] top-0 w-[1100px] opacity-0"
+        >
+          <Sheet data={data} id="studio-sheet" paperBg={false} />
+        </div>
+      )}
 
       <div className="sticky top-0 h-[100svh] overflow-hidden">
         {/* Daylight from the top left, falling onto the desk. */}
@@ -357,6 +446,7 @@ export function Studio() {
                     onReady={onReady}
                     active={active}
                     mobile={mobile}
+                    low={tier === "low"}
                   />
                 </SceneBoundary>
               )}
@@ -367,56 +457,44 @@ export function Studio() {
           ref={hero}
           className="relative z-10 mx-auto flex h-full max-w-7xl flex-col justify-end px-[var(--gutter)] pb-[9svh] md:justify-center md:pb-0"
         >
-          <div className="max-w-[40rem]">
-            <motion.p
-              className="label flex items-center gap-3"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1, delay: 0.1, ease: EASE }}
+          {/* Entrance animations are CSS: they run from the first frame, before hydration. */}
+          <div ref={copy} className="hero-copy max-w-[40rem]">
+            <p
+              className="fade-up label flex items-center gap-3"
+              style={{ animationDelay: "100ms" }}
             >
               <span className="inline-block h-px w-8 bg-ink/40" aria-hidden />
               Printed walks for real streets
-            </motion.p>
+            </p>
             <h1 className="display mt-6 text-[clamp(3.3rem,1.4rem+7.4vw,8.4rem)]">
               <span className="block overflow-hidden pb-[0.06em]">
                 {["The", "walk", "app", "that"].map((w, i) => (
-                  <motion.span
+                  <span
                     key={w}
-                    className="inline-block pr-[0.2em]"
-                    initial={reduce ? false : { y: "105%", rotate: 4 }}
-                    animate={{ y: "0%", rotate: 0 }}
-                    transition={{ duration: 1.2, delay: 0.15 + i * 0.07, ease: EASE }}
+                    className="rise pr-[0.2em]"
+                    style={{ animationDelay: `${150 + i * 70}ms` }}
                   >
                     {w}
-                  </motion.span>
+                  </span>
                 ))}
               </span>
               <span className="block overflow-hidden pb-[0.12em]">
-                <motion.em
-                  className="inline-block text-riso"
-                  initial={reduce ? false : { y: "105%", rotate: 4 }}
-                  animate={{ y: "0%", rotate: 0 }}
-                  transition={{ duration: 1.3, delay: 0.46, ease: EASE }}
+                <em
+                  className="rise text-riso"
+                  style={{ animationDelay: "460ms", animationDuration: "1.3s" }}
                 >
                   stays home.
-                </motion.em>
+                </em>
               </span>
             </h1>
-            <motion.p
-              className="lede mt-6 max-w-[33rem]"
-              initial={{ opacity: 0, y: 14 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1.1, delay: 0.7, ease: EASE }}
-            >
+            <p className="fade-up lede mt-6 max-w-[33rem]" style={{ animationDelay: "700ms" }}>
               Paper Trail folds the streets around you into an eight-page paper zine: a hand-drawn
               map, things to spot, a riddle and a box to sketch in. Print it, leave your phone, go.
               When you&rsquo;re back, one photo and Gemma reads your pencil.
-            </motion.p>
-            <motion.div
-              className="mt-9 flex flex-wrap items-center gap-3"
-              initial={{ opacity: 0, y: 14 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1.1, delay: 0.85, ease: EASE }}
+            </p>
+            <div
+              className="fade-up mt-9 flex flex-wrap items-center gap-3"
+              style={{ animationDelay: "850ms" }}
             >
               <Link href="/new" className="btn btn-riso btn-lg">
                 Make my trail
@@ -427,15 +505,10 @@ export function Studio() {
               <a href="#pages" className="btn btn-lg">
                 See inside
               </a>
-            </motion.div>
-            <motion.div
-              className="mt-8"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 1, delay: 1.1 }}
-            >
+            </div>
+            <div className="fade-up mt-8" style={{ animationDelay: "1100ms" }}>
               <ModelBadge />
-            </motion.div>
+            </div>
           </div>
         </div>
 

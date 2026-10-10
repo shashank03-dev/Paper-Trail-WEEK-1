@@ -52,9 +52,17 @@ async function ping(cfg: LlmConfig): Promise<Health> {
       latencyMs: Date.now() - t0,
       tokensPerSec: null,
       mode: serverConfig().demoMode ? "replay" : "down",
-      error: String((e as Error).message).slice(0, 160),
+      // Enough to diagnose from Settings, never the provider's raw message.
+      error: describe(e),
     };
   }
+}
+
+function describe(e: unknown): string {
+  const status = (e as { status?: number }).status;
+  if (status) return `HTTP ${status}`;
+  const name = (e as Error)?.name ?? "";
+  return /abort|timeout/i.test(name + String((e as Error)?.message)) ? "timed out" : "unreachable";
 }
 
 /** Is the model answering? `{ ok, model, where, latencyMs, tokensPerSec, mode }`. */

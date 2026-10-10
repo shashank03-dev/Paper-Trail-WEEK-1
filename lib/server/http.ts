@@ -8,6 +8,7 @@ export type ErrorCode =
   | "invalid_request"
   | "not_found"
   | "too_large"
+  | "forbidden"
   | "rate_limited"
   | "upstream_unavailable"
   | "busy"
@@ -15,6 +16,7 @@ export type ErrorCode =
 
 const CODE_BY_STATUS: Record<number, ErrorCode> = {
   400: "invalid_request",
+  403: "forbidden",
   404: "not_found",
   413: "too_large",
   429: "rate_limited",
@@ -136,13 +138,22 @@ export function sse(
       const send = (e: Record<string, unknown>) => write(`data: ${JSON.stringify(e)}\n\n`);
       beat = setInterval(() => write(": ping\n\n"), 15_000);
       let outcome = "ok";
+      let err: string | undefined;
       try {
         await producer(send, ac.signal);
       } catch (e) {
         outcome = ac.signal.aborted ? "client-gone" : "error";
-        const msg =
-          e instanceof BusyError ? e.message : ((e as Error).message?.slice(0, 200) ?? "failed");
-        send({ type: "error", error: msg, code: e instanceof BusyError ? "busy" : "internal" });
+        err = String((e as Error)?.message ?? e).slice(0, 160);
+        // The client gets a plain sentence; the real error stays in the server log.
+        send(
+          e instanceof BusyError
+            ? { type: "error", error: e.message, code: "busy" }
+            : {
+                type: "error",
+                error: `Something went wrong on our side${opts.rid ? ` (request ${opts.rid})` : ""}. Please try again.`,
+                code: "internal",
+              },
+        );
       } finally {
         clearInterval(beat);
         if (!closed) {
@@ -155,6 +166,7 @@ export function sse(
             route: opts.route,
             stream: outcome,
             ms: Date.now() - t0,
+            err,
             ...opts.note?.(),
           });
       }

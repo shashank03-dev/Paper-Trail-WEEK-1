@@ -58,8 +58,10 @@ request needs, and logs none of it (see §6).
 | Validation | Every body is parsed with zod; unknown/invalid input is a `400` listing the first 8 issues. |
 | Size | Bodies over 8 MB are refused with `413` before parsing. |
 | Errors | One shape everywhere: `{ "error": "<human sentence>", "code": "<machine code>", "details"?: [...] }`. The UI shows `error` as is. |
-| Codes | `invalid_request` 400 · `not_found` 404 · `too_large` 413 · `rate_limited` 429 · `upstream_unavailable` 502 · `busy` 503 · `internal` 500 |
+| Codes | `invalid_request` 400 · `forbidden` 403 · `not_found` 404 · `too_large` 413 · `rate_limited` 429 · `upstream_unavailable` 502 · `busy` 503 · `internal` 500 |
 | Request ID | `x-request-id` on every response (taken from the request if it's a sane token, otherwise generated). 500s quote it. |
+| Origin | `/api/*` serves this site's own pages. A browser request marked `Sec-Fetch-Site: cross-site` (another site's scripts) is refused with `403 forbidden` before it reaches rate limiting or the model. |
+| Internal errors | A 500 or a mid-stream `internal` error says only "Something went wrong on our side (request <id>)"; the real message goes to the log line as `err`. Provider errors are never echoed to the browser. |
 | Retry hints | `429` and `503` carry `Retry-After` (seconds). |
 | Streams | SSE events are `data: {"type": ...}` lines. A `: ping` comment every 15 s keeps proxies from closing long generations. A failure mid-stream is an `{"type":"error","error","code"}` event, never a dropped connection. |
 | Per-browser model choice | `x-pt-model-text` / `x-pt-model-vision` headers (validated) pick a different Gemma size; `x-pt-llm-base` is honoured only with `ALLOW_ENDPOINT_OVERRIDE=true`. |
@@ -79,7 +81,8 @@ Is the model answering? `{ ok, model, where, latencyMs, tokensPerSec, mode, cach
   badge on every page costs one model call per minute, not one per visitor.
 - `?fresh=1` (Settings → Test connection) always pings.
 - `503` when the model is down (`200` with `mode: "replay"` in demo mode).
-- `gate` reports `{ active, queued, limit }` for the model gate.
+- `gate` reports `{ active, queued, limit, budget: { used, limit } }` for the model gate and today's call budget.
+- A failed ping reports `HTTP <status>`, `timed out` or `unreachable`, never the provider's own error text.
 
 ### `POST /api/places`
 `{ lat, lon, radiusM: 100–1500, presetId? }` → `{ features[], ways[], source }`.
@@ -116,6 +119,13 @@ tokens so far, tok/s) → `plan` (`plan`, `path`, `attempts`, `tps`, `ms`) or
 Stage 2: copy for one page (`cover`, `route`, `listen`, `back`), or a re-roll of
 one part of the plan (`ispy`, `riddle`, `sketch`). The UI calls it page by page,
 so the sheet "prints" as each one lands.
+
+### `POST /api/client-error`
+`{ kind: render | runtime | promise | global, message ≤ 300, digest?, path ≤ 200 }` → `204`.
+Error tracking without a third party: the error boundaries and a window
+listener report crashes here (deduplicated, at most 5 per page load, via
+`sendBeacon`), and they land in the server log as `"route":"client-error"`.
+The query string is stripped from `path`; nothing else is stored.
 
 ### `POST /api/read` — SSE
 `{ trailId, panelImages: {4,5,6,7: data URL ≤ 3 MB}, expected, omr, mode }`.
@@ -179,6 +189,7 @@ Every generation reports its `path`: `llm` (first try), `llm-retry`,
 | --- | --- |
 | Model call | `LLM_TIMEOUT_MS` (120 s) per call; route `maxDuration` 300 s |
 | Concurrent model calls | `LLM_MAX_CONCURRENCY` (4) per server, queue wait `LLM_QUEUE_TIMEOUT_MS` (30 s) |
+| Model calls per day | `LLM_DAILY_CALL_BUDGET` (2000) per server, reset at 00:00 UTC. Past it, writing falls back to the template and reading to the tick-counter. `0` stops all generation calls; `off` removes the cap. Health pings (≤ 1/min) are not counted. |
 | `/api/trail/*`, `/api/read` | 40-request bucket per IP, refilling 20/min |
 | Other `/api/*` | 120-request bucket per IP, refilling 60/min |
 | Overpass / Nominatim / Open-Meteo | 30 s / 10 s / 10 s |

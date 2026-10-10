@@ -10,7 +10,45 @@ const intEnv = (k: string, d: number) => {
 };
 /** Every model call on this server goes through one gate (see gate.ts). */
 const gate = createGate(intEnv("LLM_MAX_CONCURRENCY", 4), intEnv("LLM_QUEUE_TIMEOUT_MS", 30_000));
-export const gateStats = () => gate.stats();
+export const gateStats = () => ({ ...gate.stats(), budget: budget.stats() });
+
+/**
+ * A daily ceiling on model calls for this server, so a traffic spike (or a
+ * script) can't run up the provider bill. Past it, calls fail fast with
+ * BudgetError and every caller degrades the way it already does when the model
+ * is down: template pages for the writer, the tick-counter for the reader.
+ * LLM_DAILY_CALL_BUDGET=off disables it; 0 stops all model calls (kill switch).
+ */
+export class BudgetError extends Error {
+  constructor() {
+    super("Today's model budget is used up; using the built-in template instead.");
+  }
+}
+export function createBudget(setting = process.env.LLM_DAILY_CALL_BUDGET ?? "") {
+  const raw = setting.trim().toLowerCase();
+  const n = Number(raw);
+  // A typo falls back to the default rather than silently switching the model off.
+  const limit =
+    raw === "off" ? Infinity : raw === "" || !Number.isFinite(n) ? 2000 : Math.max(0, n);
+  let day = "";
+  let used = 0;
+  const today = () => new Date().toISOString().slice(0, 10);
+  return {
+    take(): void {
+      if (day !== today()) {
+        day = today();
+        used = 0;
+      }
+      if (used >= limit) throw new BudgetError();
+      used++;
+    },
+    stats: () => ({
+      used: day === today() ? used : 0,
+      limit: Number.isFinite(limit) ? limit : null,
+    }),
+  };
+}
+const budget = createBudget();
 
 /** What one request spent on the model, for its log line. */
 export interface Usage {
@@ -64,6 +102,7 @@ export async function chatFor(
   const base = createChat(cfg);
   const live: Chat = (req, opts) =>
     gate.run(async () => {
+      budget.take();
       const r = await base(req, { ...opts, signal: opts?.signal ?? signal });
       usage.calls++;
       usage.ms += r.ms;

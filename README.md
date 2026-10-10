@@ -157,7 +157,7 @@ pnpm lint && pnpm typecheck && pnpm test && pnpm test:e2e
 
 Useful scripts: `pnpm fixtures:fetch` (replace the hand-traced presets with live OSM), `pnpm fixtures:record` (record real Gemma output for demo replay), `pnpm fixtures:photos` (synthetic filled-in sheets), `pnpm fonts:metrics` (regenerate text metrics from the font files).
 
-Code map: `lib/zine/` (layout, imposition, text metrics, the SVG sheet), `lib/writer/` + `lib/prompts/` (Gemma writer, grounding, fallbacks), `lib/vision/` (fiducials, homography, warp, OMR), `lib/reader/` (per-panel reading, combining, score), `app/api/*` (zod-validated route handlers). See [docs/design.md](docs/design.md), [docs/api.md](docs/api.md) (the API system design: every endpoint, timeouts, caching, rate limits, provider fallback and logging) and [DECISIONS.md](DECISIONS.md).
+Code map: `lib/zine/` (layout, imposition, text metrics, the SVG sheet), `lib/writer/` + `lib/prompts/` (Gemma writer, grounding, fallbacks), `lib/vision/` (fiducials, homography, warp, OMR), `lib/reader/` (per-panel reading, combining, score), `app/api/*` (zod-validated route handlers). See [docs/design.md](docs/design.md), [docs/api.md](docs/api.md) (the API system design: every endpoint, timeouts, caching, rate limits, provider fallback and logging), [docs/launch.md](docs/launch.md) (rollback, kill switches, key rotation, monitoring) and [DECISIONS.md](DECISIONS.md).
 
 ## Limitations (honestly)
 

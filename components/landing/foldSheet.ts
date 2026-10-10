@@ -14,6 +14,11 @@
  */
 
 export const SHEET_W = 2.794;
+/** Where the desk (the shadow catcher) sits, behind the paper. */
+export const DESK_Z = -0.42;
+/** The camera: distance and vertical field of view. */
+export const CAMERA_Z = 7;
+export const CAMERA_FOV = 30;
 export const SHEET_H = 2.159;
 const CW = SHEET_W / 4;
 const CH = SHEET_H / 2;

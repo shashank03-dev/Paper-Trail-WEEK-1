@@ -27,6 +27,13 @@ export function middleware(req: NextRequest) {
   const rid = given && /^[\w-]{6,64}$/.test(given) ? given : crypto.randomUUID().slice(0, 12);
   const headers = new Headers(req.headers);
   headers.set("x-request-id", rid);
+  // The API is for this site's own pages. Browsers label requests made by
+  // another site's scripts as cross-site; those never reach a model call.
+  if (req.headers.get("sec-fetch-site") === "cross-site")
+    return NextResponse.json(
+      { error: "This API only serves Paper Trail's own pages.", code: "forbidden" },
+      { status: 403, headers: { "x-request-id": rid } },
+    );
   if (process.env.RATE_LIMIT !== "off") {
     const ip =
       req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||

@@ -15,19 +15,10 @@ export interface RackItem {
   cover: HTMLCanvasElement | null;
 }
 
-export const ZINE_W = 1;
-export const ZINE_H = 1.545; // a quarter of the landscape sheet, upright
-const ZINE_D = 0.035;
-const GAP = 0.42;
-export const ROW_H = 2.1;
-const LEAN = -0.16;
+import { GAP, ROW_H, ZINE_H, ZINE_W, rackSize } from "./rackLayout";
 
-function rackSize(n: number, cols: number) {
-  const c = Math.max(1, Math.min(cols, n));
-  const rows = Math.max(1, Math.ceil(n / c));
-  return { c, rows, w: c * ZINE_W + (c - 1) * GAP + 1.2, h: rows * ROW_H + 0.3 };
-}
-export { rackSize };
+const ZINE_D = 0.035;
+const LEAN = -0.16;
 
 let oak: THREE.CanvasTexture | null = null;
 function oakTexture() {
@@ -186,12 +177,14 @@ export default function ZineRackScene({
   items,
   cols,
   active,
+  low = false,
   onOpen,
   onHover,
 }: {
   items: RackItem[];
   cols: number;
   active: boolean;
+  low?: boolean;
   onOpen: (id: string) => void;
   onHover: (id: string | null, x: number, y: number) => void;
 }) {
@@ -210,7 +203,7 @@ export default function ZineRackScene({
   const rowWidth = c * ZINE_W + (c - 1) * GAP;
   return (
     <Canvas
-      dpr={[1, 1.75]}
+      dpr={low ? [1, 1.25] : [1, 1.75]}
       frameloop={active ? "always" : "never"}
       shadows={{ type: THREE.VSMShadowMap }}
       camera={{ position: [0, 0.1, dist], fov }}
@@ -228,7 +221,7 @@ export default function ZineRackScene({
         intensity={2.6}
         color="#fff3df"
         castShadow
-        shadow-mapSize={[2048, 2048]}
+        shadow-mapSize={low ? [1024, 1024] : [2048, 2048]}
         shadow-radius={10}
         shadow-blurSamples={16}
         shadow-bias={-0.0005}
