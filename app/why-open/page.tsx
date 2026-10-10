@@ -33,18 +33,18 @@ const POINTS = [
 
 export default function WhyOpen() {
   return (
-    <div className="mx-auto max-w-4xl px-5 pb-16 pt-32 sm:px-8 sm:pt-36">
-      <p className="eyebrow">Open by design</p>
-      <h1 className="display mt-4 text-[clamp(2.6rem,1.6rem+3.6vw,4.6rem)]">
-        Why an <em className="text-grass">open</em> model?
+    <div className="mx-auto max-w-4xl px-[var(--gutter)] pb-16 pt-32 sm:pt-40">
+      <p className="label folio">Open by design</p>
+      <h1 className="display mt-6 text-[clamp(3rem,1.6rem+5vw,6rem)]">
+        Why an <em className="text-riso">open</em> model?
       </h1>
       <ul className="mt-14 grid gap-4">
         {POINTS.map(({ icon: Icon, title, body }, i) => (
-          <Reveal as="li" key={title} delay={i * 0.05} className="panel flex gap-6 p-7">
-            <Icon size={22} strokeWidth={1.5} className="mt-1 shrink-0 text-grass" />
+          <Reveal as="li" key={title} delay={i * 0.05} className="card flex gap-6 p-7 sm:p-9">
+            <Icon size={22} strokeWidth={1.5} className="mt-1 shrink-0 text-riso" />
             <div>
-              <h2 className="h3 text-2xl">{title}</h2>
-              <p className="mt-2 leading-relaxed text-fg-2">{body}</p>
+              <h2 className="title text-[2rem]">{title}</h2>
+              <p className="mt-2 leading-relaxed text-ink-2">{body}</p>
             </div>
           </Reveal>
         ))}

@@ -51,15 +51,15 @@ export default function Settings() {
     }
   };
   return (
-    <div className="mx-auto max-w-3xl px-5 pb-16 pt-32 sm:px-8 sm:pt-36">
-      <p className="eyebrow">Saved in this browser</p>
-      <h1 className="display mt-4 text-[clamp(2.6rem,1.6rem+3.6vw,4.2rem)]">Settings</h1>
-      <section className="panel mt-10 grid gap-6 p-6 sm:p-8" aria-labelledby="model-h">
-        <h2 id="model-h" className="h3 text-2xl">
+    <div className="mx-auto max-w-3xl px-[var(--gutter)] pb-16 pt-32 sm:pt-40">
+      <p className="label folio">Saved in this browser</p>
+      <h1 className="display mt-6 text-[clamp(3rem,1.6rem+5vw,6rem)]">Settings</h1>
+      <section className="card mt-10 grid gap-6 p-6 sm:p-8" aria-labelledby="model-h">
+        <h2 id="model-h" className="title text-[2rem]">
           The model
         </h2>
         <div>
-          <label htmlFor="ep" className="eyebrow block">
+          <label htmlFor="ep" className="label block">
             Where the model runs
           </label>
           {cfg?.allowEndpointOverride ? (
@@ -73,7 +73,7 @@ export default function Settings() {
           ) : (
             <p
               id="ep"
-              className="mono mt-2 rounded-2xl text-fg-2 shadow-[inset_0_0_0_1px_var(--color-line-2)] px-3 py-2 text-sm"
+              className="mono mt-2 rounded-2xl text-ink-2 bg-bone/60 shadow-[inset_0_0_0_1px_var(--color-line-2)] px-4 py-3 text-[0.82rem] leading-relaxed"
             >
               Set on the server: {cfg?.providers?.join(" → ") ?? "…"}. Change it with{" "}
               <code>LLM_PROVIDER</code> and the API keys, or set{" "}
@@ -83,7 +83,7 @@ export default function Settings() {
         </div>
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
-            <label htmlFor="mt" className="eyebrow block">
+            <label htmlFor="mt" className="label block">
               Text model (writer)
             </label>
             <input
@@ -95,7 +95,7 @@ export default function Settings() {
             />
           </div>
           <div>
-            <label htmlFor="mv" className="eyebrow block">
+            <label htmlFor="mv" className="label block">
               Vision model (reader)
             </label>
             <input
@@ -107,14 +107,14 @@ export default function Settings() {
             />
           </div>
         </div>
-        <p className="text-xs text-fg-3">
+        <p className="text-xs text-ink-3">
           Try <code className="mono">gemma4:e2b</code> on smaller machines. Only open-weights models
           served by your own endpoint are supported.
         </p>
         <div className="flex flex-wrap items-center gap-3">
           <button
             type="button"
-            className="btn btn-primary"
+            className="btn btn-ink"
             onClick={run}
             disabled={test.state === "busy"}
             data-testid="test-connection"
@@ -125,14 +125,14 @@ export default function Settings() {
             role="status"
             aria-live="polite"
             data-testid="test-result"
-            className={`text-sm ${test.state === "ok" ? "text-grass" : test.state === "fail" ? "text-ember" : "text-fg-3"}`}
+            className={`text-sm ${test.state === "ok" ? "text-riso" : test.state === "fail" ? "text-postmark" : "text-ink-3"}`}
           >
             {test.text}
           </p>
         </div>
       </section>
-      <section className="panel mt-6 grid gap-5 p-6 sm:p-8" aria-labelledby="paper-h">
-        <h2 id="paper-h" className="h3 text-2xl">
+      <section className="card mt-6 grid gap-5 p-6 sm:p-8" aria-labelledby="paper-h">
+        <h2 id="paper-h" className="title text-[2rem]">
           Paper
         </h2>
         <div className="flex gap-2" role="radiogroup" aria-label="Paper size">
@@ -160,7 +160,7 @@ export default function Settings() {
         </div>
       </section>
       <p className="mt-8">
-        <Link href="/why-open" className="link text-fg-2">
+        <Link href="/why-open" className="link text-ink-2">
           Why open models? →
         </Link>
       </p>

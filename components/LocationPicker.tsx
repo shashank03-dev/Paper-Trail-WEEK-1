@@ -25,9 +25,9 @@ export default function LocationPicker({
       }).addTo(map);
       const marker = L.circleMarker([lat, lon], {
         radius: 9,
-        color: "#1B1B1B",
+        color: "#FBFAF6",
         weight: 3,
-        fillColor: "#FF5C8A",
+        fillColor: "#2B3DD8",
         fillOpacity: 1,
       }).addTo(map);
       map.on("click", (e) => {
@@ -44,7 +44,7 @@ export default function LocationPicker({
   return (
     <div
       ref={el}
-      className="h-72 w-full overflow-hidden rounded-xl shadow-[inset_0_0_0_1px_var(--color-line-2)]"
+      className="h-72 w-full overflow-hidden rounded-2xl shadow-[0_0_0_1px_var(--color-line-2)]"
       aria-label="Map: click to choose where the walk starts"
       role="application"
     />

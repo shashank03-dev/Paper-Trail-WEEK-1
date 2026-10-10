@@ -39,7 +39,7 @@ export function CornerEditor({
     );
   const r = Math.max(width, height) / 70;
   return (
-    <div className="relative mx-auto w-full max-w-3xl overflow-hidden rounded-xl shadow-[inset_0_0_0_1px_var(--color-line-2)] bg-ink">
+    <div className="relative mx-auto w-full max-w-3xl overflow-hidden rounded-2xl bg-dark-2">
       <img
         src={src}
         alt="Your photo of the sheet"
@@ -56,8 +56,8 @@ export function CornerEditor({
       >
         <polygon
           points={corners.map((c) => `${c.x},${c.y}`).join(" ")}
-          fill="rgb(255 92 138 / .12)"
-          stroke="#FF5C8A"
+          fill="rgb(43 61 216 / .14)"
+          stroke="#7C8BFF"
           strokeWidth={r / 3}
           strokeDasharray={`${r} ${r / 2}`}
         />
@@ -103,7 +103,7 @@ export function CornerEditor({
               cx={c.x}
               cy={c.y}
               r={r * 0.45}
-              fill={snapped ? "#1F8A8A" : "#FF5C8A"}
+              fill={snapped ? "#2B3DD8" : "#C8402A"}
               stroke="#fff"
               strokeWidth={r / 6}
             />

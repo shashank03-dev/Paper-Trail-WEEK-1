@@ -91,32 +91,58 @@
   src: url("/fonts/nanum-pen-script-latin-400-normal.woff2") format("woff2");
 }
 
-/* Site typography (variable fonts). The printed zine keeps the static files above. */
+/*
+ * Site typography. The printed zine keeps the faces above (its text metrics are
+ * generated from those exact files); the website is set in these.
+ */
 @font-face {
-  font-family: "Fraunces Var";
-  font-weight: 100 900;
+  font-family: "Instrument Serif";
+  font-weight: 400;
   font-style: normal;
   font-display: swap;
-  src: url("/fonts/fraunces-var-latin-normal.woff2") format("woff2-variations");
+  src: url("/fonts/instrument-serif-latin-400-normal.woff2") format("woff2");
 }
 @font-face {
-  font-family: "Fraunces Var";
-  font-weight: 100 900;
+  font-family: "Instrument Serif";
+  font-weight: 400;
   font-style: italic;
   font-display: swap;
-  src: url("/fonts/fraunces-var-latin-italic.woff2") format("woff2-variations");
+  src: url("/fonts/instrument-serif-latin-400-italic.woff2") format("woff2");
 }
 @font-face {
-  font-family: "Geist";
-  font-weight: 100 900;
+  font-family: "Instrument Sans";
+  font-weight: 400 700;
+  font-stretch: 75% 100%;
   font-style: normal;
   font-display: swap;
-  src: url("/fonts/geist-var.woff2") format("woff2-variations");
+  src: url("/fonts/instrument-sans-latin-standard-normal.woff2") format("woff2-variations");
 }
 @font-face {
-  font-family: "Geist Mono";
-  font-weight: 100 900;
+  font-family: "Instrument Sans";
+  font-weight: 400 700;
+  font-stretch: 75% 100%;
+  font-style: italic;
+  font-display: swap;
+  src: url("/fonts/instrument-sans-latin-standard-italic.woff2") format("woff2-variations");
+}
+@font-face {
+  font-family: "Fragment Mono";
+  font-weight: 400;
   font-style: normal;
   font-display: swap;
-  src: url("/fonts/geist-mono-var.woff2") format("woff2-variations");
+  src: url("/fonts/fragment-mono-latin-400-normal.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Kalam";
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+  src: url("/fonts/kalam-latin-300-normal.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Kalam";
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  src: url("/fonts/kalam-latin-400-normal.woff2") format("woff2");
 }

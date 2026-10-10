@@ -43,7 +43,13 @@ export function ModelBadge({
       alive = false;
     };
   }, []);
-  const color = !h ? "bg-fg-3" : h.ok ? "bg-grass" : h.mode === "replay" ? "bg-sun" : "bg-ember";
+  const color = !h
+    ? "bg-ink-3"
+    : h.ok
+      ? "bg-moss"
+      : h.mode === "replay"
+        ? "bg-amber"
+        : "bg-postmark";
   const where = !h
     ? "checking…"
     : h.ok
@@ -55,7 +61,7 @@ export function ModelBadge({
         : "model offline";
   return (
     <span
-      className={`mono inline-flex items-center gap-2 text-[0.72rem] text-fg-2 ${className}`}
+      className={`mono inline-flex items-center gap-2 text-[0.74rem] text-ink-2 ${className}`}
       role="status"
       aria-live="polite"
       title={
@@ -73,7 +79,7 @@ export function ModelBadge({
         <span>{h?.model ?? "gemma4"}</span>
       ) : (
         <span>
-          Runs on Gemma 4 · <span className="text-fg-3">{h?.model ?? "…"}</span> · {where}
+          Runs on Gemma 4 · <span className="text-ink-3">{h?.model ?? "…"}</span> · {where}
         </span>
       )}
     </span>

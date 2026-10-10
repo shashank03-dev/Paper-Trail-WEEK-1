@@ -40,7 +40,7 @@ Paper Trail turns your real neighbourhood into a one-sheet, 8-page paper zine wr
 
 Every graphic on the sheet is drawn in code (SVG + rough.js): the map, the weather glyph, the stamp, the QR code. No stock images, no image generation, **zero external assets on paper**.
 
-The site itself is a dark, cinematic "night walk" design: the landing page is a real-time three.js scene in which **the actual printed sheet** (rasterised into a texture and split into its eight quarter-panels with real hinges) folds into a booklet and unfolds as you scroll, under a warm "desk lamp" over a slow topographic-contour shader. Everything is built in this repo and self-hosted — no hosted 3D scenes, no CDNs.
+The site is a "paper studio": bone-white paper under soft daylight, carbon ink and one riso spot colour (ultramarine), set in Instrument Serif, Instrument Sans and Fragment Mono. The landing page is a real-time three.js still life in which **the actual printed sheet** (rasterised into a texture and split into its eight quarter-panels with real hinges) lies on a desk beside a pencil, then opens as a concertina into the flat sheet and folds back as you scroll, casting real shadows onto the page. The Trail Book is a 3D picture ledge of your walked zines, with their real covers and stamps; the folded-booklet preview turns pages that bend like paper. Everything is built in this repo and self-hosted — no hosted 3D scenes, no CDNs.
 
 ## Quick start
 
@@ -174,6 +174,6 @@ Code map: `lib/zine/` (layout, imposition, text metrics, the SVG sheet), `lib/wr
 - Weather by [Open-Meteo](https://open-meteo.com/). Geocoding by Nominatim.
 - [rough.js](https://roughjs.com/) by Preet Shihn for every wobbly line.
 - [three.js](https://threejs.org/) + [react-three-fiber](https://r3f.docs.pmnd.rs/), [Motion](https://motion.dev/), [Lenis](https://lenis.darkroom.engineering/) and [Lucide](https://lucide.dev/) icons.
-- Fonts: Fraunces, Geist, Inter, IBM Plex Mono, Caveat, Reenie Beanie, Nanum Pen Script (SIL OFL), self-hosted.
+- Fonts: Instrument Serif, Instrument Sans, Fragment Mono and Kalam on the site; Fraunces, Inter, IBM Plex Mono, Caveat, Reenie Beanie and Nanum Pen Script on the printed zine (all SIL OFL, self-hosted).
 - Inspired by the **I-Spy** spotter books (1948 onward), whose readers mailed in a finished book and got a reward back by post.
 - Gemma 4 by Google DeepMind, served by [Ollama](https://ollama.com/).

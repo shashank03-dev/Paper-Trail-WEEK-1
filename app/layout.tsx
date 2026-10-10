@@ -3,17 +3,17 @@ import "./globals.css";
 import { Footer, Nav } from "@/components/Nav";
 
 export const metadata: Metadata = {
-  title: "Paper Trail — leave your phone at home",
+  title: "Paper Trail: the walk app that stays home",
   description:
-    "Paper Trail turns the streets around you into a printable 8-page walk. Print it, go outside, and snap one photo when you're back.",
+    "Paper Trail folds the streets around you into an eight-page paper zine. Print it, leave your phone, go. When you're back, one photo and Gemma reads your pencil.",
   icons: { icon: "/icon.svg" },
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0A0A08",
+  themeColor: "#F1EDE4",
   width: "device-width",
   initialScale: 1,
-  colorScheme: "dark",
+  colorScheme: "light",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

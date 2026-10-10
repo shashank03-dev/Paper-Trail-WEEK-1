@@ -5,7 +5,7 @@ import { useLiveQuery } from "dexie-react-hooks";
 import { Booklet } from "@/components/Booklet";
 import { FoldGuide } from "@/components/FoldGuide";
 import { GoOverlay } from "@/components/GoOverlay";
-import { Download, Loader2, Printer, ScanSearch } from "lucide-react";
+import { ArrowUpRight, Download, Loader2, Printer, ScanSearch } from "lucide-react";
 import { PrintPortal } from "@/components/PrintPortal";
 import { SheetStage } from "@/components/SheetStage";
 import { Sheet } from "@/lib/zine/Sheet";
@@ -173,14 +173,14 @@ export default function TrailPage({ params }: { params: Promise<{ id: string }> 
   };
 
   if (trail === undefined)
-    return <p className="mx-auto max-w-5xl px-6 pb-20 pt-40 text-fg-3">Unfolding…</p>;
+    return <p className="mx-auto max-w-5xl px-6 pb-20 pt-40 text-ink-3">Unfolding…</p>;
   if (trail === null)
     return (
-      <div className="mx-auto max-w-xl px-6 pb-20 pt-40 text-center">
-        <ScanSearch size={36} strokeWidth={1.3} className="mx-auto text-fg-3" />
-        <h1 className="h2 mt-6 text-4xl">No trail here.</h1>
-        <p className="lede mt-3">Trails are saved in the browser that made them.</p>
-        <Link href="/new" className="btn btn-primary mt-8">
+      <div className="mx-auto max-w-xl px-6 pb-20 pt-44 text-center">
+        <ScanSearch size={36} strokeWidth={1.3} className="mx-auto text-ink-3" />
+        <h1 className="headline mt-6 text-5xl">No trail here.</h1>
+        <p className="lede mt-4">Trails are kept in the browser that made them.</p>
+        <Link href="/new" className="btn btn-ink mt-8">
           Make a new one
         </Link>
       </div>
@@ -192,36 +192,40 @@ export default function TrailPage({ params }: { params: Promise<{ id: string }> 
   const paths = Object.values(trail.genPaths);
   const replay = paths.includes("replay") || meta.mode === "replay";
   const fallback = paths.includes("fallback");
-  const progressPct = Math.round(((8 - pending.length) / 8) * 100);
+  const paperName = trail.paper === "letter" ? "US Letter" : "A4";
 
   return (
-    <div className="mx-auto max-w-6xl px-5 pb-16 pt-32 sm:px-8 sm:pt-36">
-      <div className="flex flex-wrap items-end justify-between gap-6">
-        <div className="max-w-3xl">
-          <p className="eyebrow">
+    <div className="mx-auto max-w-7xl px-[var(--gutter)] pb-16 pt-32 sm:pt-40">
+      <div className="flex flex-wrap items-end justify-between gap-8">
+        <div className="max-w-4xl">
+          <p className="label folio">
             No. {String(trail.edition).padStart(3, "0")} · {trail.location.label} ·{" "}
             {trail.durationMin} min
           </p>
-          <h1 className="display mt-4 text-[clamp(2.3rem,1.4rem+3.2vw,4.2rem)]">
-            {trail.plan?.title ?? <span className="text-fg-3">Writing your trail…</span>}
+          <h1 className="display mt-6 text-[clamp(2.8rem,1.4rem+4.6vw,5.6rem)]">
+            {trail.plan?.title ?? <span className="text-ink-3">Writing your trail…</span>}
           </h1>
           {trail.plan && (
-            <p className="serif-italic mt-3 text-xl text-fg-2">{trail.plan.subtitle}</p>
+            <p className="mt-4 font-serif text-[clamp(1.3rem,1.1rem+0.6vw,1.7rem)] italic text-ink-2">
+              {trail.plan.subtitle}
+            </p>
           )}
         </div>
         <p
-          className="mono flex flex-wrap items-center gap-2 text-[0.72rem] text-fg-3"
+          className="mono flex flex-wrap items-center gap-2 text-[0.74rem] text-ink-3"
           aria-live="polite"
           data-testid="gen-meta"
         >
-          <span>
+          <span className="rounded-full bg-sheet px-3 py-1.5 shadow-[inset_0_0_0_1px_var(--color-line)]">
             {trail.model} · {meta.where}
             {meta.tps ? ` · ${meta.tps} tok/s` : ""}
           </span>
-          {replay && <span className="rounded-full bg-sun/15 px-2 py-0.5 text-sun">replay</span>}
+          {replay && (
+            <span className="rounded-full bg-[#f4e8cf] px-3 py-1.5 text-amber">replay</span>
+          )}
           {fallback && (
             <span
-              className="rounded-full bg-white/5 px-2 py-0.5 text-fg-2"
+              className="rounded-full bg-bone-2 px-3 py-1.5 text-ink-2"
               title="Some pages used the built-in template because the model was unavailable or kept failing checks."
             >
               template
@@ -230,30 +234,9 @@ export default function TrailPage({ params }: { params: Promise<{ id: string }> 
         </p>
       </div>
 
-      {!done && (
-        <div
-          className="panel mt-8 flex items-center gap-4 px-5 py-4"
-          role="status"
-          aria-live="polite"
-        >
-          <Loader2 size={18} className="shrink-0 animate-spin text-grass" />
-          <span className="text-sm text-fg-2">{meta.status || "Warming up…"}</span>
-          <div className="ml-auto flex items-center gap-3">
-            <div className="h-1 w-32 overflow-hidden rounded-full bg-white/10">
-              <div
-                className="h-full rounded-full bg-grass transition-[width] duration-700"
-                style={{ width: `${progressPct}%` }}
-              />
-            </div>
-            <span className="mono text-xs text-fg-3">{8 - pending.length}/8</span>
-          </div>
-        </div>
-      )}
+      {!done && <PrintQueue pending={pending} status={meta.status || "Warming up the press…"} />}
       {error && (
-        <p
-          className="mt-4 rounded-2xl bg-ember/10 px-4 py-3 text-sm text-ember shadow-[inset_0_0_0_1px_rgb(255_138_107/0.3)]"
-          role="alert"
-        >
+        <p className="notice notice-error mt-5" role="alert">
           {error}
         </p>
       )}
@@ -263,16 +246,12 @@ export default function TrailPage({ params }: { params: Promise<{ id: string }> 
         role="toolbar"
         aria-label="Sheet options"
       >
-        <div
-          className="flex gap-1 rounded-full bg-white/[0.03] p-1 shadow-[inset_0_0_0_1px_var(--color-line)]"
-          role="radiogroup"
-          aria-label="View"
-        >
+        <div className="segmented" role="radiogroup" aria-label="View">
           <button
             type="button"
             role="radio"
             aria-checked={view === "flat"}
-            className="chip !h-9 !shadow-none"
+            className="chip"
             onClick={() => setView("flat")}
           >
             Flat sheet
@@ -281,7 +260,7 @@ export default function TrailPage({ params }: { params: Promise<{ id: string }> 
             type="button"
             role="radio"
             aria-checked={view === "folded"}
-            className="chip !h-9 !shadow-none"
+            className="chip"
             onClick={() => setView("folded")}
             disabled={!done}
           >
@@ -294,6 +273,10 @@ export default function TrailPage({ params }: { params: Promise<{ id: string }> 
           aria-pressed={trail.color}
           onClick={() => save({ color: !trail.color })}
         >
+          <span
+            aria-hidden
+            className={`h-3 w-3 rounded-full ${trail.color ? "bg-[conic-gradient(#FF5C8A_0_50%,#1F8A8A_0)]" : "bg-ink-3"}`}
+          />
           {trail.color ? "Colour" : "Black & white"}
         </button>
         <button
@@ -304,12 +287,12 @@ export default function TrailPage({ params }: { params: Promise<{ id: string }> 
             void save({ paper });
             saveSettings({ ...loadSettings(), paper });
           }}
-          aria-label={`Paper size: ${trail.paper === "letter" ? "US Letter" : "A4"}. Switch.`}
+          aria-label={`Paper size: ${paperName}. Switch.`}
         >
-          {trail.paper === "letter" ? "US Letter" : "A4"}
+          {paperName}
         </button>
         <div className="ml-auto flex flex-wrap gap-2">
-          <button type="button" className="btn" onClick={pdf} disabled={!done || pdfBusy}>
+          <button type="button" className="btn btn-sheet" onClick={pdf} disabled={!done || pdfBusy}>
             {pdfBusy ? (
               <Loader2 size={16} className="animate-spin" />
             ) : (
@@ -319,7 +302,7 @@ export default function TrailPage({ params }: { params: Promise<{ id: string }> 
           </button>
           <button
             type="button"
-            className="btn btn-primary"
+            className="btn btn-riso"
             onClick={print}
             disabled={!done}
             data-testid="print"
@@ -329,15 +312,21 @@ export default function TrailPage({ params }: { params: Promise<{ id: string }> 
         </div>
       </div>
 
-      <div className="mt-8" data-testid="sheet-preview">
+      <div
+        className="relative mt-6 rounded-[28px] bg-bone-2/60 p-3 shadow-[inset_0_0_0_1px_var(--color-line),inset_0_2px_10px_rgb(21_20_18/0.04)] sm:p-8 lg:p-12"
+        data-testid="sheet-preview"
+      >
         {view === "flat" || !done ? (
-          <SheetStage
-            data={data}
-            pending={pending}
-            onReroll={done ? reroll : undefined}
-            rerolling={rerolling}
-            svgId={`sheet-${id}`}
-          />
+          // Never taller than the window, so the whole sheet is in view at once.
+          <div className="mx-auto max-w-[calc((100svh-10rem)*1.3)]">
+            <SheetStage
+              data={data}
+              pending={pending}
+              onReroll={done ? reroll : undefined}
+              rerolling={rerolling}
+              svgId={`sheet-${id}`}
+            />
+          </div>
         ) : (
           <>
             <Booklet data={data} />
@@ -349,28 +338,35 @@ export default function TrailPage({ params }: { params: Promise<{ id: string }> 
         )}
       </div>
       {done && view === "flat" && (
-        <p className="no-print mt-4 text-center text-xs text-fg-3">
-          Hover a page to rewrite just that page. Print at actual size:{" "}
-          {trail.paper === "letter" ? "US Letter" : "A4"}, landscape, no margins.
+        <p className="no-print mt-4 text-center text-[0.82rem] text-ink-3">
+          Hover a page to rewrite just that page. Print at actual size: {paperName}, landscape, no
+          margins.
         </p>
       )}
 
       {done && (
-        <section className="no-print mt-24" aria-labelledby="fold-guide">
-          <p className="eyebrow">After printing</p>
-          <h2 id="fold-guide" className="h2 mt-3 text-4xl">
-            One cut, six folds.
-          </h2>
-          <div className="mt-8">
+        <section className="no-print mt-28" aria-labelledby="fold-guide">
+          <div className="flex flex-wrap items-end justify-between gap-6">
+            <div>
+              <p className="label folio">After printing</p>
+              <h2
+                id="fold-guide"
+                className="headline mt-6 text-[clamp(2.4rem,1.6rem+2.6vw,3.8rem)]"
+              >
+                One cut, <em className="serif-em text-riso">six folds.</em>
+              </h2>
+            </div>
+            <p className="max-w-xs text-[0.92rem] text-ink-2">
+              Not sure the pages will land in order? Print the{" "}
+              <Link className="underline-ink inline-flex items-center gap-0.5" href="/fold-test">
+                fold test <ArrowUpRight size={14} />
+              </Link>{" "}
+              first.
+            </p>
+          </div>
+          <div className="mt-10">
             <FoldGuide />
           </div>
-          <p className="mt-6 text-sm text-fg-3">
-            Not sure the pages land in order? Print the{" "}
-            <Link className="link text-fg-2" href="/fold-test">
-              fold test
-            </Link>{" "}
-            first.
-          </p>
         </section>
       )}
 
@@ -380,6 +376,35 @@ export default function TrailPage({ params }: { params: Promise<{ id: string }> 
         </PrintPortal>
       )}
       {go && <GoOverlay trailId={id} onClose={() => setGo(false)} />}
+    </div>
+  );
+}
+
+/** Eight slots, one per page, filling in as the press finishes each one. */
+function PrintQueue({ pending, status }: { pending: PageNo[]; status: string }) {
+  const done = 8 - pending.length;
+  return (
+    <div
+      className="card mt-8 flex flex-wrap items-center gap-x-6 gap-y-4 px-5 py-4 sm:px-6"
+      role="status"
+      aria-live="polite"
+    >
+      <Loader2 size={18} className="shrink-0 animate-spin text-riso" />
+      <span className="min-w-[12rem] flex-1 text-[0.95rem] text-ink-2">{status}</span>
+      <ol className="flex items-end gap-1.5" aria-label={`${done} of 8 pages written`}>
+        {([1, 2, 3, 4, 5, 6, 7, 8] as PageNo[]).map((p) => {
+          const ready = !pending.includes(p);
+          return (
+            <li
+              key={p}
+              className={`grid h-9 w-6 place-items-end justify-center rounded-[3px] pb-0.5 text-[0.6rem] transition-all duration-700 ease-[var(--ease-out-expo)] ${ready ? "bg-ink text-sheet" : "bg-bone-2 text-ink-3 shadow-[inset_0_0_0_1px_var(--color-line-2)]"}`}
+            >
+              <span className="mono">{p}</span>
+            </li>
+          );
+        })}
+      </ol>
+      <span className="mono num text-xs text-ink-3">{done}/8</span>
     </div>
   );
 }

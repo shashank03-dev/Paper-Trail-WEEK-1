@@ -8,10 +8,12 @@ export function PageSvg({
   data,
   page,
   className,
+  id,
 }: {
   data: ZineData;
   page: PageNo;
   className?: string;
+  id?: string;
 }) {
   const g = sheetGeometry(data.paper);
   const k = inks(data.color);
@@ -22,6 +24,7 @@ export function PageSvg({
     <svg
       viewBox={`0 0 ${g.panelW} ${g.panelH}`}
       className={className}
+      id={id}
       role="img"
       aria-label={`Page ${page}`}
       xmlns="http://www.w3.org/2000/svg"

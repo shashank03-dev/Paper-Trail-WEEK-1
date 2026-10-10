@@ -81,9 +81,9 @@ export default function FoldTest() {
   const [paper, setPaper] = useState<Paper>("letter");
   useEffect(() => setPaper(defaultPaper()), []);
   return (
-    <div className="mx-auto max-w-6xl px-5 pb-16 pt-32 sm:px-8 sm:pt-36">
-      <p className="eyebrow">Print this first if you&rsquo;re unsure</p>
-      <h1 className="display mt-4 text-[clamp(2.6rem,1.6rem+3.6vw,4.2rem)]">Fold test</h1>
+    <div className="mx-auto max-w-7xl px-[var(--gutter)] pb-16 pt-32 sm:pt-40">
+      <p className="label folio">Print this first if you&rsquo;re unsure</p>
+      <h1 className="display mt-6 text-[clamp(3rem,1.6rem+5vw,6rem)]">Fold test</h1>
       <p className="lede mt-4 max-w-2xl">
         Print, cut the dashed line, fold. Flip through: you should read 1 → 8 in order, all upright.
         If not, the fix is one table: <code className="mono">IMPOSITION</code> in{" "}
@@ -101,18 +101,14 @@ export default function FoldTest() {
             {p === "letter" ? "US Letter" : "A4"}
           </button>
         ))}
-        <button
-          type="button"
-          className="btn btn-primary btn-sm ml-auto"
-          onClick={() => window.print()}
-        >
+        <button type="button" className="btn btn-ink btn-sm ml-auto" onClick={() => window.print()}>
           Print fold test
         </button>
       </div>
-      <div className="paper mt-8 overflow-hidden">
+      <div className="paper mt-8 overflow-hidden !rounded-[4px]">
         <FoldTestSheet paper={paper} />
       </div>
-      <p className="mono mt-4 text-xs text-fg-3">
+      <p className="mono mt-4 text-xs text-ink-3">
         Layout: top row{" "}
         {[0, 1, 2, 3]
           .map((c) => PAGES.find((p) => IMPOSITION[p].row === 0 && IMPOSITION[p].col === c))

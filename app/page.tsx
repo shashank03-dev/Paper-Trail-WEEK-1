@@ -1,73 +1,141 @@
 import Link from "next/link";
-import { ArrowRight, HardDrive, ShieldCheck, WifiOff } from "lucide-react";
-import { Story } from "@/components/landing/Story";
+import { ArrowRight, ArrowUpRight } from "lucide-react";
+import { Studio } from "@/components/landing/Studio";
 import { Pages } from "@/components/landing/Pages";
-import { Return } from "@/components/landing/Return";
+import { How } from "@/components/landing/How";
+import { Darkroom } from "@/components/landing/Darkroom";
+import { Shelf } from "@/components/landing/Shelf";
 import { Reveal } from "@/components/Reveal";
 import { SmoothScroll } from "@/components/SmoothScroll";
 
-const OPEN = [
+/** Real things from the three example trails, as they'd appear on an I-Spy page. */
+const SPOTTED = [
+  "a golden hydrant",
+  "a bench with a view",
+  "the red library",
+  "a heron by the pond",
+  "a mural with a face in it",
+  "the rose garden",
+  "the farthest thing you can see",
+  "a post box",
+  "the bandstand",
+  "a palm tree, waving",
+];
+
+const PRINCIPLES = [
   {
-    icon: HardDrive,
-    title: "Runs on Gemma",
-    body: "An open model from Google. Run it on your own computer with Ollama, or use Ollama Cloud or the Gemini API.",
+    n: "01",
+    title: "An open model",
+    body: "Gemma’s weights are public. Run it on your own computer with Ollama, or use Ollama Cloud or Google’s Gemini API if you’d rather not install anything.",
   },
   {
-    icon: ShieldCheck,
-    title: "Nothing to sign up for",
-    body: "No accounts and no tracking. Your trails are saved in this browser, not on a server.",
+    n: "02",
+    title: "No account, no tracking",
+    body: "There’s nothing to sign up for. Your trails, photos and Field Reports are kept in this browser, not on a server.",
   },
   {
-    icon: WifiOff,
-    title: "Works without signal",
-    body: "Once it's printed, it's paper. No battery, no notifications, no map app.",
+    n: "03",
+    title: "Paper needs no signal",
+    body: "Once it’s printed it works anywhere: in a park with no bars, with a flat battery, in light rain if you’re careful.",
   },
 ];
+
+function Marquee() {
+  const row = [...SPOTTED, ...SPOTTED];
+  return (
+    <div
+      className="relative overflow-hidden border-y border-line-2 py-6"
+      aria-label="Things to spot on real trails"
+    >
+      <ul className="marquee">
+        {row.map((s, i) => (
+          <li
+            key={i}
+            aria-hidden={i >= SPOTTED.length}
+            className="flex shrink-0 items-center gap-8 pr-8 font-serif text-[clamp(1.6rem,1.2rem+1.4vw,2.6rem)] italic leading-none"
+          >
+            {s}
+            <span className="inline-block h-2.5 w-2.5 rotate-45 bg-riso" aria-hidden />
+          </li>
+        ))}
+      </ul>
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-bone to-transparent"
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-bone to-transparent"
+      />
+    </div>
+  );
+}
 
 export default function Landing() {
   return (
     <>
       <SmoothScroll />
-      <Story />
+      <Studio />
+      <Marquee />
       <Pages />
-      <Return />
+      <How />
+      <Darkroom />
+      <Shelf />
 
       <section
-        className="relative mx-auto max-w-6xl px-5 py-24 sm:px-8 sm:py-32"
         aria-labelledby="open-h"
+        className="relative mx-auto max-w-7xl px-[var(--gutter)] py-28 sm:py-36"
       >
-        <Reveal className="max-w-2xl">
-          <p className="eyebrow">Open by design</p>
-          <h2 id="open-h" className="h2 mt-4 text-[clamp(2.1rem,1.3rem+2.6vw,3.5rem)]">
-            Your street is nobody&rsquo;s data.
-          </h2>
+        <Reveal className="grid gap-8 md:grid-cols-2 md:items-end">
+          <div>
+            <p className="label folio">Open by design</p>
+            <h2 id="open-h" className="headline mt-6 text-[clamp(2.5rem,1.4rem+3.6vw,4.6rem)]">
+              Your street is <em className="serif-em text-riso">nobody&rsquo;s business.</em>
+            </h2>
+          </div>
+          <p className="lede max-w-md md:justify-self-end">
+            Paper Trail sees a map of where you live and a photo of your handwriting. So it runs on
+            an open model, keeps nothing on a server and asks you for nothing.
+          </p>
         </Reveal>
-        <ul className="mt-14 grid gap-5 md:grid-cols-3">
-          {OPEN.map(({ icon: Icon, title, body }, i) => (
-            <Reveal as="li" key={title} delay={i * 0.08} className="panel p-7">
-              <Icon size={22} strokeWidth={1.5} className="text-grass" />
-              <h3 className="h3 mt-6 text-xl">{title}</h3>
-              <p className="mt-2 leading-relaxed text-fg-2">{body}</p>
+        <ul className="mt-16 grid gap-px overflow-hidden rounded-[22px] bg-line-2 md:grid-cols-3">
+          {PRINCIPLES.map(({ n, title, body }, i) => (
+            <Reveal as="li" key={n} delay={i * 0.08} className="bg-bone p-8 sm:p-10">
+              <span className="mono text-[0.78rem] text-riso">{n}</span>
+              <h3 className="title mt-10 text-[1.9rem]">{title}</h3>
+              <p className="mt-3 leading-relaxed text-ink-2">{body}</p>
             </Reveal>
           ))}
         </ul>
+        <p className="mt-8">
+          <Link
+            href="/why-open"
+            className="link inline-flex items-center gap-1.5 text-ink-2 hover:text-ink"
+          >
+            Why an open model <ArrowUpRight size={16} />
+          </Link>
+        </p>
       </section>
 
-      <section className="relative overflow-hidden px-5 py-32 sm:py-44" aria-labelledby="cta-h">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 bg-[radial-gradient(50%_60%_at_50%_100%,rgba(201,238,115,0.10),transparent_70%)]"
-        />
-        <Reveal className="relative mx-auto max-w-3xl text-center">
-          <h2 id="cta-h" className="display text-[clamp(2.8rem,1.6rem+5vw,6rem)]">
-            Print one <em className="text-grass">this weekend.</em>
+      <section
+        className="relative overflow-hidden px-[var(--gutter)] pb-16 pt-20 sm:pt-28"
+        aria-labelledby="cta-h"
+      >
+        <Reveal className="relative mx-auto max-w-5xl text-center">
+          <p className="label">Free · about a minute · any printer</p>
+          <h2 id="cta-h" className="display mt-8 text-[clamp(3.2rem,1.6rem+7vw,8rem)]">
+            The best part happens <em className="text-riso">off screen.</em>
           </h2>
-          <p className="lede mx-auto mt-6 max-w-md">
-            Pick a starting point and a time. It takes about a minute, and it&rsquo;s free.
+          <p className="lede mx-auto mt-8 max-w-md">
+            Pick a starting point and a length. We&rsquo;ll draw the map and write the pages. You
+            bring a pencil.
           </p>
           <div className="mt-10 flex justify-center">
-            <Link href="/new" className="btn btn-primary btn-lg">
-              Make my trail <ArrowRight size={18} className="arrow" />
+            <Link href="/new" className="btn btn-riso btn-lg">
+              Make my trail
+              <span className="knob" aria-hidden>
+                <ArrowRight size={18} />
+              </span>
             </Link>
           </div>
         </Reveal>

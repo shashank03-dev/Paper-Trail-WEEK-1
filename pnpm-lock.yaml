@@ -69,9 +69,6 @@ importers:
       '@eslint/eslintrc':
         specifier: ^3.3.1
         version: 3.3.7
-      '@fontsource-variable/fraunces':
-        specifier: 5.2.8
-        version: 5.2.8
       '@fontsource/caveat':
         specifier: ^5.2.8
         version: 5.3.0
@@ -123,9 +120,6 @@ importers:
       eslint-config-next:
         specifier: 15.5.27
         version: 15.5.27(eslint@9.39.5(jiti@2.7.0))(typescript@5.9.3)
-      geist:
-        specifier: 1.5.1
-        version: 1.5.1(next@15.5.27(@playwright/test@1.56.1)(@types/node@22.20.5)(react-dom@19.1.1(react@19.1.1))(react@19.1.1))
       jpeg-js:
         specifier: 0.4.4
         version: 0.4.4
@@ -374,9 +368,6 @@ packages:
   '@eslint/plugin-kit@0.4.1':
     resolution: {integrity: sha512-43/qtrDUokr7LJqoF2c3+RInu/t4zfrpYdoSDfYyhg52rwLV6TnOvdG4fXm7IkSB3wErkcmJS9iEhjVtOSEjjA==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
-
-  '@fontsource-variable/fraunces@5.2.8':
-    resolution: {integrity: sha512-dQYLYcmyrTqIjN+f5XM6hLUkIvj7OTuGfKET+2uyJ2fIe7LFmdbyDprymjAVvrDhOwc9lzibJbqaFdKk96S3oA==}
 
   '@fontsource/caveat@5.3.0':
     resolution: {integrity: sha512-eHTfzQxFSW9ABERRLNruHoNJmKed2J7pqTUc5lp4a4POMgXGKpxmWj3d9Hz10kmAg6iuTTLe6UagbA4bnsmfQw==}
@@ -1716,11 +1707,6 @@ packages:
   functions-have-names@1.2.3:
     resolution: {integrity: sha512-xckBUXyTIqT97tq2x2AMb+g163b5JFysYk0x4qxNFwbfQkmNZoiRHb6sPzI9/QV33WeuvVYBUIiD4NzNIyqaRQ==}
 
-  geist@1.5.1:
-    resolution: {integrity: sha512-mAHZxIsL2o3ZITFaBVFBnwyDOw+zNLYum6A6nIjpzCGIO8QtC3V76XF2RnZTyLx1wlDTmMDy8jg3Ib52MIjGvQ==}
-    peerDependencies:
-      next: '>=13.2.0'
-
   generator-function@2.0.1:
     resolution: {integrity: sha512-SFdFmIJi+ybC0vjlHN0ZGVGHc3lgE0DxPAT0djjVg+kjOnSqclqmj0KQ7ykTOLP6YxoqOvuAODGdcHJn+43q3g==}
     engines: {node: '>= 0.4'}
@@ -3024,8 +3010,6 @@ snapshots:
     dependencies:
       '@eslint/core': 0.17.0
       levn: 0.4.1
-
-  '@fontsource-variable/fraunces@5.2.8': {}
 
   '@fontsource/caveat@5.3.0': {}
 
@@ -4405,10 +4389,6 @@ snapshots:
       is-document.all: 1.0.0
 
   functions-have-names@1.2.3: {}
-
-  geist@1.5.1(next@15.5.27(@playwright/test@1.56.1)(@types/node@22.20.5)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)):
-    dependencies:
-      next: 15.5.27(@playwright/test@1.56.1)(@types/node@22.20.5)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
 
   generator-function@2.0.1: {}
 

@@ -1,27 +1,37 @@
-/** The mark: a folded sheet with a dotted trail running over it. */
-export function LogoMark({ size = 26 }: { size?: number }) {
+/**
+ * The mark: the sheet as it comes off the printer — eight panels, one cut —
+ * with the walk drawn across it as a single loop that starts at a riso dot.
+ */
+export function LogoMark({ size = 28 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 32 32" aria-hidden fill="none">
-      <path d="M5 8.5 16 5l11 3.5v17L16 29 5 25.5z" fill="#EFEAE0" />
-      <path d="M16 5v24" stroke="#0A0A08" strokeOpacity=".22" strokeWidth="1" />
-      <path d="M16 5 27 8.5v17L16 29z" fill="#E1DBCD" />
+      <rect width="32" height="32" rx="9" fill="#151412" />
+      <rect x="5" y="8.5" width="22" height="15" rx="1.4" fill="#FBFAF6" />
       <path
-        d="M8.5 21.5c2.2-1.4 3.6-4.6 6.4-5.2 2.9-.6 4.1 2.6 6.9 1.6 1.6-.6 2.4-2.3 3.2-3.6"
-        stroke="#0A0A08"
-        strokeWidth="1.6"
-        strokeLinecap="round"
-        strokeDasharray="0.1 3"
+        d="M10.5 8.5v15M16 8.5v15M21.5 8.5v15M5 16h22"
+        stroke="#151412"
+        strokeOpacity=".16"
+        strokeWidth=".8"
       />
-      <circle cx="25" cy="13.6" r="1.9" fill="#C9EE73" stroke="#0A0A08" strokeWidth="1" />
+      <path d="M10.5 16h11" stroke="#151412" strokeWidth="1.1" strokeDasharray="1.4 1.1" />
+      <path
+        d="M8.6 19.6c1.3-5.6 4.4-8.3 8.2-7.7 3.2.5 3.6 3.5 6.1 3.4 1.3 0 1.9-.9 2.1-1.8"
+        stroke="#2B3DD8"
+        strokeWidth="1.7"
+        strokeLinecap="round"
+      />
+      <circle cx="8.6" cy="19.6" r="1.9" fill="#2B3DD8" stroke="#FBFAF6" strokeWidth=".9" />
     </svg>
   );
 }
 
-export function Logo() {
+export function Logo({ className = "" }: { className?: string }) {
   return (
-    <span className="flex items-center gap-2.5">
+    <span className={`flex items-center gap-2.5 ${className}`}>
       <LogoMark />
-      <span className="text-[1.02rem] font-semibold tracking-[-0.02em]">Paper Trail</span>
+      <span className="font-serif text-[1.42rem] leading-none tracking-[-0.02em]">
+        Paper <span className="italic">Trail</span>
+      </span>
     </span>
   );
 }

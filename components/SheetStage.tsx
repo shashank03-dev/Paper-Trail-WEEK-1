@@ -46,7 +46,7 @@ export function SheetStage({
                 <button
                   key={p}
                   type="button"
-                  className="no-print absolute grid place-items-start p-1 opacity-0 transition-opacity focus-visible:opacity-100 [@media(hover:hover)]:hover:opacity-100"
+                  className="no-print absolute grid place-items-start p-2 opacity-0 transition-opacity duration-300 focus-visible:opacity-100 [@media(hover:hover)]:hover:bg-riso/[0.04] [@media(hover:hover)]:hover:opacity-100"
                   style={{
                     left: `${(c.x / g.w) * 100}%`,
                     top: `${(c.y / g.h) * 100}%`,
@@ -58,7 +58,7 @@ export function SheetStage({
                   aria-label={`Regenerate page ${p}`}
                 >
                   <span
-                    className={`mono rounded-full bg-bg/85 px-2.5 py-1 text-[0.68rem] text-grass shadow-[inset_0_0_0_1px_rgb(201_238_115/0.4)] backdrop-blur ${rerolling === p ? "animate-pulse" : ""}`}
+                    className={`mono rounded-full bg-ink/90 px-3 py-1.5 text-[0.68rem] text-sheet shadow-[0_8px_20px_-8px_rgb(21_20_18/0.6)] backdrop-blur ${rerolling === p ? "animate-pulse" : ""}`}
                   >
                     ↻ {rerolling === p ? "rewriting…" : `rewrite page ${p}`}
                   </span>

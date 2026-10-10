@@ -2,6 +2,7 @@
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { TrailTicket } from "@/components/TrailTicket";
 import {
   ArrowRight,
   Baby,
@@ -32,7 +33,7 @@ import { useScreenTime } from "@/lib/client/useScreenTime";
 
 const LocationPicker = dynamic(() => import("@/components/LocationPicker"), {
   ssr: false,
-  loading: () => <div className="h-72 animate-pulse rounded-2xl bg-white/5" />,
+  loading: () => <div className="h-72 animate-pulse rounded-2xl bg-bone-2" />,
 });
 
 type Where = { lat: number; lon: number; label: string; presetId?: string };
@@ -173,32 +174,26 @@ export default function NewTrail() {
 
   const whoLabel = WHO.find((w) => w.id === who)!.label;
   return (
-    <div className="mx-auto max-w-6xl px-5 pb-16 pt-32 sm:px-8 sm:pt-36">
-      <p className="eyebrow">New trail</p>
-      <h1 className="display mt-4 text-[clamp(2.6rem,1.6rem+3.6vw,4.6rem)]">
-        Where does your <em className="text-grass">walk</em> start?
+    <div className="mx-auto max-w-7xl px-[var(--gutter)] pb-16 pt-32 sm:pt-40">
+      <p className="label folio">New trail</p>
+      <h1 className="display mt-6 text-[clamp(3rem,1.6rem+5vw,6.2rem)]">
+        Where does your <em className="text-riso">walk begin?</em>
       </h1>
-      <p className="lede mt-4 max-w-xl">
-        Pick a place, a length and who&rsquo;s coming. We&rsquo;ll draw the map, plan a loop and
-        write the booklet.
+      <p className="lede mt-6 max-w-xl">
+        Choose a starting point, a length and your company. We&rsquo;ll draw the map, plan a loop
+        and write all eight pages.
       </p>
 
-      <div className="mt-12 grid gap-8 lg:grid-cols-[1fr_22rem]">
-        <div className="panel divide-y divide-line">
-          <section className="p-6 sm:p-8" aria-labelledby="where">
-            <div className="flex items-baseline gap-3">
-              <span className="mono text-xs text-grass">01</span>
-              <h2 id="where" className="h3 text-2xl">
-                Start point
-              </h2>
-            </div>
-            <div className="mt-6 flex flex-wrap gap-2.5">
-              <button type="button" className="btn" onClick={locate}>
+      <div className="mt-14 grid gap-8 lg:grid-cols-[1fr_24rem] lg:gap-10">
+        <div className="card divide-y divide-line">
+          <Step n="01" id="where" title="Start point">
+            <div className="flex flex-wrap gap-2.5">
+              <button type="button" className="btn btn-sheet" onClick={locate}>
                 <LocateFixed size={17} strokeWidth={1.6} /> Use my location
               </button>
               <button
                 type="button"
-                className="btn"
+                className="btn btn-sheet"
                 onClick={() => setShowMap((v) => !v)}
                 aria-expanded={showMap}
               >
@@ -212,32 +207,32 @@ export default function NewTrail() {
               <Search
                 size={17}
                 strokeWidth={1.6}
-                className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-fg-3"
+                className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-ink-3"
               />
               <input
                 id="q"
-                className="field !pl-11 !pr-24"
-                placeholder="Search a street, park or neighbourhood"
+                className="field !pl-11 !pr-28"
+                placeholder="A street, a park or a neighbourhood"
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
               />
               <button
-                className="btn btn-sm absolute right-1.5 top-1/2 -translate-y-1/2"
+                className="btn btn-ink btn-sm absolute right-1.5 top-1/2 -translate-y-1/2"
                 type="submit"
               >
                 Search
               </button>
             </form>
             {results && results.length > 0 && (
-              <ul className="mt-2 overflow-hidden rounded-2xl bg-raise shadow-[inset_0_0_0_1px_var(--color-line-2)]">
+              <ul className="mt-2 overflow-hidden rounded-2xl bg-sheet shadow-[0_0_0_1px_var(--color-line-2),0_18px_40px_-24px_rgb(21_20_18/0.4)]">
                 {results.map((r) => (
                   <li key={`${r.lat},${r.lon}`}>
                     <button
                       type="button"
-                      className="flex w-full items-center gap-3 px-4 py-3 text-left text-sm text-fg-2 hover:bg-white/5 hover:text-fg"
+                      className="flex w-full items-center gap-3 px-4 py-3 text-left text-[0.95rem] text-ink-2 transition-colors hover:bg-bone hover:text-ink"
                       onClick={() => (setWhere(r), setResults(null))}
                     >
-                      <MapPin size={15} strokeWidth={1.6} className="shrink-0 text-fg-3" />{" "}
+                      <MapPin size={15} strokeWidth={1.6} className="shrink-0 text-riso" />{" "}
                       {r.label}
                     </button>
                   </li>
@@ -253,15 +248,15 @@ export default function NewTrail() {
                     setWhere({ lat, lon, label: `${lat.toFixed(4)}, ${lon.toFixed(4)}` })
                   }
                 />
-                <p className="mt-2 text-xs text-fg-3">
+                <p className="mt-2 text-xs text-ink-3">
                   Map tiles load from openstreetmap.org only while this map is open.
                 </p>
               </div>
             )}
 
-            <p className="eyebrow mt-9">Or try an example place</p>
+            <p className="label mt-10">Or start from an example park</p>
             <div
-              className="mt-3 grid gap-2.5 sm:grid-cols-3"
+              className="mt-4 grid gap-3 sm:grid-cols-3"
               role="radiogroup"
               aria-label="Example places"
             >
@@ -282,59 +277,60 @@ export default function NewTrail() {
                         presetId: p.id,
                       })
                     }
-                    className={`group rounded-2xl p-4 text-left transition-all duration-300 ${on ? "bg-fg text-bg" : "bg-white/[0.03] shadow-[inset_0_0_0_1px_var(--color-line)] hover:bg-white/[0.06]"}`}
+                    className={`group relative overflow-hidden rounded-[18px] p-5 text-left transition-[background,box-shadow,transform] duration-500 ease-[var(--ease-out-expo)] hover:-translate-y-0.5 ${on ? "bg-ink text-sheet shadow-[0_18px_34px_-18px_rgb(21_20_18/0.7)]" : "bg-bone/60 shadow-[inset_0_0_0_1px_var(--color-line-2)] hover:bg-bone"}`}
                   >
                     <span
-                      className={`mono text-[0.68rem] uppercase tracking-[0.14em] ${on ? "text-bg/60" : "text-fg-3"}`}
+                      className={`mono text-[0.7rem] uppercase tracking-[0.08em] ${on ? "text-sheet/70" : "text-ink-3"}`}
                     >
                       {p.city}
                     </span>
-                    <span className="h3 mt-1 block text-lg">{p.name}</span>
+                    <span className="title mt-2 block text-[1.55rem]">{p.name}</span>
                     <span
-                      className={`mt-1 block text-[0.82rem] leading-snug ${on ? "text-bg/70" : "text-fg-2"}`}
+                      className={`mt-2 block text-[0.88rem] leading-snug ${on ? "text-sheet/75" : "text-ink-2"}`}
                     >
                       {p.blurb}
+                    </span>
+                    <span
+                      aria-hidden
+                      className={`absolute right-4 top-4 grid h-5 w-5 place-items-center rounded-full transition-all duration-500 ${on ? "scale-100 bg-riso" : "scale-75 shadow-[inset_0_0_0_1.5px_var(--color-line-2)]"}`}
+                    >
+                      {on && <span className="h-1.5 w-1.5 rounded-full bg-white" />}
                     </span>
                   </button>
                 );
               })}
             </div>
-          </section>
+          </Step>
 
-          <section className="p-6 sm:p-8" aria-labelledby="long">
-            <div className="flex items-baseline gap-3">
-              <span className="mono text-xs text-grass">02</span>
-              <h2 id="long" className="h3 text-2xl">
-                How long
-              </h2>
-            </div>
-            <div className="mt-6 grid grid-cols-3 gap-2" role="radiogroup" aria-label="Walk length">
+          <Step n="02" id="long" title="How long">
+            <div
+              className="segmented !grid w-full grid-cols-3"
+              role="radiogroup"
+              aria-label="Walk length"
+            >
               {([10, 20, 40] as Duration[]).map((d) => (
                 <button
                   key={d}
                   type="button"
                   role="radio"
                   aria-checked={duration === d}
-                  className="chip !h-14 justify-center !text-base"
+                  className="chip !h-16 flex-col !gap-0"
                   onClick={() => setDuration(d)}
                 >
-                  {d} min
+                  <span className="font-serif text-[1.7rem] leading-none">{d}</span>
+                  <span className="mono text-[0.66rem] uppercase tracking-[0.08em] text-ink-3">
+                    minutes
+                  </span>
                 </button>
               ))}
             </div>
-            <p className="mono mt-3 text-xs text-fg-3">
-              Looks about {RADIUS_BY_DURATION[duration]} m around your start.
+            <p className="mono mt-4 text-[0.78rem] text-ink-3">
+              Looks for places within about {RADIUS_BY_DURATION[duration]} m of your start.
             </p>
-          </section>
+          </Step>
 
-          <section className="p-6 sm:p-8" aria-labelledby="who">
-            <div className="flex items-baseline gap-3">
-              <span className="mono text-xs text-grass">03</span>
-              <h2 id="who" className="h3 text-2xl">
-                Who&rsquo;s coming
-              </h2>
-            </div>
-            <div className="mt-6 flex flex-wrap gap-2" role="radiogroup" aria-label="Who's coming">
+          <Step n="03" id="who" title="Who’s coming">
+            <div className="flex flex-wrap gap-2" role="radiogroup" aria-label="Who's coming">
               {WHO.map(({ id, label, icon: Icon }) => (
                 <button
                   key={id}
@@ -348,7 +344,7 @@ export default function NewTrail() {
                 </button>
               ))}
             </div>
-            <label htmlFor="name" className="eyebrow mt-8 block">
+            <label htmlFor="name" className="label mt-10 block">
               Name on the cover (optional)
             </label>
             <input
@@ -360,59 +356,75 @@ export default function NewTrail() {
               onChange={(e) => setName(e.target.value)}
               autoComplete="given-name"
             />
-          </section>
+          </Step>
         </div>
 
         <aside className="lg:sticky lg:top-28 lg:self-start">
-          <div className="panel p-6">
-            <p className="eyebrow">Your trail</p>
-            <dl className="mt-5 grid grid-cols-2 gap-x-8 gap-y-4 text-sm">
-              <div className="col-span-2">
-                <dt className="text-fg-3">Starting at</dt>
-                <dd className="mt-0.5 text-base text-fg" aria-live="polite">
-                  {where ? where.label : <span className="text-fg-3">Not chosen yet</span>}
-                </dd>
-              </div>
-              <div>
-                <dt className="text-fg-3">Length</dt>
-                <dd className="mt-0.5 text-base text-fg">{duration} min</dd>
-              </div>
-              <div>
-                <dt className="text-fg-3">Company</dt>
-                <dd className="mt-0.5 text-base text-fg">{whoLabel}</dd>
-              </div>
-            </dl>
-            <div className="hairline my-6" />
+          <TrailTicket
+            where={where?.label ?? null}
+            duration={duration}
+            company={whoLabel}
+            name={name.trim()}
+          >
             <button
               type="button"
-              className="btn btn-primary btn-lg w-full"
+              className="btn btn-riso btn-lg w-full"
               disabled={!where || !!busy}
               onClick={fold}
               data-testid="fold"
             >
               {busy ? <Loader2 size={18} className="animate-spin" /> : null}
               {busy ? "Working…" : "Fold my trail"}
-              {!busy && <ArrowRight size={18} className="arrow" />}
+              {!busy && (
+                <span className="knob" aria-hidden>
+                  <ArrowRight size={18} />
+                </span>
+              )}
             </button>
-            <p className="mt-3 text-center text-xs text-fg-3" role="status" aria-live="polite">
+            <p
+              className="mt-3 text-center text-[0.82rem] text-ink-3"
+              role="status"
+              aria-live="polite"
+            >
               {busy ?? (where ? "Takes about a minute." : "Choose a start point first.")}
             </p>
             {demo && where && !where.presetId && (
-              <p className="mt-3 text-xs text-fg-3">
-                Demo mode uses the nearest example place&rsquo;s map.
+              <p className="mt-2 text-center text-[0.8rem] text-ink-3">
+                Demo mode uses the nearest example park&rsquo;s map.
               </p>
             )}
-          </div>
+          </TrailTicket>
           {error && (
-            <p
-              className="mt-4 rounded-2xl bg-ember/10 px-4 py-3 text-sm text-ember shadow-[inset_0_0_0_1px_rgb(255_138_107/0.3)]"
-              role="alert"
-            >
+            <p className="notice notice-error mt-4" role="alert">
               {error}
             </p>
           )}
         </aside>
       </div>
     </div>
+  );
+}
+
+function Step({
+  n,
+  id,
+  title,
+  children,
+}: {
+  n: string;
+  id: string;
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <section className="p-6 sm:p-9" aria-labelledby={id}>
+      <div className="mb-7 flex items-baseline gap-4">
+        <span className="mono text-[0.78rem] text-riso">{n}</span>
+        <h2 id={id} className="title text-[2rem]">
+          {title}
+        </h2>
+      </div>
+      {children}
+    </section>
   );
 }

@@ -4,7 +4,7 @@ import { use, useEffect, useMemo, useRef, useState } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
 import { CornerEditor } from "@/components/CornerEditor";
 import { FieldReport } from "@/components/FieldReport";
-import { ArrowRight, Camera, Check, Loader2 } from "lucide-react";
+import { ArrowRight, Camera, Check, ImageUp, Loader2 } from "lucide-react";
 import { db } from "@/lib/client/db";
 import { screenMs as screenMsOf } from "@/lib/client/db";
 import { postSSE } from "@/lib/client/api";
@@ -48,6 +48,7 @@ export default function ReturnPage({ params }: { params: Promise<{ id: string }>
   const [screen, setScreen] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [debug, setDebug] = useState(false);
+  const [dragging, setDragging] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
   useScreenTime(trail ? id : null, "return");
 
@@ -194,7 +195,7 @@ export default function ReturnPage({ params }: { params: Promise<{ id: string }>
   };
 
   if (trail === undefined)
-    return <p className="mx-auto max-w-5xl px-6 pb-20 pt-40 text-fg-3">Unfolding…</p>;
+    return <p className="mx-auto max-w-5xl px-6 pb-20 pt-40 text-ink-3">Unfolding…</p>;
 
   const points = trail?.plan?.ispy.map((i) => i.points) ?? labels.map(() => 10);
   const outsideMs =
@@ -204,63 +205,57 @@ export default function ReturnPage({ params }: { params: Promise<{ id: string }>
   const stepIndex = { upload: 0, corners: 1, reading: 2, report: 3 }[step];
 
   return (
-    <div className="mx-auto max-w-6xl px-5 pb-16 pt-32 sm:px-8 sm:pt-36">
+    <div className="mx-auto max-w-7xl px-[var(--gutter)] pb-16 pt-32 sm:pt-40">
       {step !== "report" && (
-        <div className="flex flex-wrap items-end justify-between gap-6">
+        <div className="flex flex-wrap items-end justify-between gap-8">
           <div>
-            <p className="eyebrow">{trail?.plan?.title ?? "Paper Trail"}</p>
-            <h1 className="display mt-4 text-[clamp(2.6rem,1.6rem+3.6vw,4.6rem)]">
-              Welcome <em className="text-grass">back.</em>
+            <p className="label folio">{trail?.plan?.title ?? "Paper Trail"}</p>
+            <h1 className="display mt-6 text-[clamp(3rem,1.6rem+5vw,6.2rem)]">
+              Welcome <em className="text-riso">back.</em>
             </h1>
           </div>
-          <ol
-            className="mono flex items-center gap-2 text-[0.7rem] uppercase tracking-[0.14em]"
-            aria-label="Progress"
-          >
+          <ol className="flex flex-wrap items-center gap-2" aria-label="Progress">
             {STEPS.map((label, i) => (
               <li
                 key={label}
-                className={`flex items-center gap-2 ${i === stepIndex ? "text-fg" : i < stepIndex ? "text-grass" : "text-fg-3"}`}
+                className={`mono flex items-center gap-2 text-[0.72rem] uppercase tracking-[0.06em] ${i === stepIndex ? "text-ink" : i < stepIndex ? "text-riso" : "text-ink-3"}`}
                 aria-current={i === stepIndex ? "step" : undefined}
               >
                 <span
-                  className={`grid h-5 w-5 place-items-center rounded-full text-[0.6rem] ${i < stepIndex ? "bg-grass text-bg" : i === stepIndex ? "bg-fg text-bg" : "shadow-[inset_0_0_0_1px_var(--color-line-2)]"}`}
+                  className={`grid h-6 w-6 place-items-center rounded-full text-[0.66rem] transition-colors duration-500 ${i < stepIndex ? "bg-riso text-white" : i === stepIndex ? "bg-ink text-sheet" : "shadow-[inset_0_0_0_1px_var(--color-line-2)]"}`}
                 >
-                  {i < stepIndex ? <Check size={11} strokeWidth={3} /> : i + 1}
+                  {i < stepIndex ? <Check size={12} strokeWidth={3} /> : i + 1}
                 </span>
                 {label}
-                {i < STEPS.length - 1 && <span className="mx-1 h-px w-5 bg-line-2" aria-hidden />}
+                {i < STEPS.length - 1 && <span className="mx-1 h-px w-6 bg-line-2" aria-hidden />}
               </li>
             ))}
           </ol>
         </div>
       )}
       {!trail && (
-        <p
-          className="mt-6 max-w-2xl rounded-2xl bg-sun/10 px-4 py-3 text-sm text-sun shadow-[inset_0_0_0_1px_rgb(244_194_122/0.3)]"
-          role="note"
-        >
+        <p className="notice notice-warn mt-8 max-w-2xl" role="note">
           This trail lives on the device that made it. Open this link there, or upload the photo
           here and we&rsquo;ll read it anyway.
         </p>
       )}
 
       {step === "upload" && (
-        <section className="mt-12 grid items-center gap-12 md:grid-cols-[1fr_1fr]">
+        <section className="mt-14 grid items-center gap-14 md:grid-cols-[1fr_1.05fr]">
           <div>
             <p className="lede max-w-md">
               Unfold your sheet and take one photo of the printed side. Lay it flat in good light,
               with all four black corner squares in the frame.
             </p>
-            <div className="mt-8 flex flex-wrap gap-3">
+            <div className="mt-9 flex flex-wrap gap-3">
               <button
                 type="button"
-                className="btn btn-primary btn-lg"
+                className="btn btn-riso btn-lg"
                 onClick={() => fileRef.current?.click()}
               >
                 <Camera size={18} strokeWidth={1.7} /> Take or upload a photo
               </button>
-              <button type="button" className="btn btn-lg" onClick={useSample}>
+              <button type="button" className="btn btn-sheet btn-lg" onClick={useSample}>
                 Try a sample photo
               </button>
             </div>
@@ -274,60 +269,100 @@ export default function ReturnPage({ params }: { params: Promise<{ id: string }>
               data-testid="photo-input"
               onChange={(e) => e.target.files?.[0] && onFile(e.target.files[0])}
             />
-            <p className="mono mt-6 text-[0.72rem] leading-relaxed text-fg-3">
+            <p className="mono mt-8 max-w-md text-[0.74rem] leading-relaxed text-ink-3">
               The photo is read by {trail?.model ?? "Gemma"}
               {trail?.hostedOn ? ` via ${trail.hostedOn}` : " on your configured endpoint"}. It
               isn&rsquo;t stored anywhere else.
             </p>
           </div>
-          <div className="relative mx-auto w-full max-w-md" aria-hidden>
-            <div className="stage">
-              <div className="paper relative aspect-[1.29] w-full overflow-hidden [transform:rotateX(28deg)_rotateZ(-7deg)]">
-                <div className="absolute inset-[6%] grid grid-cols-4 grid-rows-2 gap-[3%]">
-                  {Array.from({ length: 8 }, (_, i) => (
-                    <div
-                      key={i}
-                      className="rounded-[2px] shadow-[inset_0_0_0_1px_rgb(26_25_21/0.18)]"
-                    />
-                  ))}
-                </div>
-                {[
-                  "left-[3%] top-[4%]",
-                  "right-[3%] top-[4%]",
-                  "left-[3%] bottom-[4%]",
-                  "right-[3%] bottom-[4%]",
-                ].map((pos) => (
-                  <span
-                    key={pos}
-                    className={`absolute h-[7%] w-[5.4%] bg-paper-ink ${pos} shadow-[inset_0_0_0_3px_#efeae0,inset_0_0_0_6px_#1a1915]`}
+          {/* A drop zone shaped like the sheet it wants: four corner squares and eight panels. */}
+          <button
+            type="button"
+            onClick={() => fileRef.current?.click()}
+            onDragOver={(e) => {
+              e.preventDefault();
+              setDragging(true);
+            }}
+            onDragLeave={() => setDragging(false)}
+            onDrop={(e) => {
+              e.preventDefault();
+              setDragging(false);
+              const f = e.dataTransfer.files?.[0];
+              if (f) void onFile(f);
+            }}
+            aria-label="Drop a photo of your sheet here, or choose one"
+            className="group relative mx-auto w-full max-w-lg [perspective:1600px]"
+          >
+            <div
+              className={`paper relative aspect-[1.29] w-full overflow-hidden transition-transform duration-700 ease-[var(--ease-out-expo)] ${dragging ? "[transform:rotateX(0deg)_rotateZ(0deg)_scale(1.03)]" : "[transform:rotateX(24deg)_rotateZ(-5deg)] group-hover:[transform:rotateX(14deg)_rotateZ(-3deg)]"}`}
+            >
+              <div className="absolute inset-[7%] grid grid-cols-4 grid-rows-2 gap-[2.5%]">
+                {Array.from({ length: 8 }, (_, i) => (
+                  <div
+                    key={i}
+                    className={`rounded-[2px] transition-colors duration-500 ${dragging ? "bg-riso/10 shadow-[inset_0_0_0_1px_rgb(43_61_216/0.4)]" : "shadow-[inset_0_0_0_1px_rgb(21_20_18/0.14)]"}`}
                   />
                 ))}
               </div>
+              {[
+                "left-[3%] top-[4%]",
+                "right-[3%] top-[4%]",
+                "left-[3%] bottom-[4%]",
+                "right-[3%] bottom-[4%]",
+              ].map((pos) => (
+                <span
+                  key={pos}
+                  className={`absolute h-[7%] w-[5.4%] bg-ink ${pos} shadow-[inset_0_0_0_3px_#fffdf8,inset_0_0_0_6px_#151412]`}
+                />
+              ))}
+              <span className="absolute inset-0 grid place-items-center">
+                <span
+                  className={`flex items-center gap-2 rounded-full px-4 py-2 text-[0.88rem] font-medium shadow-[0_10px_30px_-12px_rgb(21_20_18/0.5)] transition-colors duration-300 ${dragging ? "bg-riso text-white" : "bg-ink text-sheet"}`}
+                >
+                  <ImageUp size={16} /> {dragging ? "Drop it" : "Drop the photo here"}
+                </span>
+              </span>
             </div>
-            <p className="mono mt-6 text-center text-[0.7rem] uppercase tracking-[0.14em] text-fg-3">
-              Get all four corner squares in
-            </p>
-          </div>
+            <span className="label mt-8 block text-center">Get all four corner squares in</span>
+          </button>
         </section>
       )}
 
       {step === "corners" && photo && (
-        <section className="mt-10" aria-labelledby="corners-h">
-          <h2 id="corners-h" className="h3 text-2xl">
-            {conf >= 0.5 ? (
-              <span data-testid="corners-found" className="inline-flex items-center gap-2">
-                Corners found <Check size={20} className="text-grass" />
-              </span>
-            ) : (
-              "Drag the dots onto the four corner squares"
-            )}
-          </h2>
-          <p className="mt-2 text-sm text-fg-3">
-            {conf >= 0.5
-              ? "Adjust them if they look off, then read the sheet."
-              : "We couldn't spot all four markers. Put each dot on the middle of a corner square."}
-          </p>
-          <div className="mt-6">
+        <section className="mt-12" aria-labelledby="corners-h">
+          <div className="flex flex-wrap items-end justify-between gap-4">
+            <div>
+              <h2 id="corners-h" className="title text-[2.2rem]">
+                {conf >= 0.5 ? (
+                  <span data-testid="corners-found" className="inline-flex items-center gap-3">
+                    Corners found{" "}
+                    <span className="grid h-8 w-8 place-items-center rounded-full bg-moss text-white">
+                      <Check size={18} strokeWidth={2.5} />
+                    </span>
+                  </span>
+                ) : (
+                  "Drag the dots onto the four corner squares"
+                )}
+              </h2>
+              <p className="mt-2 text-ink-2">
+                {conf >= 0.5
+                  ? "Nudge them if they look off, then read the sheet."
+                  : "We couldn't spot all four marks. Put each dot on the middle of a corner square."}
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-3">
+              <button type="button" className="btn btn-sheet" onClick={() => setStep("upload")}>
+                Retake
+              </button>
+              <button type="button" className="btn btn-riso" onClick={read} data-testid="read">
+                Read my sheet
+                <span className="knob" aria-hidden>
+                  <ArrowRight size={16} />
+                </span>
+              </button>
+            </div>
+          </div>
+          <div className="mt-8 rounded-[28px] bg-dark p-3 sm:p-6">
             <CornerEditor
               src={photo.src}
               width={photo.img.width}
@@ -337,32 +372,27 @@ export default function ReturnPage({ params }: { params: Promise<{ id: string }>
               snapped={conf >= 0.5}
             />
           </div>
-          <div className="mt-6 flex flex-wrap justify-center gap-3">
-            <button
-              type="button"
-              className="btn btn-primary btn-lg"
-              onClick={read}
-              data-testid="read"
-            >
-              Read my sheet <ArrowRight size={18} className="arrow" />
-            </button>
-            <button type="button" className="btn btn-lg" onClick={() => setStep("upload")}>
-              Retake
-            </button>
-          </div>
         </section>
       )}
 
       {step === "reading" && (
-        <section className="mt-12" aria-live="polite" aria-labelledby="reading-h">
-          <h2 id="reading-h" className="h3 flex items-center gap-3 text-2xl">
-            <Loader2 size={20} className="animate-spin text-grass" /> Reading your pencil…
+        <section
+          data-surface="dark"
+          className="mt-12 rounded-[28px] bg-dark p-6 text-dark-fg sm:p-10"
+          aria-live="polite"
+          aria-labelledby="reading-h"
+        >
+          <h2 id="reading-h" className="title flex items-center gap-3 text-[2rem]">
+            <Loader2 size={20} className="animate-spin text-safelight" /> Reading your pencil…
           </h2>
-          <ul className="mt-8 grid grid-cols-2 gap-5 md:grid-cols-4">
+          <p className="mt-2 text-dark-fg-2">
+            Four pages, one at a time. The tick-counter checks every box as well.
+          </p>
+          <ul className="mt-10 grid grid-cols-2 gap-5 md:grid-cols-4">
             {READ_PAGES.map(({ page, label }) => (
               <li key={page} className="flex flex-col gap-3">
                 <div
-                  className={`paper overflow-hidden !rounded-[3px] transition-shadow ${reading === page ? "scan ring-2 ring-grass" : ""}`}
+                  className={`overflow-hidden rounded-[4px] bg-[#fffdf8] transition-shadow duration-500 ${reading === page ? "scan shadow-[0_0_0_2px_#ff6a4d,0_0_40px_-6px_rgb(255_106_77/0.6)]" : ""}`}
                 >
                   {panels[page] ? (
                     <img
@@ -371,12 +401,15 @@ export default function ReturnPage({ params }: { params: Promise<{ id: string }>
                       className="block w-full"
                     />
                   ) : (
-                    <div className="aspect-[0.65] animate-pulse bg-paper-2" />
+                    <div className="aspect-[0.65] animate-pulse bg-dark-2" />
                   )}
                 </div>
-                <p className="text-sm text-fg-2">
-                  <span className="font-medium text-fg">{label}</span>{" "}
-                  <span className="hand block text-[1.4rem] leading-none text-grass">
+                <p className="text-[0.9rem] text-dark-fg-2">
+                  <span className="mono text-[0.68rem] uppercase tracking-[0.08em] text-safelight">
+                    page {page}
+                  </span>{" "}
+                  <span className="block font-medium text-dark-fg">{label}</span>
+                  <span className="hand block min-h-[1.6em] text-[1.4rem] leading-tight text-dark-fg">
                     {notes[page] ?? (reading === page ? "reading…" : "")}
                   </span>
                 </p>
@@ -384,7 +417,7 @@ export default function ReturnPage({ params }: { params: Promise<{ id: string }>
             ))}
           </ul>
           {reading === 0 && (
-            <p className="mt-6 text-sm text-fg-3">The Trail Office is writing back…</p>
+            <p className="mt-6 text-[0.92rem] text-dark-fg-2">The Trail Office is writing back…</p>
           )}
         </section>
       )}
@@ -407,12 +440,12 @@ export default function ReturnPage({ params }: { params: Promise<{ id: string }>
             onAddToBook={() => void (trail ? db().trails.update(id, { inBook: true }) : undefined)}
           />
           {!trail && (
-            <p className="mt-4 text-sm text-fg-3">
+            <p className="mt-4 text-[0.9rem] text-ink-3">
               This report isn&rsquo;t saved: the trail lives on another device.
             </p>
           )}
-          <p className="mt-12 text-center">
-            <Link href="/book" className="link text-fg-2">
+          <p className="mt-14 text-center">
+            <Link href="/book" className="link text-ink-2 hover:text-ink">
               Open your Trail Book →
             </Link>
           </p>
@@ -420,10 +453,7 @@ export default function ReturnPage({ params }: { params: Promise<{ id: string }>
       )}
 
       {error && (
-        <p
-          className="mt-6 rounded-2xl bg-ember/10 px-4 py-3 text-sm text-ember shadow-[inset_0_0_0_1px_rgb(255_138_107/0.3)]"
-          role="alert"
-        >
+        <p className="notice notice-error mt-6" role="alert">
           {error}
         </p>
       )}
