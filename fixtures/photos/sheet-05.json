@@ -1,0 +1,94 @@
+{
+ "file": "sheet-05.jpg",
+ "paper": "a4",
+ "preset": "dolores-park",
+ "ticked": [
+  false,
+  true,
+  false,
+  true,
+  true,
+  true,
+  true,
+  true,
+  true,
+  false
+ ],
+ "listen": {
+  "loudest": "kids on swings",
+  "quietest": "birds",
+  "newSound": null
+ },
+ "riddle": {
+  "written": "playground",
+  "kind": "correct"
+ },
+ "sketch": {
+  "blank": false,
+  "kind": "house"
+ },
+ "expected": {
+  "ispy": [
+   {
+    "label": "Dolores Park hilltop",
+    "points": 25
+   },
+   {
+    "label": "Golden Fire Hydrant",
+    "points": 20
+   },
+   {
+    "label": "Dolores Park footbridge",
+    "points": 25
+   },
+   {
+    "label": "Helen Diller Playground",
+    "points": 25
+   },
+   {
+    "label": "Mexican Liberty Bell replica",
+    "points": 20
+   },
+   {
+    "label": "MaestraPeace",
+    "points": 25
+   },
+   {
+    "label": "Miguel Hidalgo statue",
+    "points": 20
+   },
+   {
+    "label": "A leaf that's two colours",
+    "points": 10
+   },
+   {
+    "label": "A cloud shaped like an animal",
+    "points": 15
+   },
+   {
+    "label": "Something smaller than an ant",
+    "points": 25
+   }
+  ],
+  "riddle": {
+   "text": "I'm full of shouts but have no voice,\nI've slides and swings to make your choice.\nThe grown-ups sit, the small ones fly.\nWhat am I, beneath the sky?",
+   "answer": "playground",
+   "acceptable": [
+    "park",
+    "swings",
+    "Helen Diller Playground"
+   ]
+  },
+  "sketchPrompt": "Draw the silliest-looking tree you passed, and give it a name.",
+  "listenStop": 1,
+  "title": "The Secret Life of MaestraPeace"
+ },
+ "photo": {
+  "rotZ": 3.018503189086914,
+  "rotX": -2.4218990802764893,
+  "rotY": -7.31164813041687,
+  "blur": 0.30612628161907196,
+  "shadow": 0.22594966888427734,
+  "quality": 77
+ }
+}

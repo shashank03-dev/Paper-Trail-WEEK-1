@@ -1,0 +1,94 @@
+{
+ "file": "sheet-01.jpg",
+ "paper": "a4",
+ "preset": "vondelpark",
+ "ticked": [
+  false,
+  false,
+  true,
+  false,
+  true,
+  false,
+  true,
+  false,
+  true,
+  true
+ ],
+ "listen": {
+  "loudest": "pigeons arguing",
+  "quietest": "pigeons arguing",
+  "newSound": null
+ },
+ "riddle": {
+  "written": "drniking fountain",
+  "kind": "close"
+ },
+ "sketch": {
+  "blank": false,
+  "kind": "sun"
+ },
+ "expected": {
+  "ispy": [
+   {
+    "label": "'t Blauwe Theehuis",
+    "points": 20
+   },
+   {
+    "label": "A drinking fountain",
+    "points": 20
+   },
+   {
+    "label": "Speeltuin Groot Melkhuis",
+    "points": 25
+   },
+   {
+    "label": "Figure découpée l'Oiseau",
+    "points": 25
+   },
+   {
+    "label": "A big old tree",
+    "points": 15
+   },
+   {
+    "label": "Vondelpark",
+    "points": 25
+   },
+   {
+    "label": "Vondelkerk",
+    "points": 20
+   },
+   {
+    "label": "A perfect puddle reflection",
+    "points": 15
+   },
+   {
+    "label": "A leaf that's two colours",
+    "points": 10
+   },
+   {
+    "label": "A cloud shaped like an animal",
+    "points": 15
+   }
+  ],
+  "riddle": {
+   "text": "I'm always full, I'm never sad,\nI give you something good, not bad.\nPress my button, bend your head.\nWhat am I? Enough said.",
+   "answer": "drinking fountain",
+   "acceptable": [
+    "water fountain",
+    "fountain",
+    "tap"
+   ]
+  },
+  "sketchPrompt": "Draw the silliest-looking tree you passed, and give it a name.",
+  "listenStop": 5,
+  "title": "The Secret Life of Figure découpée l'Oiseau"
+ },
+ "photo": {
+  "rotZ": 0.6849956512451172,
+  "rotX": 10.873199701309204,
+  "rotY": -1.371042251586914,
+  "blur": 0.4176833152770996,
+  "shadow": 0.20648012161254883,
+  "quality": 74
+ }
+}

@@ -1,0 +1,93 @@
+{
+ "file": "sheet-03.jpg",
+ "paper": "a4",
+ "preset": "cubbon-park",
+ "ticked": [
+  true,
+  true,
+  true,
+  false,
+  true,
+  false,
+  false,
+  false,
+  false,
+  true
+ ],
+ "listen": {
+  "loudest": "traffic hum",
+  "quietest": "a bus sighing",
+  "newSound": "a door closing"
+ },
+ "riddle": {
+  "written": "bench",
+  "kind": "correct"
+ },
+ "sketch": {
+  "blank": false,
+  "kind": "tree"
+ },
+ "expected": {
+  "ispy": [
+   {
+    "label": "A bench with a view",
+    "points": 15
+   },
+   {
+    "label": "A drinking fountain",
+    "points": 15
+   },
+   {
+    "label": "A big old tree",
+    "points": 10
+   },
+   {
+    "label": "Cubbon Park Bandstand",
+    "points": 15
+   },
+   {
+    "label": "A fountain",
+    "points": 20
+   },
+   {
+    "label": "Sir Mark Cubbon statue",
+    "points": 15
+   },
+   {
+    "label": "Attara Kacheri",
+    "points": 15
+   },
+   {
+    "label": "A leaf that's two colours",
+    "points": 10
+   },
+   {
+    "label": "A cloud shaped like an animal",
+    "points": 15
+   },
+   {
+    "label": "Someone else not on a phone",
+    "points": 20
+   }
+  ],
+  "riddle": {
+   "text": "I have four legs but never run,\nI wait all day in rain and sun.\nYou sit on me to rest your feet.\nWhat am I, along the street?",
+   "answer": "bench",
+   "acceptable": [
+    "a bench",
+    "seat"
+   ]
+  },
+  "sketchPrompt": "Draw your friend as the statue this street is missing.",
+  "listenStop": 1,
+  "title": "The Secret Life of Cubbon Park Bandstand"
+ },
+ "photo": {
+  "rotZ": 4.313293933868408,
+  "rotX": -5.2388856410980225,
+  "rotY": -7.988023996353149,
+  "blur": 0.21991314589977265,
+  "shadow": 0.20263127684593202,
+  "quality": 56
+ }
+}

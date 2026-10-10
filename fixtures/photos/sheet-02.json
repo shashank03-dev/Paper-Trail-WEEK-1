@@ -1,0 +1,94 @@
+{
+ "file": "sheet-02.jpg",
+ "paper": "letter",
+ "preset": "dolores-park",
+ "ticked": [
+  true,
+  false,
+  true,
+  false,
+  true,
+  false,
+  true,
+  false,
+  false,
+  true
+ ],
+ "listen": {
+  "loudest": "a radio",
+  "quietest": "pigeons arguing",
+  "newSound": null
+ },
+ "riddle": {
+  "written": null,
+  "kind": "blank"
+ },
+ "sketch": {
+  "blank": false,
+  "kind": "tree"
+ },
+ "expected": {
+  "ispy": [
+   {
+    "label": "Dolores Park hilltop",
+    "points": 20
+   },
+   {
+    "label": "Golden Fire Hydrant",
+    "points": 15
+   },
+   {
+    "label": "Dolores Park footbridge",
+    "points": 20
+   },
+   {
+    "label": "Helen Diller Playground",
+    "points": 20
+   },
+   {
+    "label": "Mexican Liberty Bell replica",
+    "points": 15
+   },
+   {
+    "label": "MaestraPeace",
+    "points": 20
+   },
+   {
+    "label": "Miguel Hidalgo statue",
+    "points": 15
+   },
+   {
+    "label": "A leaf that's two colours",
+    "points": 10
+   },
+   {
+    "label": "A cloud shaped like an animal",
+    "points": 15
+   },
+   {
+    "label": "The most-sniffed lamp post",
+    "points": 20
+   }
+  ],
+  "riddle": {
+   "text": "I'm full of shouts but have no voice,\nI've slides and swings to make your choice.\nThe grown-ups sit, the small ones fly.\nWhat am I, beneath the sky?",
+   "answer": "playground",
+   "acceptable": [
+    "park",
+    "swings",
+    "Helen Diller Playground"
+   ]
+  },
+  "sketchPrompt": "Draw your dog's favourite smell on this walk (somehow).",
+  "listenStop": 1,
+  "title": "The Secret Life of MaestraPeace"
+ },
+ "photo": {
+  "rotZ": -0.6863627433776855,
+  "rotX": -9.511160612106323,
+  "rotY": 7.279582321643829,
+  "blur": 0.37684543132781984,
+  "shadow": 0.3124152898788452,
+  "quality": 70
+ }
+}
