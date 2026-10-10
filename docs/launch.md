@@ -4,6 +4,18 @@ What to do when the live site misbehaves, and the switches that stop it
 costing money. The site is one Render web service (Docker) that redeploys on
 every push to `main`.
 
+## How deploys work
+
+Render's GitHub App is installed on this repository (and only this one), so a
+push to `main` starts a build within a minute; it shows in Render → *Events*
+as triggered by a new commit. The build takes about two minutes, and the old
+version keeps serving until the new one is up.
+
+If a push doesn't start a deploy, check that the Render app still has access
+to the repository (GitHub → *Settings* → *Applications* → *Render*) and that
+*Auto-Deploy* is *On Commit* in the service's settings. A one-off deploy can
+always be started from the dashboard with *Manual Deploy*.
+
 ## Roll back
 
 1. **Fastest: redeploy the last good build.** Render dashboard → the service →
