@@ -1,0 +1,7 @@
+{
+ "task": "route",
+ "model": "mock-llm (placeholder, NOT Gemma — re-record with `pnpm fixtures:record`)",
+ "endpoint": "local",
+ "recordedAt": "2026-10-10T10:19:35.687Z",
+ "content": "{\"stops\":[{\"stop\":1,\"text\":\"Walk toward Dolores Park hilltop and look around for a moment.\"},{\"stop\":2,\"text\":\"Walk toward Golden Fire Hydrant and look around for a moment.\"},{\"stop\":3,\"text\":\"Walk toward Dolores Park footbridge and look around for a moment.\"},{\"stop\":4,\"text\":\"Walk toward the tree and look around for a moment.\"},{\"stop\":5,\"text\":\"Walk toward Helen Diller Playground and look around for a moment.\"},{\"stop\":6,\"text\":\"Walk toward Mexican Liberty Bell replica and look around for a moment. Then head home.\"}],\"ifLost\":{\"featureId\":\"n9000103\",\"text\":\"If you get lost: head toward Dolores Park hilltop and you're home.\"}}"
+}

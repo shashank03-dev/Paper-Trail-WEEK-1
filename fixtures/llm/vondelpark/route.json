@@ -1,0 +1,7 @@
+{
+ "task": "route",
+ "model": "mock-llm (placeholder, NOT Gemma — re-record with `pnpm fixtures:record`)",
+ "endpoint": "local",
+ "recordedAt": "2026-10-10T10:19:35.670Z",
+ "content": "{\"stops\":[{\"stop\":1,\"text\":\"Walk toward 't Blauwe Theehuis and look around for a moment.\"},{\"stop\":2,\"text\":\"Walk toward the drinking water and look around for a moment.\"},{\"stop\":3,\"text\":\"Walk toward Speeltuin Groot Melkhuis and look around for a moment.\"},{\"stop\":4,\"text\":\"Walk toward Figure découpée l'Oiseau and look around for a moment.\"},{\"stop\":5,\"text\":\"Walk toward the tree and look around for a moment.\"},{\"stop\":6,\"text\":\"Walk toward Vondelpark and look around for a moment. Then head home.\"}],\"ifLost\":{\"featureId\":\"n9000053\",\"text\":\"If you get lost: head toward 't Blauwe Theehuis and you're home.\"}}"
+}

@@ -1,0 +1,7 @@
+{
+ "task": "listen",
+ "model": "mock-llm (placeholder, NOT Gemma — re-record with `pnpm fixtures:record`)",
+ "endpoint": "local",
+ "recordedAt": "2026-10-10T10:19:35.649Z",
+ "content": "{\"intro\":\"Stand still at stop two. Close your eyes for 60 seconds. Listen for wheels, wings and whispers.\"}"
+}

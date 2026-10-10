@@ -1,0 +1,7 @@
+{
+ "task": "back",
+ "model": "mock-llm (placeholder, NOT Gemma — re-record with `pnpm fixtures:record`)",
+ "endpoint": "local",
+ "recordedAt": "2026-10-10T10:19:35.687Z",
+ "content": "{\"blurb\":\"You went out with paper and came back with a story. The phone waited. Good phone.\"}"
+}

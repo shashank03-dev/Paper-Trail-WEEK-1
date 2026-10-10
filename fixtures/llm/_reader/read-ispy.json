@@ -1,0 +1,7 @@
+{
+ "task": "read-ispy",
+ "model": "mock-llm (placeholder, NOT Gemma — re-record with `pnpm fixtures:record`)",
+ "endpoint": "local",
+ "recordedAt": "2026-10-10T10:19:36.399Z",
+ "content": "{\"items\":[{\"index\":0,\"ticked\":true,\"confidence\":0.82},{\"index\":1,\"ticked\":true,\"confidence\":0.82},{\"index\":2,\"ticked\":false,\"confidence\":0.82},{\"index\":3,\"ticked\":true,\"confidence\":0.82},{\"index\":4,\"ticked\":true,\"confidence\":0.82},{\"index\":5,\"ticked\":false,\"confidence\":0.82},{\"index\":6,\"ticked\":true,\"confidence\":0.82},{\"index\":7,\"ticked\":true,\"confidence\":0.82},{\"index\":8,\"ticked\":false,\"confidence\":0.82},{\"index\":9,\"ticked\":true,\"confidence\":0.82}]}"
+}

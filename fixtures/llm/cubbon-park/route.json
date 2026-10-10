@@ -1,0 +1,7 @@
+{
+ "task": "route",
+ "model": "mock-llm (placeholder, NOT Gemma — re-record with `pnpm fixtures:record`)",
+ "endpoint": "local",
+ "recordedAt": "2026-10-10T10:19:35.649Z",
+ "content": "{\"stops\":[{\"stop\":1,\"text\":\"Walk toward the drinking water and look around for a moment.\"},{\"stop\":2,\"text\":\"Walk toward the tree and look around for a moment.\"},{\"stop\":3,\"text\":\"Walk toward State Central Library and look around for a moment.\"},{\"stop\":4,\"text\":\"Walk toward Government Museum and look around for a moment.\"},{\"stop\":5,\"text\":\"Walk toward Cubbon Park Bandstand and look around for a moment.\"},{\"stop\":6,\"text\":\"Walk toward the fountain and look around for a moment. Then head home.\"}],\"ifLost\":{\"featureId\":\"n9000013\",\"text\":\"If you get lost: head toward State Central Library and you're home.\"}}"
+}
