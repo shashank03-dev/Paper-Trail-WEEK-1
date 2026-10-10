@@ -6,6 +6,7 @@ import {
   sheetGeometry,
   ispyRows,
   contentBox,
+  frameBox,
   FOOTER,
 } from "@/lib/zine/layout";
 
@@ -32,15 +33,22 @@ describe("imposition (standard one-cut mini-zine)", () => {
 
 describe("sheet geometry", () => {
   it.each(["letter", "a4"] as const)(
-    "%s: 6 mm margins, 4×2 grid, cut across the middle two columns",
+    "%s: panels are exact quarters so folds land on panel edges; cut across the middle two columns",
     (paper) => {
       const g = sheetGeometry(paper);
-      expect(g.grid.x).toBe(6);
-      expect(g.grid.w).toBeCloseTo(g.w - 12);
+      expect(g.panelW).toBeCloseTo(g.w / 4);
+      expect(g.panelH).toBeCloseTo(g.h / 2);
       expect(g.panelW * 4).toBeCloseTo(g.grid.w);
       expect(g.cut.x1).toBeCloseTo(g.grid.x + g.panelW);
       expect(g.cut.x2).toBeCloseTo(g.grid.x + 3 * g.panelW);
       expect(g.cut.y1).toBeCloseTo(g.h / 2);
+      // Frames keep >= 5 mm from the paper edge and from every fold.
+      expect(frameBox(g).x).toBeGreaterThanOrEqual(5);
+      // Fiducials sit inside a printable margin.
+      for (const f of g.fiducials)
+        expect(Math.min(f.x, f.y, g.w - f.x - f.size, g.h - f.y - f.size)).toBeGreaterThanOrEqual(
+          4.9,
+        );
     },
   );
 

@@ -9,14 +9,18 @@ export const PAPER_MM: Record<Paper, { w: number; h: number; label: string }> = 
   a4: { w: 297, h: 210, label: "A4" },
 };
 
-/** Print-safe margin around the sheet. */
-export const MARGIN = 6;
-/** Inner gutter per panel (frame inset). */
-export const GUTTER = 3;
+/**
+ * Panels are exact quarters of the sheet, so the physical folds (halving the
+ * paper) land exactly on panel edges. Margins live inside each panel.
+ */
+/** Distance of the corner markers from the sheet edges (inside printers' margins). */
+export const MARGIN = 5;
+/** Frame inset from every panel edge: ≥ 5 mm from the paper edge and from each fold. */
+export const GUTTER = 5.5;
 /** Content padding inside the frame. */
-export const PAD = 4;
+export const PAD = 3.5;
 /** Bottom band of every panel; its corners hold the fiducials on pages 1, 2, 5, 6. */
-export const FOOTER = 12;
+export const FOOTER = 14;
 /** Fiducial marker: solid black square with a white inner square. */
 export const FIDUCIAL = 8;
 export const FIDUCIAL_INNER = 4;
@@ -72,7 +76,7 @@ export interface SheetGeometry {
 
 export function sheetGeometry(paper: Paper): SheetGeometry {
   const { w, h } = PAPER_MM[paper];
-  const grid = { x: MARGIN, y: MARGIN, w: w - 2 * MARGIN, h: h - 2 * MARGIN };
+  const grid = { x: 0, y: 0, w, h };
   const panelW = grid.w / COLS;
   const panelH = grid.h / ROWS;
   const cells = {} as SheetGeometry["cells"];
@@ -88,10 +92,10 @@ export function sheetGeometry(paper: Paper): SheetGeometry {
   }
   const f = FIDUCIAL;
   const fiducials: SheetGeometry["fiducials"] = [
-    { corner: "tl", x: grid.x, y: grid.y },
-    { corner: "tr", x: grid.x + grid.w - f, y: grid.y },
-    { corner: "br", x: grid.x + grid.w - f, y: grid.y + grid.h - f },
-    { corner: "bl", x: grid.x, y: grid.y + grid.h - f },
+    { corner: "tl", x: MARGIN, y: MARGIN },
+    { corner: "tr", x: w - MARGIN - f, y: MARGIN },
+    { corner: "br", x: w - MARGIN - f, y: h - MARGIN - f },
+    { corner: "bl", x: MARGIN, y: h - MARGIN - f },
   ].map((d) => ({
     ...(d as { corner: "tl" | "tr" | "br" | "bl"; x: number; y: number }),
     size: f,
