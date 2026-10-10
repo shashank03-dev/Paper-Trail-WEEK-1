@@ -1,0 +1,32 @@
+# One-command local run: docker compose up
+# The first start pulls the model (several GB) into the ollama volume.
+services:
+  ollama:
+    build:
+      context: .
+      dockerfile: deploy/Dockerfile.ollama
+    environment:
+      OLLAMA_MODEL: ${OLLAMA_MODEL:-gemma4:e4b}
+    volumes:
+      - ollama:/root/.ollama
+    ports:
+      - "11434:11434"
+    restart: unless-stopped
+  web:
+    build: .
+    depends_on: [ollama]
+    environment:
+      LLM_BASE_URL: http://ollama:11434/v1
+      LLM_API_KEY: ollama
+      LLM_MODEL_TEXT: ${OLLAMA_MODEL:-gemma4:e4b}
+      LLM_MODEL_VISION: ${OLLAMA_MODEL:-gemma4:e4b}
+      LLM_TIMEOUT_MS: "180000"
+      DEVICE_LABEL: ${DEVICE_LABEL:-my own computer}
+      PUBLIC_URL: ${PUBLIC_URL:-http://localhost:3000}
+      NOMINATIM_EMAIL: ${NOMINATIM_EMAIL:-you@example.com}
+      DEMO_MODE: ${DEMO_MODE:-false}
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+volumes:
+  ollama:

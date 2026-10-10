@@ -1,0 +1,51 @@
+# Render Blueprint: Render as the AI runtime. Gemma runs in a private service
+# next to the web app, so no closed API is anywhere in the stack.
+# Plan note: gemma4:e2b needs ≥ 8 GB RAM on CPU. It's slow (see README), which
+# is why the zine streams panel by panel.
+services:
+  - type: pserv
+    name: papertrail-ollama
+    runtime: docker
+    dockerfilePath: ./deploy/Dockerfile.ollama
+    plan: pro plus # 8 GB RAM: the smallest plan that holds gemma4:e2b comfortably
+    disk:
+      name: ollama-models
+      mountPath: /root/.ollama
+      sizeGB: 20
+    envVars:
+      - key: OLLAMA_MODEL
+        value: gemma4:e2b
+      - key: OLLAMA_NUM_PARALLEL
+        value: "1"
+      - key: OLLAMA_MAX_LOADED_MODELS
+        value: "1"
+      - key: OLLAMA_KEEP_ALIVE
+        value: 24h
+
+  - type: web
+    name: papertrail-web
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: starter
+    healthCheckPath: /api/config
+    envVars:
+      - key: LLM_BASE_URL
+        value: http://papertrail-ollama:11434/v1
+      - key: LLM_API_KEY
+        value: ollama
+      - key: LLM_MODEL_TEXT
+        value: gemma4:e2b
+      - key: LLM_MODEL_VISION
+        value: gemma4:e2b
+      - key: LLM_TIMEOUT_MS
+        value: "300000"
+      - key: DEVICE_LABEL
+        value: a Render CPU instance
+      - key: DEMO_MODE
+        value: "false"
+      - key: ALLOW_ENDPOINT_OVERRIDE
+        value: "false"
+      - key: NOMINATIM_EMAIL
+        sync: false
+      - key: PUBLIC_URL
+        sync: false
