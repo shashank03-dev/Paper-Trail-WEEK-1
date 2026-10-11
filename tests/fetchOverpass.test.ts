@@ -102,6 +102,37 @@ describe("Overpass failover", () => {
     expect(f.asked).toEqual(["a.example"]);
   });
 
+  it("asks the next server when one is slow, takes the first answer, and cancels the rest", async () => {
+    let slowAborted = false;
+    const slow = (signal: AbortSignal) =>
+      new Promise<Response>((res, rej) => {
+        const t = setTimeout(() => res(ok()), 2000);
+        signal.addEventListener("abort", () => {
+          clearTimeout(t);
+          slowAborted = true;
+          rej(new DOMException("aborted", "AbortError"));
+        });
+      });
+    const asked: string[] = [];
+    const impl = (async (url: string | URL | Request, init?: RequestInit) => {
+      asked.push(new URL(String(url)).host);
+      if (String(url) === A) return slow(init!.signal!);
+      return ok([{ type: "node", id: 2, lat: 0, lon: 0 }]);
+    }) as typeof fetch;
+    const t0 = Date.now();
+    const r = await fetchOverpass([A, B, C], "q", { ...opts(impl), hedgeMs: 50 });
+    expect(Date.now() - t0).toBeLessThan(1000);
+    expect(r.data.elements[0]).toMatchObject({ id: 2 });
+    expect(asked).toEqual(["a.example", "b.example"]);
+    expect(r.attempts).toEqual([{ host: "b.example", ms: expect.any(Number) }]);
+    expect(slowAborted).toBe(true);
+
+    // The slow one was cancelled, not failed: it isn't cooled off. (B answered, so it leads.)
+    const next = fake({ [B]: () => new Response("", { status: 500 }), [A]: () => ok() });
+    await fetchOverpass([A, B, C], "q", { ...opts(next.impl), hedgeMs: 5000 });
+    expect(next.asked).toEqual(["b.example", "a.example"]);
+  });
+
   it("names timeouts plainly", () => {
     expect(describeError(new DOMException("t", "TimeoutError"))).toBe("timeout");
   });

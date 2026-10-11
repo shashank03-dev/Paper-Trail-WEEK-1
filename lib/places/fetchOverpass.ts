@@ -72,11 +72,14 @@ function order(urls: string[], now: number): string[] {
 }
 
 /**
- * Run an Overpass query, failing over between instances within one time
- * budget. Throws `OverpassUnavailable` (with every attempt) if none answers,
- * or the caller's abort reason if the request was cancelled.
+ * Run an Overpass query across instances within one time budget. A server
+ * that fails is replaced at once; one that is merely slow gets a head start
+ * of `hedgeMs`, then the next is asked alongside it and the first good answer
+ * wins (the others are cancelled, and not held against them). Throws
+ * `OverpassUnavailable` (with every attempt) if none answers, or the caller's
+ * abort reason if the request was cancelled.
  */
-export async function fetchOverpass(
+export function fetchOverpass(
   urls: string[],
   query: string,
   opts: {
@@ -84,46 +87,95 @@ export async function fetchOverpass(
     signal?: AbortSignal;
     budgetMs?: number;
     perTryMs?: number;
+    hedgeMs?: number;
     fetchImpl?: typeof fetch;
   },
 ): Promise<{ data: OverpassResponse; attempts: Attempt[] }> {
   const doFetch = opts.fetchImpl ?? fetch;
   const start = Date.now();
   const deadline = start + (opts.budgetMs ?? 45_000);
+  const hedgeMs = opts.hedgeMs ?? 5000;
+  const queue = order([...new Set(urls)], start);
   const attempts: Attempt[] = [];
-  for (const url of order([...new Set(urls)], start)) {
-    const remaining = deadline - Date.now();
-    if (remaining < 1500) break;
-    opts.signal?.throwIfAborted();
-    const t0 = Date.now();
-    const timeout = AbortSignal.timeout(Math.min(opts.perTryMs ?? 25_000, remaining));
-    try {
-      const res = await doFetch(url, {
-        method: "POST",
-        headers: {
-          "content-type": "application/x-www-form-urlencoded",
-          accept: "application/json",
-          "user-agent": opts.userAgent,
+
+  const ask = async (url: string, signal: AbortSignal): Promise<OverpassResponse> => {
+    const res = await doFetch(url, {
+      method: "POST",
+      headers: {
+        "content-type": "application/x-www-form-urlencoded",
+        accept: "application/json",
+        "user-agent": opts.userAgent,
+      },
+      body: `data=${encodeURIComponent(query)}`,
+      signal,
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = (await res.json().catch(() => null)) as
+      (OverpassResponse & { remark?: string }) | null;
+    if (!data || !Array.isArray(data.elements)) throw new Error("not Overpass JSON");
+    // An overloaded instance can answer 200 with a runtime error and no data.
+    if (!data.elements.length && /runtime error|timed out|out of memory/i.test(data.remark ?? ""))
+      throw new Error(`remark: ${data.remark!.slice(0, 80)}`);
+    return data;
+  };
+
+  return new Promise((resolve, reject) => {
+    let settled = false;
+    let running = 0;
+    const live = new Set<AbortController>();
+    const timers = new Set<ReturnType<typeof setTimeout>>();
+    const finish = (fn: () => void) => {
+      if (settled) return;
+      settled = true;
+      timers.forEach(clearTimeout);
+      live.forEach((c) => c.abort());
+      opts.signal?.removeEventListener("abort", onAbort);
+      fn();
+    };
+    const onAbort = () =>
+      finish(() => reject(opts.signal!.reason ?? new DOMException("aborted", "AbortError")));
+    if (opts.signal?.aborted) return onAbort();
+    opts.signal?.addEventListener("abort", onAbort, { once: true });
+
+    const launch = () => {
+      if (settled) return;
+      const remaining = deadline - Date.now();
+      const url = remaining >= 1500 ? queue.shift() : undefined;
+      if (!url) {
+        if (running === 0) finish(() => reject(new OverpassUnavailable(attempts)));
+        return;
+      }
+      running++;
+      const ctl = new AbortController();
+      live.add(ctl);
+      const t0 = Date.now();
+      const signal = AbortSignal.any([
+        ctl.signal,
+        AbortSignal.timeout(Math.min(opts.perTryMs ?? 25_000, remaining)),
+      ]);
+      // Slow but not failed: ask the next server too.
+      const hedge = setTimeout(launch, hedgeMs);
+      timers.add(hedge);
+      ask(url, signal).then(
+        (data) => {
+          if (settled) return;
+          attempts.push({ host: hostOf(url), ms: Date.now() - t0 });
+          preferred = url;
+          coolUntil.delete(url);
+          finish(() => resolve({ data, attempts }));
         },
-        body: `data=${encodeURIComponent(query)}`,
-        signal: opts.signal ? AbortSignal.any([timeout, opts.signal]) : timeout,
-      });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data = (await res.json().catch(() => null)) as
-        (OverpassResponse & { remark?: string }) | null;
-      if (!data || !Array.isArray(data.elements)) throw new Error("not Overpass JSON");
-      // An overloaded instance can answer 200 with a runtime error and no data.
-      if (!data.elements.length && /runtime error|timed out|out of memory/i.test(data.remark ?? ""))
-        throw new Error(`remark: ${data.remark!.slice(0, 80)}`);
-      attempts.push({ host: hostOf(url), ms: Date.now() - t0 });
-      preferred = url;
-      coolUntil.delete(url);
-      return { data, attempts };
-    } catch (e) {
-      if (opts.signal?.aborted) throw opts.signal.reason ?? e;
-      attempts.push({ host: hostOf(url), ms: Date.now() - t0, error: describeError(e) });
-      coolUntil.set(url, Date.now() + COOL_OFF_MS);
-    }
-  }
-  throw new OverpassUnavailable(attempts);
+        (e) => {
+          running--;
+          live.delete(ctl);
+          clearTimeout(hedge);
+          timers.delete(hedge);
+          if (settled) return;
+          attempts.push({ host: hostOf(url), ms: Date.now() - t0, error: describeError(e) });
+          coolUntil.set(url, Date.now() + COOL_OFF_MS);
+          launch();
+        },
+      );
+    };
+    launch();
+  });
 }

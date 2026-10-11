@@ -91,7 +91,9 @@ in `lib/places/overpass.ts`. Cached 24 h by rounded coordinates + radius, with
 single-flight. A preset (or demo mode) serves the fixture instead, re-measured
 from the actual start point. Servers are tried in order within a 45 s budget
 (`lib/places/fetchOverpass.ts`): `OVERPASS_URL` first, then public mirrors;
-the last one that answered goes first next time, a failing one waits 5 min at
+a failure moves on at once, and a server still silent after 5 s gets the
+next one asked alongside it (first good answer wins, the other is cancelled
+without penalty); the last one that answered goes first next time, a failing one waits 5 min at
 the back, and each attempt's real error (`ECONNREFUSED`, `HTTP 429`, timeout)
 is logged. (overpass-api.de refuses connections from the Render host.) If none
 answers, a stale cached map of the same spot (up to 30 days) is served; only
