@@ -53,6 +53,24 @@ export async function cached<T>(
   return value;
 }
 
+/**
+ * A cached value past its freshness, up to `maxAge` old, for when the upstream
+ * is down: yesterday's map of the same streets beats no map.
+ */
+export async function stale<T>(ns: string, key: string, maxAge = 30 * DAY): Promise<T | null> {
+  const k = `${ns}:${createHash("sha1").update(key).digest("hex").slice(0, 20)}`;
+  const hit = mem.get(k);
+  if (hit && Date.now() - hit.at < maxAge) return hit.value as T;
+  try {
+    const file = join(process.cwd(), ".cache", `${k.replace(":", "-")}.json`);
+    const disk = JSON.parse(await readFile(file, "utf8")) as { at: number; value: T };
+    if (Date.now() - disk.at < maxAge) return disk.value;
+  } catch {
+    /* none */
+  }
+  return null;
+}
+
 function remember(k: string, v: { at: number; value: unknown }) {
   mem.set(k, v);
   while (mem.size > MAX) mem.delete(mem.keys().next().value!);

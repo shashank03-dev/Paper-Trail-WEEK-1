@@ -1,10 +1,16 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { serverConfig } from "@/lib/config";
-import { cached } from "@/lib/server/cache";
+import { cached, stale } from "@/lib/server/cache";
 import { nearestPreset, presetPlaces } from "@/lib/server/fixtures";
 import { jsonError, parseBody, route } from "@/lib/server/http";
-import { normalizeOverpass, overpassQuery, type OverpassResponse } from "@/lib/places/overpass";
+import { normalizeOverpass, overpassQuery } from "@/lib/places/overpass";
+import {
+  DEFAULT_OVERPASS_URLS,
+  OverpassUnavailable,
+  fetchOverpass,
+  type Attempt,
+} from "@/lib/places/fetchOverpass";
 import { bearingDeg, distanceM } from "@/lib/geo";
 import type { Places } from "@/lib/schemas";
 
@@ -29,33 +35,46 @@ export const POST = route("places", async (req, rc) => {
     rc.note({ source: "fixture" });
     return NextResponse.json({ ...recenter(p, lat, lon, radiusM), source: "fixture", presetId });
   }
+  const key = `${lat.toFixed(4)},${lon.toFixed(4)},${Math.round(radiusM)}`;
+  let attempts: Attempt[] = [];
   try {
-    const places = await cached(
-      "places",
-      `${lat.toFixed(4)},${lon.toFixed(4)},${Math.round(radiusM)}`,
-      async () => {
-        const res = await fetch(s.overpassUrl, {
-          method: "POST",
-          headers: {
-            "content-type": "application/x-www-form-urlencoded",
-            "user-agent": `PaperTrail/1.0 (+${s.repoUrl})`,
-          },
-          body: `data=${encodeURIComponent(overpassQuery(lat, lon, radiusM))}`,
-          signal: AbortSignal.timeout(30_000),
-        });
-        if (!res.ok) throw new Error(`Overpass ${res.status}`);
-        return normalizeOverpass((await res.json()) as OverpassResponse, lat, lon, radiusM);
-      },
-    );
-    rc.note({ source: "osm", features: places.features.length });
+    const places = await cached("places", key, async () => {
+      const r = await fetchOverpass(
+        // Configured servers first; the public list always backs them up.
+        [...s.overpassUrls, ...DEFAULT_OVERPASS_URLS],
+        overpassQuery(lat, lon, radiusM),
+        { userAgent: `PaperTrail/1.0 (+${s.repoUrl})`, signal: rc.signal },
+      );
+      attempts = r.attempts;
+      return normalizeOverpass(r.data, lat, lon, radiusM);
+    });
+    rc.note({ source: "osm", features: places.features.length, ...overpassLog(attempts) });
     return NextResponse.json({ ...places, source: "osm" });
   } catch (e) {
+    if (rc.signal.aborted) throw e;
+    if (e instanceof OverpassUnavailable) attempts = e.attempts;
+    // Every server is down: the last map of these same streets still makes a true walk.
+    const old = await stale<Places>("places", key);
+    if (old) {
+      rc.note({ source: "osm-stale", features: old.features.length, ...overpassLog(attempts) });
+      return NextResponse.json({ ...old, source: "osm" });
+    }
+    rc.note({ ...overpassLog(attempts), error: (e as Error).message.slice(0, 300) });
     return jsonError(
       502,
-      `Couldn't reach OpenStreetMap (${(e as Error).message}). Try a demo preset.`,
+      "OpenStreetMap isn't answering right now, so the map around you can't be read. Try again in a minute, or pick a demo preset.",
+      undefined,
+      { "retry-after": "30" },
     );
   }
 });
+
+/** Which Overpass servers were tried and why they failed, for the request log. */
+function overpassLog(attempts: Attempt[]) {
+  return attempts.length
+    ? { overpass: attempts.map((a) => `${a.host} ${a.error ?? "ok"} ${a.ms}ms`).join(" | ") }
+    : {};
+}
 
 /** Fixture data is stored around the preset centre; re-measure from where the walk starts. */
 function recenter(p: Places, lat: number, lon: number, radiusM: number): Places {

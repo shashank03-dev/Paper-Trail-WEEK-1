@@ -173,7 +173,11 @@ export function serverConfig() {
     publicUrl: env("PUBLIC_URL") ?? "",
     repoUrl: env("REPO_URL") ?? "https://github.com/shashank03-dev/Paper-Trail-WEEK-1",
     nominatimEmail: env("NOMINATIM_EMAIL") ?? "",
-    overpassUrl: env("OVERPASS_URL") ?? "https://overpass-api.de/api/interpreter",
+    // One URL or a comma-separated list, tried in order (lib/places/fetchOverpass.ts).
+    overpassUrls: (env("OVERPASS_URL") ?? "")
+      .split(",")
+      .map((u) => u.trim())
+      .filter((u) => /^https?:\/\//.test(u)),
     allowEndpointOverride: env("ALLOW_ENDPOINT_OVERRIDE") === "true",
   };
 }

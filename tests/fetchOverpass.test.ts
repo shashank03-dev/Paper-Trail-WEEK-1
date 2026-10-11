@@ -1,0 +1,108 @@
+import { beforeEach, describe, expect, it } from "vitest";
+import {
+  OverpassUnavailable,
+  describeError,
+  fetchOverpass,
+  resetOverpassState,
+} from "@/lib/places/fetchOverpass";
+
+const A = "https://a.example/api/interpreter";
+const B = "https://b.example/api/interpreter";
+const C = "https://c.example/api/interpreter";
+const ok = (elements: unknown[] = [{ type: "node", id: 1, lat: 0, lon: 0 }]) =>
+  new Response(JSON.stringify({ elements }), { headers: { "content-type": "application/json" } });
+/** What undici throws when a host refuses the connection. */
+const refused = () =>
+  Object.assign(new TypeError("fetch failed"), { cause: { code: "ECONNREFUSED" } });
+
+/** A fake fetch: each host answers with its handler; records the order hosts were asked. */
+function fake(handlers: Record<string, () => Response | Promise<Response>>) {
+  const asked: string[] = [];
+  const impl = (async (url: string | URL | Request) => {
+    const u = String(url);
+    asked.push(new URL(u).host);
+    const h = handlers[u];
+    if (!h) throw refused();
+    return h();
+  }) as typeof fetch;
+  return { impl, asked };
+}
+const opts = (impl: typeof fetch) => ({ userAgent: "test", fetchImpl: impl, budgetMs: 10_000 });
+
+describe("Overpass failover", () => {
+  beforeEach(() => resetOverpassState());
+
+  it("moves on when a server refuses the connection, and says why", async () => {
+    const f = fake({ [B]: () => ok() });
+    const r = await fetchOverpass([A, B], "q", opts(f.impl));
+    expect(r.data.elements).toHaveLength(1);
+    expect(f.asked).toEqual(["a.example", "b.example"]);
+    expect(r.attempts[0]!.error).toBe("fetch failed (ECONNREFUSED)");
+    expect(r.attempts[1]!.error).toBeUndefined();
+  });
+
+  it("treats rate limits, gateway errors, HTML and runtime-error remarks as failures", async () => {
+    const f = fake({
+      [A]: () => new Response("slow down", { status: 429 }),
+      [B]: () => new Response("<html>504</html>", { status: 200 }),
+      [C]: () => ok(),
+    });
+    const r = await fetchOverpass([A, B, C], "q", opts(f.impl));
+    expect(r.attempts.map((a) => a.error)).toEqual(["HTTP 429", "not Overpass JSON", undefined]);
+
+    resetOverpassState();
+    const g = fake({
+      [A]: () =>
+        new Response(JSON.stringify({ elements: [], remark: "runtime error: Query timed out" })),
+      [B]: () => ok(),
+    });
+    const s = await fetchOverpass([A, B], "q", opts(g.impl));
+    expect(s.attempts[0]!.error).toMatch(/^remark: runtime error/);
+  });
+
+  it("accepts an honest empty answer (a place with nothing mapped)", async () => {
+    const f = fake({ [A]: () => ok([]) });
+    const r = await fetchOverpass([A, B], "q", opts(f.impl));
+    expect(r.data.elements).toEqual([]);
+    expect(f.asked).toEqual(["a.example"]);
+  });
+
+  it("asks the server that answered last first, and puts failing ones at the back", async () => {
+    const first = fake({ [B]: () => ok() });
+    await fetchOverpass([A, B, C], "q", opts(first.impl));
+    const second = fake({ [B]: () => ok() });
+    await fetchOverpass([A, B, C], "q", opts(second.impl));
+    expect(second.asked).toEqual(["b.example"]);
+  });
+
+  it("throws every attempt when no server answers", async () => {
+    const f = fake({});
+    const e = await fetchOverpass([A, B, A], "q", opts(f.impl)).catch((x: unknown) => x);
+    expect(e).toBeInstanceOf(OverpassUnavailable);
+    // Duplicates are asked once.
+    expect((e as OverpassUnavailable).attempts.map((a) => a.host)).toEqual([
+      "a.example",
+      "b.example",
+    ]);
+    expect((e as Error).message).toContain("ECONNREFUSED");
+  });
+
+  it("stops at once when the caller goes away", async () => {
+    const ctl = new AbortController();
+    const f = fake({
+      [A]: () => {
+        ctl.abort(new Error("client left"));
+        throw new DOMException("aborted", "AbortError");
+      },
+      [B]: () => ok(),
+    });
+    await expect(
+      fetchOverpass([A, B], "q", { ...opts(f.impl), signal: ctl.signal }),
+    ).rejects.toThrow("client left");
+    expect(f.asked).toEqual(["a.example"]);
+  });
+
+  it("names timeouts plainly", () => {
+    expect(describeError(new DOMException("t", "TimeoutError"))).toBe("timeout");
+  });
+});
