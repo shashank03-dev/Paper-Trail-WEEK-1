@@ -108,6 +108,7 @@ On CPU it's slow: TODO: _measured tok/s on Render_. That's why the zine streams 
 | `NOMINATIM_EMAIL` | — | Required by the Nominatim usage policy |
 | `OVERPASS_URL` | overpass-api.de | Comma-separated; public mirrors always back it up |
 | `PHOTON_URL` | photon.komoot.io | Search-as-you-type suggestions |
+| `TILEJSON_URL` | tiles.openfreemap.org/planet | OSM vector tiles, the backup source for places |
 | `DEVICE_LABEL` | `my laptop` | Printed in the colophon |
 | `DEMO_MODE` | `false` | Fixtures for places/weather; replay if the model is offline |
 | `PUBLIC_URL` | request origin | Base of the QR code URL |

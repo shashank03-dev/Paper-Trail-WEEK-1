@@ -32,6 +32,18 @@ export class OverpassUnavailable extends Error {
 }
 
 const COOL_OFF_MS = 5 * 60 * 1000;
+/** Each server gets up to this many tries per request, for transient failures only. */
+const MAX_TRIES = 3;
+let RETRY_BASE_MS = 800;
+/** For tests: shorten the wait before a retry. */
+export function setRetryBaseMs(ms: number): void {
+  RETRY_BASE_MS = ms;
+}
+/** Overload, rate limits, gateway errors and timeouts pass; refused or unknown hosts don't. */
+const transient = (error: string) =>
+  /^HTTP (5\d\d|429)|timeout|^remark:|not Overpass JSON|ECONNRESET|UND_ERR_SOCKET|terminated/.test(
+    error,
+  );
 /** The instance that answered last is tried first; failing ones wait a while at the back. */
 let preferred: string | null = null;
 const coolUntil = new Map<string, number>();
@@ -137,14 +149,18 @@ export function fetchOverpass(
     if (opts.signal?.aborted) return onAbort();
     opts.signal?.addEventListener("abort", onAbort, { once: true });
 
+    const tries = new Map<string, number>();
+    let waiting = 0; // retries scheduled but not yet re-queued
     const launch = () => {
       if (settled) return;
       const remaining = deadline - Date.now();
       const url = remaining >= 1500 ? queue.shift() : undefined;
       if (!url) {
-        if (running === 0) finish(() => reject(new OverpassUnavailable(attempts)));
+        if (running === 0 && (waiting === 0 || remaining < 1500))
+          finish(() => reject(new OverpassUnavailable(attempts)));
         return;
       }
+      tries.set(url, (tries.get(url) ?? 0) + 1);
       running++;
       const ctl = new AbortController();
       live.add(ctl);
@@ -170,8 +186,26 @@ export function fetchOverpass(
           clearTimeout(hedge);
           timers.delete(hedge);
           if (settled) return;
-          attempts.push({ host: hostOf(url), ms: Date.now() - t0, error: describeError(e) });
+          const error = describeError(e);
+          attempts.push({ host: hostOf(url), ms: Date.now() - t0, error });
           coolUntil.set(url, Date.now() + COOL_OFF_MS);
+          // Public instances flap: a 500 or a timeout often clears in a second
+          // or two, so try it again later in this same request. A refused
+          // connection or an unknown host won't, so those are not retried.
+          const n = tries.get(url)!;
+          if (transient(error) && n < MAX_TRIES) {
+            waiting++;
+            const t = setTimeout(
+              () => {
+                timers.delete(t);
+                waiting--;
+                queue.push(url);
+                launch();
+              },
+              Math.min(RETRY_BASE_MS * 2 ** (n - 1), 4000),
+            );
+            timers.add(t);
+          }
           launch();
         },
       );

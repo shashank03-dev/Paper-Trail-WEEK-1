@@ -174,6 +174,8 @@ export function serverConfig() {
     repoUrl: env("REPO_URL") ?? "https://github.com/shashank03-dev/Paper-Trail-WEEK-1",
     nominatimEmail: env("NOMINATIM_EMAIL") ?? "",
     photonUrl: env("PHOTON_URL") ?? "https://photon.komoot.io/api",
+    /** TileJSON of the OpenStreetMap vector tiles used as the backup source for places. */
+    tileJsonUrl: env("TILEJSON_URL") ?? "",
     // One URL or a comma-separated list, tried in order (lib/places/fetchOverpass.ts).
     overpassUrls: (env("OVERPASS_URL") ?? "")
       .split(",")

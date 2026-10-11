@@ -48,10 +48,12 @@ export default function Privacy() {
         <li>
           <strong>Where you start a walk.</strong> The coordinates you pick are sent to{" "}
           <a href="https://wiki.osmfoundation.org/wiki/Privacy_Policy">OpenStreetMap</a> services
-          (Overpass for nearby places, Nominatim if you search an address) and to{" "}
-          <a href="https://open-meteo.com/en/terms">Open-Meteo</a> for the weather. Results are
-          cached on the server for up to a day, keyed by rounded coordinates, so that repeat lookups
-          don&rsquo;t hit those services again.
+          (Overpass for nearby places, Nominatim if you search an address), to{" "}
+          <a href="https://openfreemap.org">OpenFreeMap</a> for the same OpenStreetMap streets and
+          places as map tiles (a backup when Overpass is slow; it only sees which ~2 km square you
+          are in), and to <a href="https://open-meteo.com/en/terms">Open-Meteo</a> for the weather.
+          Results are cached on the server for up to a day, keyed by rounded coordinates, so that
+          repeat lookups don&rsquo;t hit those services again.
         </li>
         <li>
           <strong>What you type in the search box.</strong> As you type (from the third letter), the

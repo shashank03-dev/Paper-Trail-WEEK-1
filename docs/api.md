@@ -20,7 +20,7 @@ the same real map data does.
    │  zod body validation (400), 8 MB cap (413), error boundary (500),
    │  one JSON log line per request, abort signal from the client
    │
-   ├── /api/places   ──► cache (single-flight, 24 h) ──► Overpass mirrors, failover (45 s) → stale cache
+   ├── /api/places   ──► Overpass mirrors (failover, hedging, retries) ∥ OSM vector tiles → stale cache
    ├── /api/weather  ──► cache (single-flight, 30 min) ─► Open-Meteo (10 s)  → mild default on failure
    ├── /api/geocode  ──► cache ──► 1 req/s queue ──► Nominatim (10 s); mode=suggest ──► Photon (6 s)
    ├── /api/config   ──► public config only (never keys)
@@ -98,6 +98,15 @@ the back, and each attempt's real error (`ECONNREFUSED`, `HTTP 429`, timeout)
 is logged. (overpass-api.de refuses connections from the Render host.) If none
 answers, a stale cached map of the same spot (up to 30 days) is served; only
 then `502 upstream_unavailable` with `Retry-After: 30`.
+
+Alongside Overpass, the same request fetches OpenStreetMap vector tiles
+(OpenMapTiles schema) from OpenFreeMap (`lib/places/tiles.ts`): one to four
+zoom-14 tiles, decoded and normalised into the same `{ features, ways }`.
+Overpass gets a 6 s head start because it is richer (trees, benches, street
+lamps); if it hasn't answered by then, the tiles make the walk and Overpass's
+eventual answer is still cached for the next visitor. Retries: a server's
+5xx, 429 or timeout is retried (up to three tries, backing off) inside the
+same budget; a refused connection or unknown host is not.
 
 ### `POST /api/weather`
 `{ lat, lon, presetId? }` → `{ tempC, condition, precipProbNext2h, windKph, sunset, isDaylight, source }`.

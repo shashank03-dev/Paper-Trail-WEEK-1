@@ -4,6 +4,7 @@ import {
   describeError,
   fetchOverpass,
   resetOverpassState,
+  setRetryBaseMs,
 } from "@/lib/places/fetchOverpass";
 
 const A = "https://a.example/api/interpreter";
@@ -30,7 +31,10 @@ function fake(handlers: Record<string, () => Response | Promise<Response>>) {
 const opts = (impl: typeof fetch) => ({ userAgent: "test", fetchImpl: impl, budgetMs: 10_000 });
 
 describe("Overpass failover", () => {
-  beforeEach(() => resetOverpassState());
+  beforeEach(() => {
+    resetOverpassState();
+    setRetryBaseMs(20);
+  });
 
   it("moves on when a server refuses the connection, and says why", async () => {
     const f = fake({ [B]: () => ok() });
@@ -131,6 +135,81 @@ describe("Overpass failover", () => {
     const next = fake({ [B]: () => new Response("", { status: 500 }), [A]: () => ok() });
     await fetchOverpass([A, B, C], "q", { ...opts(next.impl), hedgeMs: 5000 });
     expect(next.asked).toEqual(["b.example", "a.example"]);
+  });
+
+  it("retries servers that flap (500s), but not ones that refuse: the live outage", async () => {
+    // As seen on the live site: the main server refuses, two mirrors answer 500
+    // for a moment, the last one hangs. The mirror that recovers must win.
+    const D = "https://d.example/api/interpreter";
+    let flaps = 0;
+    const asked: string[] = [];
+    const impl = (async (url: string | URL | Request, init?: RequestInit) => {
+      const u = String(url);
+      asked.push(new URL(u).host);
+      if (u === A) throw refused();
+      if (u === B) return ++flaps < 3 ? new Response("down", { status: 500 }) : ok();
+      if (u === C) return new Response("down", { status: 500 });
+      return new Promise<Response>((_, rej) =>
+        init!.signal!.addEventListener("abort", () => rej(new DOMException("t", "TimeoutError"))),
+      );
+    }) as typeof fetch;
+    const r = await fetchOverpass([A, B, C, D], "q", { ...opts(impl), hedgeMs: 5000 });
+    expect(r.attempts.at(-1)).toEqual({ host: "b.example", ms: expect.any(Number) });
+    // The refusing server was asked once; the flapping one until it recovered.
+    expect(asked.filter((h) => h === "a.example")).toHaveLength(1);
+    expect(asked.filter((h) => h === "b.example")).toHaveLength(3);
+  });
+
+  it("gives up within the budget when every server keeps failing", async () => {
+    const f = fake({
+      [A]: () => new Response("down", { status: 502 }),
+      [B]: () => new Response("down", { status: 503 }),
+    });
+    const t0 = Date.now();
+    const e = await fetchOverpass([A, B], "q", { ...opts(f.impl), budgetMs: 3000 }).catch(
+      (x: unknown) => x,
+    );
+    expect(e).toBeInstanceOf(OverpassUnavailable);
+    expect(Date.now() - t0).toBeLessThan(3000);
+    // Three tries each, then it stops.
+    expect(f.asked).toHaveLength(6);
+  });
+
+  it("retries servers that flap (500s), but not ones that refuse: the live outage", async () => {
+    // As seen on the live site: the main server refuses, two mirrors answer 500
+    // for a moment, the last one hangs. The mirror that recovers must win.
+    const D = "https://d.example/api/interpreter";
+    let flaps = 0;
+    const asked: string[] = [];
+    const impl = (async (url: string | URL | Request, init?: RequestInit) => {
+      const u = String(url);
+      asked.push(new URL(u).host);
+      if (u === A) throw refused();
+      if (u === B) return ++flaps < 3 ? new Response("down", { status: 500 }) : ok();
+      if (u === C) return new Response("down", { status: 500 });
+      return new Promise<Response>((_, rej) =>
+        init!.signal!.addEventListener("abort", () => rej(new DOMException("t", "TimeoutError"))),
+      );
+    }) as typeof fetch;
+    const r = await fetchOverpass([A, B, C, D], "q", { ...opts(impl), hedgeMs: 5000 });
+    expect(r.attempts.at(-1)).toEqual({ host: "b.example", ms: expect.any(Number) });
+    expect(asked.filter((h) => h === "a.example")).toHaveLength(1);
+    expect(asked.filter((h) => h === "b.example")).toHaveLength(3);
+  });
+
+  it("gives up within the budget when every server keeps failing", async () => {
+    const f = fake({
+      [A]: () => new Response("down", { status: 502 }),
+      [B]: () => new Response("down", { status: 503 }),
+    });
+    const t0 = Date.now();
+    const e = await fetchOverpass([A, B], "q", { ...opts(f.impl), budgetMs: 3000 }).catch(
+      (x: unknown) => x,
+    );
+    expect(e).toBeInstanceOf(OverpassUnavailable);
+    expect(Date.now() - t0).toBeLessThan(3000);
+    // Three tries each, then it stops.
+    expect(f.asked).toHaveLength(6);
   });
 
   it("names timeouts plainly", () => {
