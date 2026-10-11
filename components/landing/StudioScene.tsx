@@ -250,6 +250,29 @@ function Desk() {
   );
 }
 
+/* ----------------------------- watchdog ----------------------------- */
+
+/**
+ * Hands the hero to the lite renderer if this GPU can't keep up. Once the
+ * print is on the paper (shaders compiled, texture uploaded), it times a
+ * couple of seconds of frames; a median under ~22 fps means the fold would
+ * stutter, and Canvas 2D will draw it more smoothly.
+ */
+function Watchdog({ armed, onSlow }: { armed: boolean; onSlow: () => void }) {
+  const samples = useRef<number[]>([]);
+  const done = useRef(false);
+  useFrame((_, dt) => {
+    if (!armed || done.current || document.hidden || dt > 0.5) return;
+    samples.current.push(dt);
+    // Skip the first frames after the texture lands (uploads, first shadow pass).
+    if (samples.current.length < 20 + 120) return;
+    done.current = true;
+    const sorted = samples.current.slice(20).sort((a, b) => a - b);
+    if (sorted[sorted.length >> 1]! > 1 / 22) onSlow();
+  });
+  return null;
+}
+
 /* ------------------------------ canvas ------------------------------ */
 
 export default function StudioScene({
@@ -259,6 +282,7 @@ export default function StudioScene({
   mobile,
   low = false,
   onReady,
+  onFail,
 }: {
   rig: RefObject<Rig>;
   sheetId: string;
@@ -267,6 +291,8 @@ export default function StudioScene({
   /** A weak device: lower pixel ratio, coarser paper, smaller shadows. */
   low?: boolean;
   onReady?: () => void;
+  /** WebGL can't carry the fold here (context lost, or too slow): switch renderers. */
+  onFail?: () => void;
 }) {
   const [texture, setTexture] = useState<THREE.Texture | null>(null);
   const [still, setStill] = useState(false);
@@ -329,6 +355,8 @@ export default function StudioScene({
       camera={{ position: [0, 0, CAMERA_Z], fov: CAMERA_FOV }}
       gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
       onCreated={({ gl }) => {
+        // A lost context (memory pressure, GPU reset) would leave the hero empty.
+        gl.domElement.addEventListener("webglcontextlost", () => onFail?.(), { once: true });
         gl.setClearColor(0x000000, 0);
         gl.toneMapping = THREE.NeutralToneMapping;
         gl.toneMappingExposure = 1;
@@ -356,6 +384,7 @@ export default function StudioScene({
       <Desk />
       <Paper rig={rig} pointer={pointer} texture={texture} still={still} low={low} />
       <Pencil rig={rig} mobile={mobile} />
+      {onFail && <Watchdog armed={texture !== null} onSlow={onFail} />}
     </Canvas>
   );
 }

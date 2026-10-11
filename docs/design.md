@@ -117,6 +117,25 @@ for this build added *3D-ish and very pretty*. We reconcile both:
   gorgeous but ~150 kB, needs a texture of the sheet (which we'd have to
   rasterise anyway), and fights `prefers-reduced-motion` and print. CSS 3D
   gets 90 % of the feeling at 0 kB and keeps the sheet as live, crisp SVG.
+  (Superseded for the landing hero: see DECISIONS 31, 36 and 39.)
+
+#### Hero rendering: every device gets the fold
+
+```
+            scroll ──► anime.js timeline ──► Rig (folds, pose, pencil)
+                                               │
+                         ┌─────────────────────┼──────────────────────┐
+                         ▼                     ▼                      ▼
+                 three.js scene         Canvas 2D fold          printed sheet
+                 high / low detail      (liteFold.ts)           (last resort)
+                         │   throws, context lost,  ▲  throws         ▲
+                         └── median < 22 fps ───────┘ ────────────────┘
+```
+
+`deviceTier()` picks the starting renderer: WebGL for most devices (lower
+detail on few cores / little memory), Canvas 2D for Data Saver, 2G or no
+WebGL2. Both read the same `Rig` and the same fold geometry, so the
+choreography, captions and phone layout are identical whichever one draws.
 
 Fonts are **self-hosted** (Fraunces, Inter, IBM Plex Mono, Caveat, all OFL)
 instead of loaded from Google Fonts at runtime: no third-party request when

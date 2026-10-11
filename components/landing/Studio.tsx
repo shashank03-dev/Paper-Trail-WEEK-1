@@ -21,15 +21,27 @@ import type { Rig } from "./StudioScene";
 import { CAMERA_FOV, CAMERA_Z, DESK_Z, SHEET_H, SHEET_W } from "./foldSheet";
 
 const StudioScene = dynamic(() => import("./StudioScene"), { ssr: false });
+const LiteScene = dynamic(() => import("./LiteScene"), { ssr: false });
 
-/** Without WebGL (or if it crashes) the printed sheet sits on the page as a still. */
+/**
+ * How the hero is drawn. Everyone gets the fold: "gl" is the three.js scene,
+ * "lite" the same fold in Canvas 2D (no WebGL, Data Saver, or WebGL that
+ * failed). "still" (the printed sheet as an image) is only the last resort if
+ * even the 2D canvas throws.
+ */
+type Renderer = "gl" | "lite" | "still";
+
+/** If a renderer throws, the next one down takes over. */
 class SceneBoundary extends Component<
-  { fallback: ReactNode; children: ReactNode },
+  { fallback: ReactNode; onFail: () => void; children: ReactNode },
   { failed: boolean }
 > {
   state = { failed: false };
   static getDerivedStateFromError() {
     return { failed: true };
+  }
+  componentDidCatch() {
+    this.props.onFail();
   }
   render() {
     return this.state.failed ? this.props.fallback : this.props.children;
@@ -183,7 +195,7 @@ function choreograph(
     veil: HTMLElement;
     bar: HTMLElement;
     chapters: HTMLElement[];
-    /** The flat fallback sheet on a phone: it waits behind the hero copy, then fades in. */
+    /** The last-resort flat sheet on a phone: it waits behind the hero copy, then fades in. */
     still?: HTMLElement | null;
   },
 ) {
@@ -331,20 +343,23 @@ export function Studio() {
   const [ready, setReady] = useState(false);
   const [active, setActive] = useState(true);
   const [mobile, setMobile] = useState(false);
-  const [gl, setGl] = useState<boolean | null>(null);
+  const [renderer, setRenderer] = useState<Renderer | null>(null);
   const [tier, setTier] = useState<Tier>("high");
   const data = useMemo(() => demoZine(), []);
   const onReady = useCallback(() => setReady(true), []);
-  // WebGL waits until the page has loaded and the browser is idle, so it never
-  // competes with the first paint; the still sheet shows on devices that can't.
+  // WebGL lost its context or can't keep up: carry on in Canvas 2D.
+  const onGlFail = useCallback(() => setRenderer((r) => (r === "gl" ? "lite" : r)), []);
+  const onLiteFail = useCallback(() => setRenderer("still"), []);
+  // The scene waits until the page has loaded and the browser is idle, so it
+  // never competes with the first paint.
   useEffect(() => {
     const t = deviceTier();
     setTier(t);
-    if (t === "still" || !hasWebGL()) return setGl(false);
+    const pick: Renderer = t === "lite" || !hasWebGL() ? "lite" : "gl";
     let idle = 0;
     const start = () => {
       const ric = window.requestIdleCallback ?? ((cb: () => void) => window.setTimeout(cb, 200));
-      idle = ric(() => setGl(true), { timeout: 1500 } as IdleRequestOptions);
+      idle = ric(() => setRenderer(pick), { timeout: 1500 } as IdleRequestOptions);
     };
     if (document.readyState === "complete") start();
     else window.addEventListener("load", start, { once: true });
@@ -369,7 +384,7 @@ export function Studio() {
     const fit = mobile && copy.current ? fitPhone(copy.current.offsetTop) : null;
     const poses = fit ? fit.poses : DESKTOP;
     Object.assign(rig.current, initialRig(poses, fit ? fit.pen : DESKTOP_PEN));
-    // Tweens only apply once their start is reached, so set where the fallback sheet starts.
+    // Tweens only apply once their start is reached, so set where the last-resort sheet starts.
     if (stillRef.current) stillRef.current.style.opacity = mobile ? "0" : "";
     const tl = choreograph(rig.current, poses, {
       hero: hero.current,
@@ -385,7 +400,7 @@ export function Studio() {
       stop();
       tl.revert();
     };
-  }, [mobile, viewport, gl]);
+  }, [mobile, viewport, renderer]);
 
   // Stop drawing WebGL frames once the studio has scrolled away.
   useEffect(() => {
@@ -414,6 +429,18 @@ export function Studio() {
     </div>
   );
 
+  const lite = (
+    <SceneBoundary fallback={still} onFail={onLiteFail}>
+      <LiteScene
+        rig={rig}
+        sheetId="studio-sheet"
+        onReady={onReady}
+        active={active}
+        mobile={mobile}
+      />
+    </SceneBoundary>
+  );
+
   return (
     <section
       ref={section}
@@ -421,9 +448,9 @@ export function Studio() {
       aria-label="Paper Trail, unfolded"
       className="relative h-[460vh]"
     >
-      {/* The sheet the 3D paper is printed from (also exactly what you'd print).
-          Client-only, and only when WebGL will use it: it isn't page content. */}
-      {gl && (
+      {/* The sheet the folding paper is printed from (also exactly what you'd
+          print). Client-only, and only when a renderer will use it: it isn't page content. */}
+      {(renderer === "gl" || renderer === "lite") && (
         <div
           aria-hidden
           className="pointer-events-none fixed -left-[9999px] top-0 w-[1100px] opacity-0"
@@ -442,25 +469,26 @@ export function Studio() {
           className="absolute inset-0"
           initial={{ opacity: 0, scale: 1.02 }}
           animate={{
-            opacity: ready || gl === false ? 1 : 0,
-            scale: ready || gl === false ? 1 : 1.02,
+            opacity: ready || renderer === "still" ? 1 : 0,
+            scale: ready || renderer === "still" ? 1 : 1.02,
           }}
           transition={{ duration: 1.8, ease: EASE }}
         >
-          {gl === false
-            ? still
-            : gl && (
-                <SceneBoundary fallback={still}>
-                  <StudioScene
-                    rig={rig}
-                    sheetId="studio-sheet"
-                    onReady={onReady}
-                    active={active}
-                    mobile={mobile}
-                    low={tier === "low"}
-                  />
-                </SceneBoundary>
-              )}
+          {renderer === "still" && still}
+          {renderer === "lite" && lite}
+          {renderer === "gl" && (
+            <SceneBoundary fallback={lite} onFail={onGlFail}>
+              <StudioScene
+                rig={rig}
+                sheetId="studio-sheet"
+                onReady={onReady}
+                onFail={onGlFail}
+                active={active}
+                mobile={mobile}
+                low={tier === "low"}
+              />
+            </SceneBoundary>
+          )}
         </motion.div>
 
         {/* Hero */}

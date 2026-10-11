@@ -76,7 +76,7 @@ export function ZineRack({
   useEffect(() => {
     const t = deviceTier();
     setLow(t === "low");
-    setGl(t !== "still" && hasWebGL());
+    setGl(t !== "lite" && hasWebGL());
     const set = () => {
       const w = box.current?.clientWidth ?? window.innerWidth;
       setCols(Math.max(2, Math.min(maxCols, Math.floor(w / 190))));
