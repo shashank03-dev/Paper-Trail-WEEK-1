@@ -245,7 +245,20 @@ function grow(p: Quad["pts"], g: number): number[] {
   return out;
 }
 
-/** The paper's soft shadow on the desk, drawn small and scaled up (cheap blur). */
+let filterOk: boolean | null = null;
+/** Canvas `filter` (blur) exists in Chromium and Firefox, not in older Safari. */
+const canFilter = () =>
+  (filterOk ??=
+    typeof CanvasRenderingContext2D !== "undefined" &&
+    "filter" in CanvasRenderingContext2D.prototype);
+
+/**
+ * The paper's soft shadow on the desk. It is drawn on-canvas into a small
+ * buffer and scaled up: blurred with the canvas filter where there is one,
+ * otherwise softened by drawing it coarser (bilinear upscaling blurs it). The
+ * shape is never drawn off-canvas to borrow its `shadowBlur`, so nothing can
+ * leak onto the page however far the paper sits from the centre.
+ */
 export function drawShadow(
   ctx: CanvasRenderingContext2D,
   buf: HTMLCanvasElement,
@@ -254,7 +267,9 @@ export function drawShadow(
 ): void {
   const W = ctx.canvas.width;
   const H = ctx.canvas.height;
-  const q = 4;
+  const blur = 5 + 28 * lift; // device px
+  const filter = canFilter();
+  const q = filter ? 4 : Math.min(14, Math.max(4, Math.round(blur / 2.5)));
   const bw = Math.max(1, Math.ceil(W / q));
   const bh = Math.max(1, Math.ceil(H / q));
   if (buf.width !== bw || buf.height !== bh) {
@@ -265,12 +280,8 @@ export function drawShadow(
   if (!b) return;
   b.setTransform(1, 0, 0, 1, 0, 0);
   b.clearRect(0, 0, bw, bh);
-  // Draw the shape off-canvas and let only its blurred shadow land on it.
-  const off = bw + 50;
-  b.shadowOffsetX = off;
-  b.shadowBlur = (5 + 28 * lift) / q;
-  b.shadowColor = `rgba(${SHADE},${0.2 - 0.06 * lift})`;
-  b.fillStyle = "#000";
+  if (filter) b.filter = `blur(${(blur / q).toFixed(2)}px)`;
+  b.fillStyle = `rgba(${SHADE},${(0.2 - 0.06 * lift).toFixed(3)})`;
   b.beginPath();
   for (const quad of quads) {
     const s = quad.shadow;
@@ -278,7 +289,7 @@ export function drawShadow(
     const area = (s[2] - s[0]) * (s[7] - s[1]) - (s[6] - s[0]) * (s[3] - s[1]);
     const order = area >= 0 ? [0, 2, 4, 6] : [6, 4, 2, 0];
     order.forEach((k, n) => {
-      const x = s[k]! / q - off;
+      const x = s[k]! / q;
       const y = s[k + 1]! / q;
       if (n === 0) b.moveTo(x, y);
       else b.lineTo(x, y);
@@ -286,6 +297,9 @@ export function drawShadow(
     b.closePath();
   }
   b.fill();
+  if (filter) b.filter = "none";
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = "high";
   ctx.drawImage(buf, 0, 0, bw, bh, 0, 0, bw * q, bh * q);
 }
 
@@ -363,23 +377,23 @@ export function drawPaper(
 export function drawPencil(
   ctx: CanvasRenderingContext2D,
   r: Rig,
-  mobile: boolean,
+  stacked: boolean,
   w: number,
   h: number,
 ): void {
   if (r.penS < 0.01) return;
   const R = 0.05;
   const L = 1.55;
-  const travel = r.away * (mobile ? 1.6 : 1.3);
-  const X = r.penX + (mobile ? travel : 0);
-  const Y = r.penY - (mobile ? 0 : travel);
+  const travel = r.away * r.penOut;
+  const X = r.penX + (stacked ? travel : 0);
+  const Y = r.penY - (stacked ? 0 : travel);
   const Z = DESK_Z + R * r.penS;
   const focal = h / 2 / Math.tan((CAMERA_FOV / 2) * (Math.PI / 180));
   const d = CAMERA_Z - Z;
   const sx = w / 2 + (X * focal) / d;
   const sy = h / 2 - (Y * focal) / d;
   const k = (focal / d) * r.penS;
-  const roll = (mobile ? -1 : 1) * (travel / (R * r.penS));
+  const roll = (stacked ? -1 : 1) * (travel / (R * r.penS));
 
   ctx.save();
   ctx.translate(sx, sy);

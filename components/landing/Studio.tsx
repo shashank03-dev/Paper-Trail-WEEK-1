@@ -17,8 +17,9 @@ import { Sheet } from "@/lib/zine/Sheet";
 import { demoZine } from "@/lib/demo/demoZine";
 import { ModelBadge } from "@/components/ModelBadge";
 import { deviceTier, type Tier } from "@/lib/client/device";
+import { STACKED_QUERY } from "@/lib/client/layout";
 import type { Rig } from "./StudioScene";
-import { CAMERA_FOV, CAMERA_Z, DESK_Z, SHEET_H, SHEET_W } from "./foldSheet";
+import { DEFAULT_STAGE, fitStage, type Pen, type Pose, type Poses, type Rect } from "./stage";
 
 const StudioScene = dynamic(() => import("./StudioScene"), { ssr: false });
 const LiteScene = dynamic(() => import("./LiteScene"), { ssr: false });
@@ -81,59 +82,7 @@ const CHAPTERS = [
   },
 ] as const;
 
-/* ------------------------------------------------------------------ */
-/*  Poses. Positions are in the scene's units (100 mm); the timeline   */
-/*  below moves the paper between them while the folds open & close.  */
-/* ------------------------------------------------------------------ */
-
-type Pose = Pick<Rig, "x" | "y" | "z" | "s" | "rx" | "ry" | "rz"> & { fx?: number; fy?: number };
-interface Poses {
-  rest: Pose;
-  lift: Pose;
-  flat: Pose;
-  drift: Pose;
-  map: Pose;
-  upright: Pose;
-  land: Pose;
-}
-
-// Page 2 (the map) is the top-right panel, printed upside down. The sheet turns
-// half a revolution about the map itself, so the map holds still at `at`
-// while the rest of the sheet swings round it.
-const mapPose = (s: number, at: [number, number]): Pose => ({
-  x: at[0],
-  y: at[1],
-  z: 0.5,
-  s,
-  rx: -0.02,
-  ry: 0.02,
-  rz: Math.PI - 0.02,
-  fx: (SHEET_W * 3) / 8,
-  fy: SHEET_H / 4,
-});
-
-const DESKTOP: Poses = {
-  rest: { x: 1.72, y: 0.05, z: 0.02, s: 1.62, rx: 0.06, ry: 0.04, rz: -0.16 },
-  lift: { x: 1.45, y: -0.02, z: 0.55, s: 1.5, rx: -0.14, ry: -0.32, rz: -0.07 },
-  flat: { x: 1.18, y: 0.02, z: 0.42, s: 1.02, rx: -0.08, ry: -0.06, rz: 0.015 },
-  drift: { x: 1.2, y: 0.02, z: 0.45, s: 1.04, rx: -0.04, ry: 0.05, rz: 0.01 },
-  map: mapPose(1.45, [1.12, -0.04]),
-  upright: { x: 1.45, y: 0.0, z: 0.6, s: 1.5, rx: -0.1, ry: 0.42, rz: 0.06 },
-  land: { x: 1.6, y: -0.12, z: 0.03, s: 1.45, rx: 0.04, ry: 0.0, rz: 0.16 },
-};
-const MOBILE: Poses = {
-  rest: { x: -0.22, y: 1.2, z: 0.02, s: 0.74, rx: 0.05, ry: 0, rz: -0.14 },
-  lift: { x: 0, y: 1.0, z: 0.4, s: 0.8, rx: -0.12, ry: -0.3, rz: -0.06 },
-  flat: { x: 0, y: 0.86, z: 0.3, s: 0.55, rx: -0.06, ry: 0, rz: 0 },
-  drift: { x: 0, y: 0.88, z: 0.32, s: 0.56, rx: -0.03, ry: 0.04, rz: 0.01 },
-  map: mapPose(1.0, [0, 0.82]),
-  upright: { x: 0, y: 0.82, z: 0.45, s: 1.0, rx: -0.1, ry: 0.4, rz: 0.05 },
-  land: { x: -0.2, y: 1.12, z: 0.03, s: 0.78, rx: 0.04, ry: 0, rz: 0.12 },
-};
-
 const folded = { top: 1, a: 1, b: 1, c: 1 };
-type Pen = Pick<Rig, "penX" | "penY" | "penR" | "penS">;
-const DESKTOP_PEN: Pen = { penX: 1.55, penY: -1.38, penR: 0.14, penS: 1 };
 const initialRig = (p: Poses, pen: Pen): Rig => ({
   fx: 0,
   fy: 0,
@@ -143,41 +92,17 @@ const initialRig = (p: Poses, pen: Pen): Rig => ({
   ...pen,
 });
 
-/**
- * Phones vary a lot in height, so the resting booklet and pencil are fitted
- * into the band actually left free between the nav and the hero copy, measured
- * on the page, instead of fixed numbers that overlap the headline on short screens.
- */
-function fitPhone(copyTop: number): { poses: Poses; pen: Pen } {
-  const vw = window.innerWidth;
-  const vh = window.innerHeight;
-  const worldPerPx =
-    (2 * Math.tan(((CAMERA_FOV / 2) * Math.PI) / 180) * (CAMERA_Z - (DESK_Z + 0.05))) / vh;
-  const navBottom = 72;
-  const band = copyTop - navBottom - 14;
-  if (band < 110) {
-    // No room above the copy on this screen: the booklet waits just above the
-    // frame and drops in as the story starts; the pencil sits this one out.
-    const above = { ...MOBILE.rest, y: (vh / 2 + 200) * worldPerPx };
-    return {
-      poses: { ...MOBILE, rest: above },
-      pen: { penX: 0, penY: (vh / 2 + 300) * worldPerPx, penR: 1.05, penS: 0.001 },
-    };
+/** Offset of `el` inside `root`, from layout (so the timeline's transforms don't skew it). */
+function rectIn(el: HTMLElement, root: HTMLElement): Rect {
+  let x = 0;
+  let y = 0;
+  let n: HTMLElement | null = el;
+  while (n && n !== root) {
+    x += n.offsetLeft;
+    y += n.offsetTop;
+    n = n.offsetParent as HTMLElement | null;
   }
-  const centreY = (vh / 2 - (navBottom + band / 2 + 4)) * worldPerPx;
-  const s = (Math.min(band * 0.86, 250) * worldPerPx) / (SHEET_H / 2);
-  const x = (vw * 0.38 - vw / 2) * worldPerPx;
-  const rest = { x, y: centreY, z: 0.02, s, rx: 0.05, ry: 0, rz: -0.14 };
-  const penLen = (band * 0.92 * worldPerPx) / Math.sin(1.05);
-  return {
-    poses: { ...MOBILE, rest, land: { ...rest, z: 0.03, rz: 0.12 } },
-    pen: {
-      penX: (vw * 0.74 - vw / 2) * worldPerPx,
-      penY: centreY,
-      penR: 1.05,
-      penS: Math.min(0.5, penLen / 1.85),
-    },
-  };
+  return { x0: x, y0: y, x1: x + el.offsetWidth, y1: y + el.offsetHeight };
 }
 
 /**
@@ -319,30 +244,40 @@ export function Studio() {
   const chapters = useRef<(HTMLDivElement | null)[]>([]);
   const copy = useRef<HTMLDivElement>(null);
   const stillRef = useRef<HTMLDivElement>(null);
-  const rig = useRef<Rig>(initialRig(DESKTOP, DESKTOP_PEN));
-  // Re-fit the scene when the window really changes size (rotation, a resized
-  // desktop window); not for the address bar sliding in and out while scrolling.
-  const [viewport, setViewport] = useState("");
+  const stage = useRef<HTMLDivElement>(null);
+  const captionBox = useRef<HTMLDivElement>(null);
+  const rig = useRef<Rig>(initialRig(DEFAULT_STAGE.poses, DEFAULT_STAGE.pen));
+  // Re-fit the paper whenever the boxes it is fitted around really change size:
+  // the hero viewport (100svh, so not the address bar sliding while scrolling;
+  // rotation and resized windows, yes) and the copy and captions (web fonts
+  // arriving, text re-wrapping).
+  const [layout, setLayout] = useState(0);
   useEffect(() => {
+    const els = [stage.current, copy.current, captionBox.current].filter(
+      (e): e is HTMLDivElement => !!e,
+    );
+    const seen = new Map<Element, string>();
     let t = 0;
-    let last = { w: innerWidth, h: innerHeight };
-    const on = () => {
+    const ro = new ResizeObserver((entries) => {
+      let changed = false;
+      for (const e of entries) {
+        const k = `${Math.round(e.contentRect.width)}x${Math.round(e.contentRect.height)}`;
+        if (seen.has(e.target) && seen.get(e.target) !== k) changed = true;
+        seen.set(e.target, k);
+      }
+      if (!changed) return;
       window.clearTimeout(t);
-      t = window.setTimeout(() => {
-        if (innerWidth === last.w && Math.abs(innerHeight - last.h) < 120) return;
-        last = { w: innerWidth, h: innerHeight };
-        setViewport(`${innerWidth}x${innerHeight}`);
-      }, 200);
-    };
-    window.addEventListener("resize", on);
+      t = window.setTimeout(() => setLayout((n) => n + 1), 150);
+    });
+    els.forEach((e) => ro.observe(e));
     return () => {
-      window.removeEventListener("resize", on);
+      ro.disconnect();
       window.clearTimeout(t);
     };
   }, []);
   const [ready, setReady] = useState(false);
   const [active, setActive] = useState(true);
-  const [mobile, setMobile] = useState(false);
+  const [stacked, setStacked] = useState(false);
   const [renderer, setRenderer] = useState<Renderer | null>(null);
   const [tier, setTier] = useState<Tier>("high");
   const data = useMemo(() => demoZine(), []);
@@ -370,8 +305,8 @@ export function Studio() {
   }, []);
 
   useEffect(() => {
-    const m = window.matchMedia("(max-width: 767px)");
-    const set = () => setMobile(m.matches);
+    const m = window.matchMedia(STACKED_QUERY);
+    const set = () => setStacked(m.matches);
     set();
     m.addEventListener("change", set);
     return () => m.removeEventListener("change", set);
@@ -380,27 +315,39 @@ export function Studio() {
   // (Re)build the timeline for this layout, and scrub it with the scroll.
   useEffect(() => {
     const s = section.current;
-    if (!s || !hero.current || !cue.current || !veil.current || !bar.current) return;
-    const fit = mobile && copy.current ? fitPhone(copy.current.offsetTop) : null;
-    const poses = fit ? fit.poses : DESKTOP;
-    Object.assign(rig.current, initialRig(poses, fit ? fit.pen : DESKTOP_PEN));
+    const st = stage.current;
+    if (!s || !st || !hero.current || !cue.current || !veil.current || !bar.current) return;
+    if (!copy.current || !captionBox.current) return;
+    // Measure what the paper has to keep clear of, then fit every pose to it.
+    const navBar = document.querySelector("header > div");
+    const fit = fitStage({
+      vw: st.clientWidth,
+      vh: st.clientHeight,
+      stacked,
+      nav: Math.max(56, navBar?.getBoundingClientRect().bottom ?? 64) + 6,
+      gutter: parseFloat(getComputedStyle(hero.current).paddingLeft) || 16,
+      copy: rectIn(copy.current, st),
+      captions: rectIn(captionBox.current, st),
+    });
+    const poses = fit.poses;
+    Object.assign(rig.current, initialRig(poses, fit.pen));
     // Tweens only apply once their start is reached, so set where the last-resort sheet starts.
-    if (stillRef.current) stillRef.current.style.opacity = mobile ? "0" : "";
+    if (stillRef.current) stillRef.current.style.opacity = stacked ? "0" : "";
     const tl = choreograph(rig.current, poses, {
       hero: hero.current,
       cue: cue.current,
       veil: veil.current,
       bar: bar.current,
       chapters: chapters.current.filter((c): c is HTMLDivElement => !!c),
-      // On a phone the flat sheet would sit on top of the headline.
-      still: mobile ? stillRef.current : null,
+      // Stacked, the flat sheet would sit on top of the headline.
+      still: stacked ? stillRef.current : null,
     });
     const stop = scrub(s, (p) => tl.seek(p * tl.duration));
     return () => {
       stop();
       tl.revert();
     };
-  }, [mobile, viewport, renderer]);
+  }, [stacked, layout, renderer]);
 
   // Stop drawing WebGL frames once the studio has scrolled away.
   useEffect(() => {
@@ -416,7 +363,7 @@ export function Studio() {
   const still = (
     <div
       ref={stillRef}
-      className="absolute inset-0 flex items-start justify-center px-6 pt-[16svh] md:items-center md:justify-end md:pr-[5vw] md:pt-0"
+      className="absolute inset-0 flex items-center justify-end pr-[5vw] stacked:items-start stacked:justify-center stacked:px-6 stacked:pt-[16svh]"
     >
       <div className="paper w-full max-w-[600px] overflow-hidden [transform:perspective(1800px)_rotateX(14deg)_rotateZ(-3deg)]">
         <Sheet
@@ -436,7 +383,7 @@ export function Studio() {
         sheetId="studio-sheet"
         onReady={onReady}
         active={active}
-        mobile={mobile}
+        stacked={stacked}
       />
     </SceneBoundary>
   );
@@ -459,7 +406,7 @@ export function Studio() {
         </div>
       )}
 
-      <div className="sticky top-0 h-[100svh] overflow-hidden">
+      <div ref={stage} className="sticky top-0 h-[100svh] overflow-hidden">
         {/* Daylight from the top left, falling onto the desk. */}
         <div
           aria-hidden
@@ -484,7 +431,7 @@ export function Studio() {
                 onReady={onReady}
                 onFail={onGlFail}
                 active={active}
-                mobile={mobile}
+                stacked={stacked}
                 low={tier === "low"}
               />
             </SceneBoundary>
@@ -494,18 +441,18 @@ export function Studio() {
         {/* Hero */}
         <div
           ref={hero}
-          className="relative z-10 mx-auto flex h-full max-w-7xl flex-col justify-end px-[var(--gutter)] pb-[9svh] md:justify-center md:pb-0"
+          className="relative z-10 mx-auto flex h-full max-w-7xl flex-col justify-center px-[var(--gutter)] stacked:justify-end stacked:pb-[9svh]"
         >
           {/* Entrance animations are CSS: they run from the first frame, before hydration. */}
-          <div ref={copy} className="hero-copy max-w-[40rem]">
+          <div ref={copy} className="hero-copy max-w-[min(40rem,54vw)] stacked:max-w-[40rem]">
             <p
-              className="fade-up label flex items-center gap-3"
+              className="hero-label fade-up label flex items-center gap-3"
               style={{ animationDelay: "100ms" }}
             >
               <span className="inline-block h-px w-8 bg-ink/40" aria-hidden />
               Printed walks for real streets
             </p>
-            <h1 className="display mt-6 text-[clamp(3.3rem,1.4rem+7.4vw,8.4rem)]">
+            <h1 className="display mt-6 text-[clamp(2.6rem,min(1.4rem+7.4vw,15svh),8.4rem)]">
               <span className="block overflow-hidden pb-[0.06em]">
                 {["The", "walk", "app", "that"].map((w, i) => (
                   <span
@@ -526,13 +473,16 @@ export function Studio() {
                 </em>
               </span>
             </h1>
-            <p className="fade-up lede mt-6 max-w-[33rem]" style={{ animationDelay: "700ms" }}>
+            <p
+              className="hero-lede fade-up lede mt-6 max-w-[33rem]"
+              style={{ animationDelay: "700ms" }}
+            >
               Paper Trail folds the streets around you into an eight-page paper zine: a hand-drawn
               map, things to spot, a riddle and a box to sketch in. Print it, leave your phone, go.
               When you&rsquo;re back, one photo and Gemma reads your pencil.
             </p>
             <div
-              className="fade-up mt-9 flex flex-wrap items-center gap-3"
+              className="hero-cta fade-up mt-9 flex flex-wrap items-center gap-3"
               style={{ animationDelay: "850ms" }}
             >
               <Link href="/new" className="btn btn-riso btn-lg">
@@ -545,7 +495,7 @@ export function Studio() {
                 See inside
               </a>
             </div>
-            <div className="fade-up mt-8" style={{ animationDelay: "1100ms" }}>
+            <div className="hero-badge fade-up mt-8" style={{ animationDelay: "1100ms" }}>
               <ModelBadge />
             </div>
           </div>
@@ -553,7 +503,7 @@ export function Studio() {
 
         <div
           ref={cue}
-          className="pointer-events-none absolute inset-x-0 bottom-7 z-10 hidden justify-center md:flex"
+          className="hero-cue pointer-events-none absolute inset-x-0 bottom-7 z-10 flex justify-center stacked:hidden"
         >
           <span className="label flex flex-col items-center gap-3">
             Scroll to unfold
@@ -568,11 +518,14 @@ export function Studio() {
           ref={veil}
           aria-hidden
           style={{ opacity: 0 }}
-          className="pointer-events-none absolute inset-0 z-[5] bg-[linear-gradient(90deg,rgba(241,237,228,0.95)_0%,rgba(241,237,228,0.7)_30%,transparent_50%)] max-md:bg-[linear-gradient(0deg,rgba(241,237,228,0.98)_0%,rgba(241,237,228,0.85)_36%,transparent_56%)]"
+          className="pointer-events-none absolute inset-0 z-[5] bg-[linear-gradient(90deg,rgba(241,237,228,0.95)_0%,rgba(241,237,228,0.7)_30%,transparent_50%)] stacked:bg-[linear-gradient(0deg,rgba(241,237,228,0.98)_0%,rgba(241,237,228,0.85)_36%,transparent_56%)]"
         />
 
-        <div className="pointer-events-none absolute inset-x-0 bottom-[8svh] z-10 mx-auto max-w-7xl px-[var(--gutter)] md:bottom-auto md:top-1/2 md:-translate-y-1/2">
-          <div className="relative h-64 max-w-[30rem] md:h-80">
+        <div className="pointer-events-none absolute inset-x-0 top-1/2 z-10 mx-auto max-w-7xl -translate-y-1/2 px-[var(--gutter)] stacked:top-auto stacked:bottom-[8svh] stacked:translate-y-0">
+          <div
+            ref={captionBox}
+            className="relative h-80 max-w-[min(30rem,44vw)] stacked:h-64 stacked:max-w-[30rem]"
+          >
             {CHAPTERS.map((c, i) => (
               <div
                 key={c.n}

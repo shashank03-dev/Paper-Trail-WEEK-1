@@ -44,11 +44,13 @@ export interface Rig {
   fy: number;
   // The pencil: 0 = resting by the paper … 1 = rolled out of frame.
   away: number;
-  // Where the pencil rests (fixed per layout): position, angle, scale.
+  // Where the pencil rests (fitted per screen): position, angle, scale, and how
+  // far it rolls to leave the frame (down in the side layout, right when stacked).
   penX: number;
   penY: number;
   penR: number;
   penS: number;
+  penOut: number;
 }
 
 // Paper resolution: fine enough for smooth creases; coarser on weak phones.
@@ -171,7 +173,7 @@ function Paper({
 /* ------------------------------ pencil ------------------------------ */
 
 /** A hexagonal HB pencil, lacquered in the riso blue, built from primitives. */
-function Pencil({ rig, mobile }: { rig: RefObject<Rig>; mobile: boolean }) {
+function Pencil({ rig, stacked }: { rig: RefObject<Rig>; stacked: boolean }) {
   const ref = useRef<THREE.Group>(null);
   const body = useRef<THREE.Group>(null);
   const mats = useMemo(
@@ -199,15 +201,15 @@ function Pencil({ rig, mobile }: { rig: RefObject<Rig>; mobile: boolean }) {
     const r = rig.current;
     if (!r || !ref.current) return;
     // It rolls away across its own length's normal, turning by exactly the distance travelled.
-    const travel = r.away * (mobile ? 1.6 : 1.3);
+    const travel = r.away * r.penOut;
     ref.current.position.set(
-      r.penX + (mobile ? travel : 0),
-      r.penY - (mobile ? 0 : travel),
+      r.penX + (stacked ? travel : 0),
+      r.penY - (stacked ? 0 : travel),
       DESK_Z + R * r.penS,
     );
     ref.current.rotation.set(0, 0, r.penR);
     ref.current.scale.setScalar(r.penS);
-    if (body.current) body.current.rotation.x = (mobile ? -1 : 1) * (travel / (R * r.penS));
+    if (body.current) body.current.rotation.x = (stacked ? -1 : 1) * (travel / (R * r.penS));
   });
   return (
     <group ref={ref}>
@@ -279,7 +281,7 @@ export default function StudioScene({
   rig,
   sheetId,
   active,
-  mobile,
+  stacked,
   low = false,
   onReady,
   onFail,
@@ -287,7 +289,8 @@ export default function StudioScene({
   rig: RefObject<Rig>;
   sheetId: string;
   active: boolean;
-  mobile: boolean;
+  /** Paper above the copy (portrait screens) rather than beside it. */
+  stacked: boolean;
   /** A weak device: lower pixel ratio, coarser paper, smaller shadows. */
   low?: boolean;
   onReady?: () => void;
@@ -383,7 +386,7 @@ export default function StudioScene({
       <directionalLight position={[4, -2, 3]} intensity={0.5} color="#dfe6ff" />
       <Desk />
       <Paper rig={rig} pointer={pointer} texture={texture} still={still} low={low} />
-      <Pencil rig={rig} mobile={mobile} />
+      <Pencil rig={rig} stacked={stacked} />
       {onFail && <Watchdog armed={texture !== null} onSlow={onFail} />}
     </Canvas>
   );

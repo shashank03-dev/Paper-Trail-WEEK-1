@@ -14,13 +14,13 @@ export default function LiteScene({
   rig,
   sheetId,
   active,
-  mobile,
+  stacked,
   onReady,
 }: {
   rig: RefObject<Rig>;
   sheetId: string;
   active: boolean;
-  mobile: boolean;
+  stacked: boolean;
   onReady?: () => void;
 }) {
   const canvas = useRef<HTMLCanvasElement>(null);
@@ -90,7 +90,7 @@ export default function LiteScene({
       const still = reduce.matches;
       // Redraw only when the rig moved, the paper is still settling, or it's
       // floating (it bobs gently in the air).
-      const key = `${r.top},${r.a},${r.b},${r.c},${r.x},${r.y},${r.z},${r.s},${r.rx},${r.ry},${r.rz},${r.fx},${r.fy},${r.away},${r.penX},${r.penY},${r.penS}`;
+      const key = `${r.top},${r.a},${r.b},${r.c},${r.x},${r.y},${r.z},${r.s},${r.rx},${r.ry},${r.rz},${r.fx},${r.fy},${r.away},${r.penX},${r.penY},${r.penS},${r.penOut}`;
       const floating = !still && r.z > 0.005;
       if (key === seen && !fold.moving && !floating && !dirty.current) return;
       seen = key;
@@ -102,14 +102,14 @@ export default function LiteScene({
       drawShadow(ctx, shadowBuf, quads, Math.min(1, Math.max(0, r.z / 0.6)));
       const img = print.current;
       drawPaper(ctx, quads, img, img?.width ?? 1, img?.height ?? 1);
-      drawPencil(ctx, r, mobile, w, h);
+      drawPencil(ctx, r, stacked, w, h);
     };
     raf = requestAnimationFrame(tick);
     return () => {
       cancelAnimationFrame(raf);
       ro.disconnect();
     };
-  }, [active, mobile, rig]);
+  }, [active, stacked, rig]);
 
   return <canvas ref={canvas} aria-hidden className="absolute inset-0 h-full w-full" />;
 }

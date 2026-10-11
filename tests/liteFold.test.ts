@@ -24,6 +24,7 @@ const rig = (over: Partial<Rig> = {}): Rig => ({
   penY: 0,
   penR: 0,
   penS: 1,
+  penOut: 1,
   ...over,
 });
 

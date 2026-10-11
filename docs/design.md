@@ -137,6 +137,12 @@ detail on few cores / little memory), Canvas 2D for Data Saver, 2G or no
 WebGL2. Both read the same `Rig` and the same fold geometry, so the
 choreography, captions and phone layout are identical whichever one draws.
 
+Where the paper goes is fitted per screen (`components/landing/stage.ts`):
+the layout is picked by aspect ratio (stacked for portrait and square, side
+for landscape), and every pose is mapped from the region it was designed in
+on a reference screen into the free region measured on the page, so it never
+lands on the copy or outside the frame.
+
 Fonts are **self-hosted** (Fraunces, Inter, IBM Plex Mono, Caveat, all OFL)
 instead of loaded from Google Fonts at runtime: no third-party request when
 you open the app is part of the privacy promise.
