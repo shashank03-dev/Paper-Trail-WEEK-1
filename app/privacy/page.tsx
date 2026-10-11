@@ -58,8 +58,10 @@ export default function Privacy() {
         <li>
           <strong>What you type in the search box.</strong> As you type (from the third letter), the
           text is sent through the server to <a href="https://photon.komoot.io">Photon</a>,
-          komoot&rsquo;s OpenStreetMap search, for suggestions. Only the words you typed are passed
-          on, not your IP address.
+          komoot&rsquo;s OpenStreetMap search, for suggestions. So that nearby places come first, it
+          also passes a rough point, rounded to about a kilometre: the spot you picked, your last
+          trail&rsquo;s start, your position if you have already allowed location, or else just the
+          region of your time zone. Your IP address isn&rsquo;t passed on.
         </li>
         <li>
           <strong>Writing your zine.</strong> A list of the nearby places, the weather, the walk

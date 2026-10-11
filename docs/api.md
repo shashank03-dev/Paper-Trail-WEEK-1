@@ -119,7 +119,11 @@ must not block a trail.
 `mode: "suggest"` is search-as-you-type for the setup page: Photon (komoot's
 OSM geocoder, built for autocomplete, which Nominatim's policy forbids),
 cached a week per language and query, and it never errors: a failure returns
-`{ results: [], unavailable: true }` and the full search still works.
+`{ results: [], unavailable: true }` and the full search still works. Both modes take an
+optional `near: { lat, lon, precise }` (rounded to ~1 km by the page) so
+nearby places rank first: a precise point biases Photon at city scale and
+Nominatim through a ~30 km `viewbox`, and adds `distanceM` to each result; a
+time-zone region (`precise: false`) only nudges Photon at country scale.
 Nominatim, cached, and serialised through a 1-request-per-second queue with a
 real User-Agent and contact email, as its usage policy requires. In demo mode
 it searches the presets. Failure → `502` suggesting location, map or presets.
