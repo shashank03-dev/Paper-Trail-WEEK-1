@@ -106,7 +106,8 @@ On CPU it's slow: TODO: _measured tok/s on Render_. That's why the zine streams 
 | `LLM_TIMEOUT_MS` | `120000` | |
 | `LLM_OLLAMA_NATIVE` | `false` | Use Ollama's `/api/chat` with `format: <schema>` instead of `/v1` |
 | `NOMINATIM_EMAIL` | — | Required by the Nominatim usage policy |
-| `OVERPASS_URL` | overpass-api.de | |
+| `OVERPASS_URL` | overpass-api.de | Comma-separated; public mirrors always back it up |
+| `PHOTON_URL` | photon.komoot.io | Search-as-you-type suggestions |
 | `DEVICE_LABEL` | `my laptop` | Printed in the colophon |
 | `DEMO_MODE` | `false` | Fixtures for places/weather; replay if the model is offline |
 | `PUBLIC_URL` | request origin | Base of the QR code URL |

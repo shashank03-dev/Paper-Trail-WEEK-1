@@ -54,6 +54,12 @@ export default function Privacy() {
           don&rsquo;t hit those services again.
         </li>
         <li>
+          <strong>What you type in the search box.</strong> As you type (from the third letter), the
+          text is sent through the server to <a href="https://photon.komoot.io">Photon</a>,
+          komoot&rsquo;s OpenStreetMap search, for suggestions. Only the words you typed are passed
+          on, not your IP address.
+        </li>
+        <li>
           <strong>Writing your zine.</strong> A list of the nearby places, the weather, the walk
           length, who&rsquo;s coming and the name for the cover (if you give one) are sent to the AI
           model that writes the pages.

@@ -3,6 +3,7 @@ import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { TrailTicket } from "@/components/TrailTicket";
+import { PlaceSearch } from "@/components/PlaceSearch";
 import {
   ArrowRight,
   Baby,
@@ -10,8 +11,6 @@ import {
   Loader2,
   LocateFixed,
   Map as MapIcon,
-  MapPin,
-  Search,
   User,
   Users,
   type LucideIcon,
@@ -52,8 +51,6 @@ export default function NewTrail() {
   const [duration, setDuration] = useState<Duration>(20);
   const [who, setWho] = useState<Companions>("solo");
   const [name, setName] = useState("");
-  const [q, setQ] = useState("");
-  const [results, setResults] = useState<Where[] | null>(null);
   const [showMap, setShowMap] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -79,22 +76,6 @@ export default function NewTrail() {
       },
       { enableHighAccuracy: true, timeout: 10000 },
     );
-  };
-
-  const search = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (q.trim().length < 2) return;
-    setError(null);
-    setBusy("Searching…");
-    try {
-      const r = await postJSON<{ results: Where[] }>("/api/geocode", { q });
-      setResults(r.results);
-      if (!r.results.length) setError("Nothing found. Try a street and city.");
-    } catch (err) {
-      setError((err as Error).message);
-    } finally {
-      setBusy(null);
-    }
   };
 
   const fold = async () => {
@@ -200,45 +181,7 @@ export default function NewTrail() {
                 <MapIcon size={17} strokeWidth={1.6} /> {showMap ? "Hide map" : "Pick on a map"}
               </button>
             </div>
-            <form onSubmit={search} className="relative mt-3" role="search">
-              <label htmlFor="q" className="sr-only">
-                Search for a street or place
-              </label>
-              <Search
-                size={17}
-                strokeWidth={1.6}
-                className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-ink-3"
-              />
-              <input
-                id="q"
-                className="field !pl-11 !pr-28"
-                placeholder="A street, a park or a neighbourhood"
-                value={q}
-                onChange={(e) => setQ(e.target.value)}
-              />
-              <button
-                className="btn btn-ink btn-sm absolute right-1.5 top-1/2 -translate-y-1/2"
-                type="submit"
-              >
-                Search
-              </button>
-            </form>
-            {results && results.length > 0 && (
-              <ul className="mt-2 overflow-hidden rounded-2xl bg-sheet shadow-[0_0_0_1px_var(--color-line-2),0_18px_40px_-24px_rgb(21_20_18/0.4)]">
-                {results.map((r) => (
-                  <li key={`${r.lat},${r.lon}`}>
-                    <button
-                      type="button"
-                      className="flex w-full items-center gap-3 px-4 py-3 text-left text-[0.95rem] text-ink-2 transition-colors hover:bg-bone hover:text-ink"
-                      onClick={() => (setWhere(r), setResults(null))}
-                    >
-                      <MapPin size={15} strokeWidth={1.6} className="shrink-0 text-riso" />{" "}
-                      {r.label}
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            )}
+            <PlaceSearch onPick={setWhere} onError={setError} />
             {showMap && (
               <div className="mt-4">
                 <LocationPicker

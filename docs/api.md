@@ -20,9 +20,9 @@ the same real map data does.
    │  zod body validation (400), 8 MB cap (413), error boundary (500),
    │  one JSON log line per request, abort signal from the client
    │
-   ├── /api/places   ──► cache (single-flight, 24 h) ──► Overpass (30 s)
+   ├── /api/places   ──► cache (single-flight, 24 h) ──► Overpass mirrors, failover (45 s) → stale cache
    ├── /api/weather  ──► cache (single-flight, 30 min) ─► Open-Meteo (10 s)  → mild default on failure
-   ├── /api/geocode  ──► cache ──► 1 req/s queue ──► Nominatim (10 s)
+   ├── /api/geocode  ──► cache ──► 1 req/s queue ──► Nominatim (10 s); mode=suggest ──► Photon (6 s)
    ├── /api/config   ──► public config only (never keys)
    ├── /api/health   ──► cached ping (60 s, single-flight)
    └── /api/trail/plan · /api/trail/panel · /api/read
@@ -89,8 +89,13 @@ Is the model answering? `{ ok, model, where, latencyMs, tokensPerSec, mode, cach
 Overpass query for nameable, walkable features and street geometry, normalised
 in `lib/places/overpass.ts`. Cached 24 h by rounded coordinates + radius, with
 single-flight. A preset (or demo mode) serves the fixture instead, re-measured
-from the actual start point. Overpass failure → `502 upstream_unavailable`
-with a message that points to the presets.
+from the actual start point. Servers are tried in order within a 45 s budget
+(`lib/places/fetchOverpass.ts`): `OVERPASS_URL` first, then public mirrors;
+the last one that answered goes first next time, a failing one waits 5 min at
+the back, and each attempt's real error (`ECONNREFUSED`, `HTTP 429`, timeout)
+is logged. (overpass-api.de refuses connections from the Render host.) If none
+answers, a stale cached map of the same spot (up to 30 days) is served; only
+then `502 upstream_unavailable` with `Retry-After: 30`.
 
 ### `POST /api/weather`
 `{ lat, lon, presetId? }` → `{ tempC, condition, precipProbNext2h, windKph, sunset, isDaylight, source }`.
@@ -99,7 +104,11 @@ error it returns a mild default (`source: "default"`) — weather is a nicety an
 must not block a trail.
 
 ### `POST /api/geocode`
-`{ q: 2–120 chars }` → `{ results: [{ label, lat, lon }] }`.
+`{ q: 2–120 chars, mode?: "search" | "suggest" }` → `{ results: [{ label, lat, lon }] }`.
+`mode: "suggest"` is search-as-you-type for the setup page: Photon (komoot's
+OSM geocoder, built for autocomplete, which Nominatim's policy forbids),
+cached a week per language and query, and it never errors: a failure returns
+`{ results: [], unavailable: true }` and the full search still works.
 Nominatim, cached, and serialised through a 1-request-per-second queue with a
 real User-Agent and contact email, as its usage policy requires. In demo mode
 it searches the presets. Failure → `502` suggesting location, map or presets.
