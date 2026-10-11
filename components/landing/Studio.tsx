@@ -183,6 +183,8 @@ function choreograph(
     veil: HTMLElement;
     bar: HTMLElement;
     chapters: HTMLElement[];
+    /** The flat fallback sheet on a phone: it waits behind the hero copy, then fades in. */
+    still?: HTMLElement | null;
   },
 ) {
   const tl = createTimeline({ defaults: { ease: "inOutSine" }, autoplay: false });
@@ -213,6 +215,7 @@ function choreograph(
     10,
   );
   tl.add(el.cue, { opacity: [1, 0], duration: 30 }, 0);
+  if (el.still) tl.add(el.still, { opacity: [0, 1], duration: 70, ease: "outCubic" }, 60);
   tl.add(el.veil, { opacity: [0, 1], duration: 80 }, 120);
   tl.add(rig, { away: 1, duration: 150, ease: "inOutQuad" }, 40);
   pose(p.lift, 50, 110, "outCubic");
@@ -303,6 +306,7 @@ export function Studio() {
   const bar = useRef<HTMLDivElement>(null);
   const chapters = useRef<(HTMLDivElement | null)[]>([]);
   const copy = useRef<HTMLDivElement>(null);
+  const stillRef = useRef<HTMLDivElement>(null);
   const rig = useRef<Rig>(initialRig(DESKTOP, DESKTOP_PEN));
   // Re-fit the scene when the window really changes size (rotation, a resized
   // desktop window); not for the address bar sliding in and out while scrolling.
@@ -365,19 +369,23 @@ export function Studio() {
     const fit = mobile && copy.current ? fitPhone(copy.current.offsetTop) : null;
     const poses = fit ? fit.poses : DESKTOP;
     Object.assign(rig.current, initialRig(poses, fit ? fit.pen : DESKTOP_PEN));
+    // Tweens only apply once their start is reached, so set where the fallback sheet starts.
+    if (stillRef.current) stillRef.current.style.opacity = mobile ? "0" : "";
     const tl = choreograph(rig.current, poses, {
       hero: hero.current,
       cue: cue.current,
       veil: veil.current,
       bar: bar.current,
       chapters: chapters.current.filter((c): c is HTMLDivElement => !!c),
+      // On a phone the flat sheet would sit on top of the headline.
+      still: mobile ? stillRef.current : null,
     });
     const stop = scrub(s, (p) => tl.seek(p * tl.duration));
     return () => {
       stop();
       tl.revert();
     };
-  }, [mobile, viewport]);
+  }, [mobile, viewport, gl]);
 
   // Stop drawing WebGL frames once the studio has scrolled away.
   useEffect(() => {
@@ -391,7 +399,10 @@ export function Studio() {
   }, []);
 
   const still = (
-    <div className="absolute inset-0 flex items-start justify-center px-6 pt-[16svh] md:items-center md:justify-end md:pr-[5vw] md:pt-0">
+    <div
+      ref={stillRef}
+      className="absolute inset-0 flex items-start justify-center px-6 pt-[16svh] md:items-center md:justify-end md:pr-[5vw] md:pt-0"
+    >
       <div className="paper w-full max-w-[600px] overflow-hidden [transform:perspective(1800px)_rotateX(14deg)_rotateZ(-3deg)]">
         <Sheet
           data={data}

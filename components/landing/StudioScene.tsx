@@ -293,6 +293,10 @@ export default function StudioScene({
 
   useEffect(() => {
     let cancelled = false;
+    // Never leave the hero empty: if fonts or the rasteriser stall (some
+    // browsers never settle an SVG image decode), show the paper anyway and
+    // let the print land on it when it's ready.
+    const late = window.setTimeout(() => !cancelled && onReady?.(), 4000);
     void (async () => {
       await document.fonts.ready;
       const svg = document.getElementById(sheetId) as unknown as SVGSVGElement | null;
@@ -308,10 +312,12 @@ export default function StudioScene({
           /* the paper still renders, just blank */
         }
       }
+      window.clearTimeout(late);
       if (!cancelled) onReady?.();
     })();
     return () => {
       cancelled = true;
+      window.clearTimeout(late);
     };
   }, [sheetId, onReady, low]);
 
