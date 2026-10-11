@@ -2,12 +2,7 @@ import { describe, expect, it } from "vitest";
 import { chatJSON, extractJson, LlmJsonError } from "@/lib/llm/json";
 import { mockChat, parseFeatures } from "@/lib/llm/mock";
 import { generatePanel, generatePlan, regeneratePlanPart } from "@/lib/writer/generate";
-import {
-  ispyProblems,
-  planProblems,
-  riddleProblems,
-  scrubWaypointTags,
-} from "@/lib/writer/grounding";
+import { ispyProblems, planProblems, riddleProblems, scrubIds } from "@/lib/writer/grounding";
 import { fallbackPlan, fallbackRoute } from "@/lib/writer/fallback";
 import { planPrompt } from "@/lib/prompts/writer";
 import { TrailPlanSchema, RouteCopySchema } from "@/lib/schemas";
@@ -104,13 +99,44 @@ describe("grounding", () => {
   });
 });
 
-describe("waypoint tags", () => {
-  it("become the stop numbers printed on the map, capitalised at a sentence start", () => {
-    expect(scrubWaypointTags("W1 is a bench. Then head to W12 (by W3).")).toBe(
+describe("ids in printed copy", () => {
+  const ctx = {
+    features: [
+      {
+        id: "n9001",
+        kind: "drinking_water",
+        tags: {},
+        lat: 0,
+        lon: 0,
+        distanceM: 1,
+        bearingDeg: 0,
+      },
+      {
+        id: "w9002",
+        kind: "park",
+        name: "Rose Garden",
+        tags: {},
+        lat: 0,
+        lon: 0,
+        distanceM: 1,
+        bearingDeg: 0,
+      },
+    ],
+  };
+  it("become stop numbers, names or kinds, capitalised at a sentence start", () => {
+    expect(scrubIds("W1 is a bench. Then head to W12 (by W3).", ctx)).toBe(
       "Stop 1 is a bench. Then head to stop 12 (by stop 3).",
     );
-    expect(scrubWaypointTags("Walk 2 minutes west; n90012 stays")).toBe(
-      "Walk 2 minutes west; n90012 stays",
+    expect(scrubIds("Sip at n9001, then cross w9002.", ctx)).toBe(
+      "Sip at the drinking water, then cross Rose Garden.",
+    );
+    expect(
+      scrubIds("n9001 is cold. Find the Rose Garden (w9002) and the drinking water n9001.", ctx),
+    ).toBe("The drinking water is cold. Find the Rose Garden and the drinking water.");
+  });
+  it("leaves ids the model made up for validation to reject", () => {
+    expect(scrubIds("Walk 2 minutes to n12345 (n67890)", ctx)).toBe(
+      "Walk 2 minutes to n12345 (n67890)",
     );
   });
 });

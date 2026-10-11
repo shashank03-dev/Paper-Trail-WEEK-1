@@ -30,13 +30,37 @@ export function idLeaks(texts: (string | undefined)[]): string[] {
 }
 
 /**
- * The prompt tags waypoints W1…Wn, and the copy panels often echo them ("head
- * to W3"). The printed map numbers the same stops 1…n, so "stop 3" is exactly
- * right; swapping it in saves a whole retry. Feature ids still go to `idLeaks`.
+ * Gemma often echoes the prompt's ids in printed copy ("head to W3", "the
+ * fountain (n9000024)"). Each has an obvious wording, so swap it in rather
+ * than spend a whole retry: waypoint tags become the stop numbers printed on
+ * the map, and a known feature id becomes the place's name (or kind). Ids we
+ * never gave the model are left for `idLeaks` to reject.
  */
-export function scrubWaypointTags(text: string): string {
-  return text.replace(/\bW(\d{1,2})\b/g, (_, n: string, at: number) =>
-    /(^|[.!?]["')]?\s+)$/.test(text.slice(0, at)) ? `Stop ${n}` : `stop ${n}`,
+export function scrubIds(text: string, ctx: Pick<WriterContext, "features">): string {
+  const byId = new Map(ctx.features.map((f) => [f.id, f]));
+  const startsSentence = (before: string) => /(^|[.!?]["')]?\s+)$/.test(before);
+  return (
+    text
+      .replace(/\bW(\d{1,2})\b/g, (_, n: string, at: number) =>
+        startsSentence(text.slice(0, at)) ? `Stop ${n}` : `stop ${n}`,
+      )
+      // "(n123)" next to a name or description adds nothing.
+      .replace(/\s*[([]\s*(?:id:?\s*)?([nwr]\d{4,})\s*[)\]]/g, (m, id: string) =>
+        byId.has(id) ? "" : m,
+      )
+      .replace(/(\s*)\b([nwr]\d{4,})\b/g, (m, sp: string, id: string, at: number, all: string) => {
+        const f = byId.get(id);
+        if (!f) return m;
+        const kind = f.kind.replace(/_/g, " ");
+        const before = all.slice(0, at).toLowerCase();
+        // "the fountain n123" or "Rose Garden n123": the words are already there.
+        if (before.endsWith(kind) || (f.name && before.endsWith(f.name.toLowerCase()))) return "";
+        const words = f.name ?? `the ${kind}`;
+        return (
+          sp +
+          (startsSentence(all.slice(0, at) + sp) ? words[0]!.toUpperCase() + words.slice(1) : words)
+        );
+      })
   );
 }
 

@@ -26,7 +26,7 @@ import {
   planProblems,
   riddleProblems,
   routeCopyProblems,
-  scrubWaypointTags as scrub,
+  scrubIds,
 } from "./grounding";
 import {
   fallbackBack,
@@ -239,6 +239,7 @@ export async function generatePanel(
         }),
       fb,
     );
+  const scrub = (t: string) => scrubIds(t, ctx);
   switch (panel) {
     case "cover":
       return call(
