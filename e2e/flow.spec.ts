@@ -53,3 +53,9 @@ test("fold test page shows big page numbers", async ({ page }) => {
   await expect(page.getByRole("img", { name: /fold test sheet/i })).toBeVisible();
   await expect(page.getByText("top row 5 4 3 2")).toBeVisible();
 });
+
+test("a trail link from another browser says so instead of hanging", async ({ page }) => {
+  await page.goto("/trail/notonthisdevice");
+  await expect(page.getByRole("heading", { name: "No trail here." })).toBeVisible();
+  await expect(page).toHaveTitle("Your trail · Paper Trail");
+});

@@ -26,6 +26,7 @@ import {
   planProblems,
   riddleProblems,
   routeCopyProblems,
+  scrubWaypointTags as scrub,
 } from "./grounding";
 import {
   fallbackBack,
@@ -218,6 +219,7 @@ export async function generatePanel(
     schema: z.ZodType<T>,
     validate: (v: T) => string[],
     fb: () => T,
+    repair?: (v: T) => T,
   ) =>
     withFallback(
       w,
@@ -233,13 +235,18 @@ export async function generatePanel(
           temperature: pr.temperature,
           maxTokens: 900,
           validate,
+          repair,
         }),
       fb,
     );
   switch (panel) {
     case "cover":
-      return call(P.coverPrompt(ctx, plan), CoverCopySchema, coverProblems, () =>
-        fallbackCover(ctx),
+      return call(
+        P.coverPrompt(ctx, plan),
+        CoverCopySchema,
+        coverProblems,
+        () => fallbackCover(ctx),
+        (v) => ({ ...v, kicker: scrub(v.kicker), blurb: scrub(v.blurb) }),
       );
     case "route":
       return call(
@@ -247,12 +254,27 @@ export async function generatePanel(
         RouteCopySchema,
         (v) => routeCopyProblems(v, ctx),
         () => fallbackRoute(ctx),
+        (v) => ({
+          ...v,
+          stops: v.stops.map((s) => ({ ...s, text: scrub(s.text) })),
+          ifLost: { ...v.ifLost, text: scrub(v.ifLost.text) },
+        }),
       );
     case "listen":
-      return call(P.listenPrompt(ctx, plan), ListenCopySchema, listenProblems, () =>
-        fallbackListen(ctx, plan),
+      return call(
+        P.listenPrompt(ctx, plan),
+        ListenCopySchema,
+        listenProblems,
+        () => fallbackListen(ctx, plan),
+        (v) => ({ ...v, intro: scrub(v.intro) }),
       );
     default:
-      return call(P.backPrompt(ctx, plan), BackCopySchema, backProblems, () => fallbackBack());
+      return call(
+        P.backPrompt(ctx, plan),
+        BackCopySchema,
+        backProblems,
+        () => fallbackBack(),
+        (v) => ({ ...v, blurb: scrub(v.blurb) }),
+      );
   }
 }

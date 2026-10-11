@@ -2,7 +2,12 @@ import { describe, expect, it } from "vitest";
 import { chatJSON, extractJson, LlmJsonError } from "@/lib/llm/json";
 import { mockChat, parseFeatures } from "@/lib/llm/mock";
 import { generatePanel, generatePlan, regeneratePlanPart } from "@/lib/writer/generate";
-import { ispyProblems, planProblems, riddleProblems } from "@/lib/writer/grounding";
+import {
+  ispyProblems,
+  planProblems,
+  riddleProblems,
+  scrubWaypointTags,
+} from "@/lib/writer/grounding";
 import { fallbackPlan, fallbackRoute } from "@/lib/writer/fallback";
 import { planPrompt } from "@/lib/prompts/writer";
 import { TrailPlanSchema, RouteCopySchema } from "@/lib/schemas";
@@ -99,6 +104,17 @@ describe("grounding", () => {
   });
 });
 
+describe("waypoint tags", () => {
+  it("become the stop numbers printed on the map, capitalised at a sentence start", () => {
+    expect(scrubWaypointTags("W1 is a bench. Then head to W12 (by W3).")).toBe(
+      "Stop 1 is a bench. Then head to stop 12 (by stop 3).",
+    );
+    expect(scrubWaypointTags("Walk 2 minutes west; n90012 stays")).toBe(
+      "Walk 2 minutes west; n90012 stays",
+    );
+  });
+});
+
 describe("generation never dead-ends", () => {
   const { ctx } = presetContext(2);
   it("uses the model when it behaves", async () => {
@@ -135,6 +151,17 @@ describe("generation never dead-ends", () => {
     );
     expect(r.meta.path).toBe("fallback");
     expect(RouteCopySchema.parse(r.value)).toEqual(fallbackRoute(ctx));
+  });
+  it("turns waypoint tags into stop numbers instead of spending a retry", async () => {
+    let calls = 0;
+    const chat = async () => {
+      calls++;
+      return { content: JSON.stringify({ intro: "W2: stand still at W2 and listen." }), ms: 1 };
+    };
+    const r = await generatePanel({ chat, model: "m", ...quiet }, "listen", ctx, fallbackPlan(ctx));
+    expect(calls).toBe(1);
+    expect(r.meta.path).toBe("llm");
+    expect(r.value).toEqual({ intro: "Stop 2: stand still at stop 2 and listen." });
   });
   it("writes every copy panel and re-rolls plan parts", async () => {
     const plan = (await generatePlan({ chat: mockChat(), model: "m", ...quiet }, ctx)).plan;

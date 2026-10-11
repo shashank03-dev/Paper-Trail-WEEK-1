@@ -42,7 +42,15 @@ function pendingPages(t: TrailRecord): PageNo[] {
 
 export default function TrailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
-  const trail = useLiveQuery(() => db().trails.get(id), [id]);
+  // `get` resolves to undefined for a missing id, which useLiveQuery can't tell
+  // apart from "still loading" — map it to null so "No trail here." can show.
+  const trail = useLiveQuery(
+    () =>
+      db()
+        .trails.get(id)
+        .then((t) => t ?? null),
+    [id],
+  );
   const [cfg, setCfg] = useState<PublicConfig | null>(null);
   const [meta, setMeta] = useState<{
     tps: number | null;

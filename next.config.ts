@@ -36,6 +36,10 @@ const nextConfig: NextConfig = {
   outputFileTracingIncludes: {
     "/api/**": ["./fixtures/places/**", "./fixtures/llm/**"],
   },
+  // Browsers and crawlers still ask for /favicon.ico before reading <link rel="icon">.
+  async rewrites() {
+    return [{ source: "/favicon.ico", destination: "/icon.svg" }];
+  },
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
   },

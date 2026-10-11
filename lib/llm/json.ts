@@ -34,6 +34,8 @@ export interface JsonCallSpec<T> {
   maxTokens?: number;
   /** Extra semantic checks (grounding, fit). Return problems; empty = OK. */
   validate?: (value: T) => string[];
+  /** A deterministic fix applied to every parsed value before `validate`. */
+  repair?: (value: T) => T;
   retries?: number;
   opts?: ChatOptions;
 }
@@ -96,7 +98,7 @@ export async function chatJSON<T>(spec: JsonCallSpec<T>): Promise<JsonCallResult
           .slice(0, 6)
           .map((i) => `${i.path.join(".") || "(root)"}: ${i.message}`);
       } else {
-        value = parsed.data;
+        value = spec.repair ? spec.repair(parsed.data) : parsed.data;
         problems = spec.validate?.(value) ?? [];
       }
     } catch (e) {

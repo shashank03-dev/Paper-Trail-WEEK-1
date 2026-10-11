@@ -4,6 +4,7 @@ import { LegalPage } from "@/components/LegalPage";
 
 export const metadata = {
   title: "Privacy",
+  alternates: { canonical: "/privacy" },
   description: "What Paper Trail does with your location, your photo and your handwriting.",
 };
 // Reads the live server configuration, so it always names the provider actually in use.

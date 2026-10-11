@@ -29,6 +29,17 @@ export function idLeaks(texts: (string | undefined)[]): string[] {
     : [];
 }
 
+/**
+ * The prompt tags waypoints W1…Wn, and the copy panels often echo them ("head
+ * to W3"). The printed map numbers the same stops 1…n, so "stop 3" is exactly
+ * right; swapping it in saves a whole retry. Feature ids still go to `idLeaks`.
+ */
+export function scrubWaypointTags(text: string): string {
+  return text.replace(/\bW(\d{1,2})\b/g, (_, n: string, at: number) =>
+    /(^|[.!?]["')]?\s+)$/.test(text.slice(0, at)) ? `Stop ${n}` : `stop ${n}`,
+  );
+}
+
 /** Words that suggest a place name we were never given. */
 const PLACE_WORDS =
   /\b(street|st\.|road|rd\.|avenue|ave|lane|statue|cafe|café|bakery|shop|church|museum|library|fountain|park|square|bridge)\b/i;

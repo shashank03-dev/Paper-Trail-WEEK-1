@@ -3,6 +3,7 @@ import { LegalPage } from "@/components/LegalPage";
 
 export const metadata = {
   title: "Terms",
+  alternates: { canonical: "/terms" },
   description: "The short terms for using Paper Trail, including walking safely.",
 };
 

@@ -1,7 +1,7 @@
 import { HardDrive, KeyRound, Map, Printer, RefreshCw } from "lucide-react";
 import { Reveal } from "@/components/Reveal";
 
-export const metadata = { title: "Why an open model — Paper Trail" };
+export const metadata = { title: "Why an open model", alternates: { canonical: "/why-open" } };
 
 const POINTS = [
   {

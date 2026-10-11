@@ -2,7 +2,7 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { LostSheet } from "@/components/LostSheet";
 
-export const metadata = { title: "Off the map — Paper Trail" };
+export const metadata = { title: "Off the map" };
 
 export default function NotFound() {
   return (

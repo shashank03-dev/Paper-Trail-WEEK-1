@@ -3,6 +3,19 @@ import { expect, test, type Page } from "@playwright/test";
 import { makeTrail } from "./helpers";
 
 async function serious(page: Page) {
+  // Let entrance fades finish, or contrast gets measured on a half-faded button.
+  await page.evaluate(() =>
+    Promise.all(
+      document
+        .getAnimations()
+        .filter(
+          (a) =>
+            a.timeline === document.timeline &&
+            Number.isFinite(Number(a.effect?.getComputedTiming().endTime)),
+        )
+        .map((a) => a.finished.catch(() => {})),
+    ),
+  );
   const r = await new AxeBuilder({ page })
     .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
     .analyze();
