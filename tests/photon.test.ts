@@ -42,3 +42,32 @@ describe("Photon suggestions", () => {
     expect(photonSuggestions({})).toEqual([]);
   });
 });
+
+describe("nearby first", () => {
+  it("biases hard toward a real spot and only nudges toward a time-zone region", async () => {
+    const { photonParams } = await import("@/lib/places/photon");
+    expect(photonParams("kodige", "en", { lat: 13.0412, lon: 77.5938, precise: true })).toEqual({
+      q: "kodige",
+      limit: "8",
+      lang: "en",
+      lat: "13.04",
+      lon: "77.59",
+      zoom: "12",
+      location_bias_scale: "0.2",
+    });
+    expect(photonParams("kodige", "kn", { lat: 22.5, lon: 88.4, precise: false })).toMatchObject({
+      zoom: "5",
+      location_bias_scale: "0.5",
+    });
+    expect(photonParams("kodige", "kn")).toEqual({ q: "kodige", limit: "8" });
+  });
+
+  it("writes distances the way a walker reads them", async () => {
+    const { formatDistance } = await import("@/components/PlaceSearch");
+    expect(formatDistance(12)).toBe("50 m");
+    expect(formatDistance(347)).toBe("350 m");
+    expect(formatDistance(2440)).toBe("2.4 km");
+    expect(formatDistance(38_400)).toBe("38 km");
+    expect(formatDistance(1_234_000)).toBe("1,234 km");
+  });
+});

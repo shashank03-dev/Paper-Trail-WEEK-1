@@ -4,7 +4,8 @@ import { serverConfig } from "@/lib/config";
 import { cached } from "@/lib/server/cache";
 import { jsonError, parseBody, route } from "@/lib/server/http";
 import { PRESETS } from "@/lib/presets";
-import { photonSuggestions, type PhotonFeature } from "@/lib/places/photon";
+import { photonParams, photonSuggestions, type PhotonFeature } from "@/lib/places/photon";
+import { distanceM } from "@/lib/geo";
 
 export const dynamic = "force-dynamic";
 
@@ -12,6 +13,14 @@ const Body = z.object({
   q: z.string().trim().min(2).max(120),
   /** "suggest": as-you-type suggestions (Photon); "search": a full search (Nominatim). */
   mode: z.enum(["suggest", "search"]).default("search"),
+  /** Rank places near here first (rounded to ~1 km by the page). */
+  near: z
+    .object({
+      lat: z.number().min(-90).max(90),
+      lon: z.number().min(-180).max(180),
+      precise: z.boolean(),
+    })
+    .optional(),
 });
 
 // Nominatim's usage policy: at most 1 request per second, with a real User-Agent.
@@ -49,23 +58,26 @@ export const POST = route("geocode", async (req, rc) => {
   const lang = (req.headers.get("accept-language") ?? "en").slice(0, 2).toLowerCase();
   if (suggest) {
     try {
+      const near = b.data.near;
+      const bias = near ? `${near.lat.toFixed(2)},${near.lon.toFixed(2)},${near.precise}` : "";
       const results = await cached(
         "suggest",
-        `${lang}:${b.data.q.toLowerCase()}`,
+        `${lang}:${bias}:${b.data.q.toLowerCase()}`,
         async () => {
           const u = new URL(s.photonUrl);
-          u.search = new URLSearchParams({
-            q: b.data.q,
-            limit: "8",
-            // Photon speaks a handful of languages; others get local names.
-            ...(["en", "de", "fr", "it"].includes(lang) ? { lang } : {}),
-          }).toString();
+          u.search = new URLSearchParams(photonParams(b.data.q, lang, near)).toString();
           const res = await fetch(u, {
             headers: { "user-agent": `PaperTrail/1.0 (+${s.repoUrl})` },
             signal: AbortSignal.any([AbortSignal.timeout(6000), rc.signal]),
           });
           if (!res.ok) throw new Error(`photon ${res.status}`);
-          return photonSuggestions((await res.json()) as { features?: PhotonFeature[] });
+          const list = photonSuggestions((await res.json()) as { features?: PhotonFeature[] });
+          return near?.precise
+            ? list.map((r) => ({
+                ...r,
+                distanceM: Math.round(distanceM(near.lat, near.lon, r.lat, r.lon)),
+              }))
+            : list;
         },
         7 * 24 * 60 * 60 * 1000,
       );
@@ -78,7 +90,9 @@ export const POST = route("geocode", async (req, rc) => {
     }
   }
   try {
-    const results = await cached("geocode", b.data.q.toLowerCase(), () =>
+    const near = b.data.near?.precise ? b.data.near : undefined;
+    const bias = near ? `${near.lat.toFixed(2)},${near.lon.toFixed(2)}:` : "";
+    const results = await cached("geocode", `${bias}${b.data.q.toLowerCase()}`, () =>
       politely(async () => {
         const u = new URL("https://nominatim.openstreetmap.org/search");
         u.search = new URLSearchParams({
@@ -86,6 +100,15 @@ export const POST = route("geocode", async (req, rc) => {
           format: "jsonv2",
           limit: "5",
           addressdetails: "0",
+          // Prefer (not restrict to) a box of ~30 km around the walker.
+          ...(near
+            ? {
+                viewbox: [near.lon - 0.3, near.lat + 0.3, near.lon + 0.3, near.lat - 0.3]
+                  .map((v) => v.toFixed(2))
+                  .join(","),
+                bounded: "0",
+              }
+            : {}),
         }).toString();
         const res = await fetch(u, {
           headers: {
@@ -96,11 +119,16 @@ export const POST = route("geocode", async (req, rc) => {
         });
         if (!res.ok) throw new Error(`nominatim ${res.status}`);
         const j = (await res.json()) as { display_name: string; lat: string; lon: string }[];
-        return j.map((r) => ({
-          label: r.display_name.split(",").slice(0, 3).join(","),
-          lat: Number(r.lat),
-          lon: Number(r.lon),
-        }));
+        return j.map((r) => {
+          const lat = Number(r.lat);
+          const lon = Number(r.lon);
+          return {
+            label: r.display_name.split(",").slice(0, 3).join(","),
+            lat,
+            lon,
+            ...(near ? { distanceM: Math.round(distanceM(near.lat, near.lon, lat, lon)) } : {}),
+          };
+        });
       }),
     );
     return NextResponse.json({ results });

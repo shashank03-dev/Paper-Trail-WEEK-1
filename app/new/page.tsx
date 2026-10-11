@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { TrailTicket } from "@/components/TrailTicket";
 import { PlaceSearch } from "@/components/PlaceSearch";
+import { nearHint, type Near } from "@/lib/client/near";
 import {
   ArrowRight,
   Baby,
@@ -58,6 +59,11 @@ export default function NewTrail() {
 
   useEffect(() => {
     void getConfig().then((c) => setDemo(c.demoMode));
+  }, []);
+  // Where search should look first, found without asking (see nearHint).
+  const [hint, setHint] = useState<Near | null>(null);
+  useEffect(() => {
+    void nearHint().then(setHint);
   }, []);
 
   const locate = () => {
@@ -181,7 +187,11 @@ export default function NewTrail() {
                 <MapIcon size={17} strokeWidth={1.6} /> {showMap ? "Hide map" : "Pick on a map"}
               </button>
             </div>
-            <PlaceSearch onPick={setWhere} onError={setError} />
+            <PlaceSearch
+              onPick={setWhere}
+              onError={setError}
+              near={where ? { lat: where.lat, lon: where.lon, precise: true } : hint}
+            />
             {showMap && (
               <div className="mt-4">
                 <LocationPicker

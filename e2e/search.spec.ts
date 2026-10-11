@@ -72,3 +72,39 @@ test("nothing is suggested for one or two letters, and a dead suggester stays qu
   await expect(page.getByRole("listbox", { name: "Places" })).toBeHidden();
   await expect(page.locator(".notice-error")).toHaveCount(0);
 });
+
+test.describe("nearby first", () => {
+  test.use({ timezoneId: "Asia/Kolkata" });
+
+  test("suggestions lean toward the time zone, then toward the picked spot, with distances", async ({
+    page,
+  }) => {
+    const bodies: { q: string; near?: { lat: number; lon: number; precise: boolean } }[] = [];
+    await page.route("**/api/geocode", async (route) => {
+      const body = route.request().postDataJSON() as (typeof bodies)[number];
+      bodies.push(body);
+      await route.fulfill({
+        json: {
+          results: body.near?.precise
+            ? [{ label: "Kodigehalli, Yelahanka", lat: 13.054, lon: 77.572, distanceM: 2400 }]
+            : [{ label: "Kodigehalli, Husenpura", lat: 13.44, lon: 77.99 }],
+        },
+      });
+    });
+    await page.goto("/new");
+    const box = page.getByRole("combobox", { name: /search for a street or place/i });
+    const list = page.getByRole("listbox", { name: "Places" });
+
+    // First visit, no location shared: a region from the time zone, marked imprecise.
+    await box.pressSequentially("kodige", { delay: 30 });
+    await expect(list.getByRole("option")).toHaveText(["Kodigehalli, Husenpura"]);
+    // (If typing beats the hint, the list is asked again once it arrives.)
+    await expect.poll(() => bodies.at(-1)?.near).toEqual({ lat: 22.5, lon: 88.4, precise: false });
+
+    // Once a spot is picked, it leads, rounded to ~1 km, and distances show.
+    await list.getByRole("option").first().click();
+    await box.fill("kodigeh");
+    await expect(list.getByRole("option")).toHaveText(["Kodigehalli, Yelahanka2.4 km"]);
+    expect(bodies.at(-1)!.near).toEqual({ lat: 13.44, lon: 77.99, precise: true });
+  });
+});

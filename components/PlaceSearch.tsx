@@ -2,8 +2,22 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { Loader2, MapPin, Search } from "lucide-react";
 import { postJSON } from "@/lib/client/api";
+import { roundNear, type Near } from "@/lib/client/near";
 
-export type Place = { lat: number; lon: number; label: string; presetId?: string };
+export type Place = {
+  lat: number;
+  lon: number;
+  label: string;
+  presetId?: string;
+  distanceM?: number;
+};
+
+/** "350 m", "2.4 km", "38 km". */
+export function formatDistance(m: number): string {
+  if (m < 950) return `${Math.max(50, Math.round(m / 50) * 50)} m`;
+  if (m < 9500) return `${(m / 1000).toFixed(1)} km`;
+  return `${Math.round(m / 1000).toLocaleString("en")} km`;
+}
 
 const DEBOUNCE_MS = 280;
 const MIN_CHARS = 3;
@@ -17,9 +31,12 @@ const MIN_CHARS = 3;
 export function PlaceSearch({
   onPick,
   onError,
+  near,
 }: {
   onPick: (p: Place) => void;
   onError: (message: string | null) => void;
+  /** Rank places near here first (the picked spot, the last trail, or the time-zone region). */
+  near?: Near | null;
 }) {
   const id = useId();
   const listId = `${id}-list`;
@@ -35,14 +52,20 @@ export function PlaceSearch({
   // Picking a suggestion fills the box; that must not search again.
   const picked = useRef<string | null>(null);
 
+  const bias = near ? roundNear(near) : undefined;
+  const biasKey = bias ? `${bias.lat},${bias.lon},${bias.precise}` : "";
   const ask = async (text: string, mode: "suggest" | "search") => {
-    const key = `${mode}:${text.toLowerCase()}`;
+    const key = `${mode}:${biasKey}:${text.toLowerCase()}`;
     const hit = cache.current.get(key);
     if (hit) return hit;
     ctl.current?.abort();
     const c = new AbortController();
     ctl.current = c;
-    const r = await postJSON<{ results: Place[] }>("/api/geocode", { q: text, mode }, c.signal);
+    const r = await postJSON<{ results: Place[] }>(
+      "/api/geocode",
+      { q: text, mode, ...(bias ? { near: bias } : {}) },
+      c.signal,
+    );
     cache.current.set(key, r.results);
     return r.results;
   };
@@ -77,7 +100,9 @@ export function PlaceSearch({
       live = false;
       window.clearTimeout(t);
     };
-  }, [q]);
+    // `ask` reads the latest bias through biasKey; re-running on it is the point.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [q, biasKey]);
 
   // Close when focus or a tap goes elsewhere.
   useEffect(() => {
@@ -226,6 +251,11 @@ export function PlaceSearch({
               >
                 <MapPin size={15} strokeWidth={1.6} className="shrink-0 text-riso" />
                 <Highlight text={r.label} query={text} />
+                {r.distanceM !== undefined && (
+                  <span className="mono ml-auto shrink-0 pl-2 text-xs text-ink-3">
+                    {formatDistance(r.distanceM)}
+                  </span>
+                )}
               </li>
             ))
           ) : (
